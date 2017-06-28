@@ -30,13 +30,16 @@ import java.io.File;
 
 import org.cytoscape.app.swing.CySwingAppAdapter;
 import org.cytoscape.application.CyApplicationManager;
+import org.cytoscape.application.CyVersion;
 import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.event.CyEventHelper;
 import org.cytoscape.group.CyGroupManager;
+import org.cytoscape.io.util.StreamUtil;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNetworkFactory;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNetworkTableManager;
+import org.cytoscape.model.subnetwork.CyRootNetworkManager;
 import org.cytoscape.task.create.CreateNetworkViewTaskFactory;
 import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
 import org.cytoscape.view.model.CyNetworkView;
@@ -48,6 +51,7 @@ import org.cytoscape.view.vizmap.VisualMappingFunctionFactory;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyleFactory;
 import org.cytoscape.work.TaskManager;
+import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.work.swing.DialogTaskManager;
 
 import javax.swing.*;
@@ -57,10 +61,10 @@ public enum CyObjectManager {
     // App Configuration Directory where configuraton may be stored.
     private File configDir;
     // The Cytoscape helper class that allows us to easily get all sorts of Cytoscape objects.
-    private CySwingAppAdapter adapter;
+    public CySwingAppAdapter adapter;
     // The network table manager.
     private CyNetworkTableManager networkTableManager;
-
+    
     public File getConfigDir()
     {
         return configDir;
@@ -75,6 +79,19 @@ public enum CyObjectManager {
     }
 
     // Trivial Getters
+    public CyVersion getCyVersion(){
+    	return adapter.getCyVersion();
+    }
+    public StreamUtil getStreamUtil(){
+    	return adapter.getStreamUtil();
+    }
+    public CyRootNetworkManager getRootNetworkManager(){
+    	return adapter.getCyRootNetworkManager();
+    }
+    public CyApplicationManager getApplicationManager(){
+    	return adapter.getCyApplicationManager();
+    }
+    
     public CyNetworkFactory getNetworkFactory()
     {
         return adapter.getCyNetworkFactory();
@@ -103,7 +120,7 @@ public enum CyObjectManager {
     public VisualMappingFunctionFactory getVisualMappingFunctionPassthroughFactory() { return adapter.getVisualMappingFunctionPassthroughFactory(); }
     public RenderingEngineManager getRenderingEngineManager() { return adapter.getRenderingEngineManager(); }
 
-    public void setNetworkTableManager(CyNetworkTableManager networkTableManager) { this.networkTableManager = networkTableManager; }
+	public void setNetworkTableManager(CyNetworkTableManager networkTableManager) { this.networkTableManager = networkTableManager; }
     public CyNetworkTableManager getNetworkTableManager() { return networkTableManager; }
 
     // Slightly More Sophisticated Getters

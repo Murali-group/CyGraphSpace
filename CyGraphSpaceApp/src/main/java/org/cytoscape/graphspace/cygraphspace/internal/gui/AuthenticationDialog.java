@@ -1,81 +1,55 @@
 package org.cytoscape.graphspace.cygraphspace.internal.gui;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
+
 import javax.swing.JDialog;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
-import javax.swing.JPasswordField;
-import javax.swing.JSplitPane;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
+import javax.swing.LayoutStyle.ComponentPlacement;
+
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
+import org.graphspace.javaclient.CyGraphSpaceClient;
 
-import org.graphspace.javaclient.*;
-
+import java.awt.Component;
 import java.awt.Frame;
+
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
+import javax.swing.JPasswordField;
 
 public class AuthenticationDialog extends JDialog {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private final Frame parent;
-	private JButton save;
-	private JButton cancel;
-    private JLabel hostLabel;
-    private JLabel usernameLabel;
-    private JLabel passwordLabel;
-    private JPasswordField password;
-    private JTextField host;
-    private JTextField username;
-    private JTextPane message;
-	/**
-	 * Create the dialog.
-	 */
+	private JTextField hostField;
+	private JTextField usernameField;
+	private JPasswordField passwordField;
 	public AuthenticationDialog(Frame parent) {
-		super(parent, true);
-        this.parent = parent;
-        initComponents();
-        prepComponents();
-	}
-	
-    private void populateFieldsWithSelectedServer() {
-       
-    }
-    
-    private void prepComponents() {
-    	setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        getRootPane().setDefaultButton(save);    
-    }
-    
-    private void initComponents() {
-    	setTitle("Sign in to GraphSpace");
-        host = new JTextField("www.graphspace.org");
-        username = new JTextField();
-        hostLabel = new JLabel();
-        usernameLabel = new JLabel();
-        passwordLabel = new JLabel();
-        message = new JTextPane();
-        message.setText("");
-        message.setEditable(false);
-        save = new JButton();
-        cancel = new JButton();
-        password = new JPasswordField();
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        hostLabel.setText("Host:");
-        usernameLabel.setText("Username:");
-        passwordLabel.setText("Password:");
-        save.setText("Save");
-        
-        
-        save.addActionListener(new java.awt.event.ActionListener()
+		setTitle("Sign in to the Server");
+		JLabel hostLabel = new JLabel("Host");
+		
+		hostField = new JTextField();
+		hostField.setColumns(10);
+		
+		JLabel usernameLabel = new JLabel("Username");
+		
+		usernameField = new JTextField();
+		usernameField.setColumns(10);
+		
+		JLabel passwordLabel = new JLabel("Password");
+		
+		passwordField = new JPasswordField();
+		
+		JPanel buttonsPanel = new JPanel();
+		
+		JButton signInButton = new JButton("Sign In");
+		
+		signInButton.addActionListener(new ActionListener()
         {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
+            public void actionPerformed(ActionEvent evt)
             {
                 try {
-					saveActionPerformed(evt);
+					signInActionPerformed(evt);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					System.out.println("exception aa gya");
@@ -83,99 +57,103 @@ public class AuthenticationDialog extends JDialog {
 				}
             }
         });
+		
+		buttonsPanel.add(signInButton);
 
-        cancel.setText("Cancel");
-        cancel.addActionListener(new java.awt.event.ActionListener()
+		
+		JButton cancelButton = new JButton("Cancel");
+		
+		cancelButton.addActionListener(new ActionListener()
         {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
+            public void actionPerformed(ActionEvent evt)
             {
                 cancelActionPerformed(evt);
             }
         });
-
-        GroupLayout layout = new GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                            .addComponent(hostLabel)
-                            .addComponent(usernameLabel)
-                            .addComponent(passwordLabel))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                            .addComponent(host)
-                            .addComponent(username)
-                            .addComponent(password)))
-                    .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                            .addComponent(message))
-                    .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 221, Short.MAX_VALUE)
-                        .addComponent(cancel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(save)))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-            	.addContainerGap()
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(host, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(hostLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(username, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(usernameLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(passwordLabel)
-                    .addComponent(password, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(message))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(save)
-                    .addComponent(cancel))
-                .addContainerGap())
-        );
-
-        pack();
-    }
-
-    private void urlActionPerformed(ActionEvent evt) {
-    	
-    }
-    
-    private void saveActionPerformed(ActionEvent evt) throws Exception{
-    	System.out.println("hehehe");
-    	if (Server.INSTANCE.client == null){
-    		System.out.println("1");
-    		Server.INSTANCE.client = new Client(); 
+		buttonsPanel.add(cancelButton);
+		GroupLayout groupLayout = new GroupLayout(getContentPane());
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(hostLabel, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE)
+							.addGap(75)
+							.addComponent(hostField, GroupLayout.PREFERRED_SIZE, 347, GroupLayout.PREFERRED_SIZE))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(usernameLabel, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
+							.addGap(21)
+							.addComponent(usernameField, GroupLayout.PREFERRED_SIZE, 347, GroupLayout.PREFERRED_SIZE))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(passwordLabel, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
+							.addGap(21)
+							.addComponent(passwordField, GroupLayout.PREFERRED_SIZE, 347, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(13, Short.MAX_VALUE))
+				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+					.addContainerGap(293, Short.MAX_VALUE)
+					.addComponent(buttonsPanel, GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(31)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addGap(2)
+							.addComponent(hostLabel))
+						.addComponent(hostField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(usernameLabel)
+						.addComponent(usernameField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addGap(2)
+							.addComponent(passwordLabel))
+						.addComponent(passwordField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(buttonsPanel, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(11, Short.MAX_VALUE))
+		);
+		getContentPane().setLayout(groupLayout);
+		populateFields();
+		pack();
+	}
+	
+	private void signInActionPerformed(ActionEvent evt) throws Exception{
+    	String hostText = hostField.getText();
+    	String usernameText = usernameField.getText();
+    	String passwordText = new String(passwordField.getPassword());
+    	if (hostText.isEmpty() || usernameText.isEmpty() || passwordText.isEmpty()){
+    		JOptionPane.showMessageDialog((Component)evt.getSource(), "Please enter all the values", "Error", JOptionPane.ERROR_MESSAGE);
     	}
-    	System.out.println("2");
-    	String hostText = host.getText();
-    	String usernameText = username.getText();
-    	String passwordText = password.getPassword().toString();
-    	if (hostText == "" || usernameText == "" || passwordText == ""){
-    		System.out.println("3");
-    		message.setText("Please enter the values");
+    	else{
+	    	System.out.println(hostText+" : "+usernameText+" : "+passwordText);
+	    	Server.INSTANCE.authenticate(hostText, usernameText, passwordText);
+	    	System.out.println(Server.INSTANCE.getHost()+" : "+Server.INSTANCE.getUsername()+" : "+Server.INSTANCE.getPassword());
+	    	this.dispose();
     	}
-    	System.out.println("4");
-    	Server.INSTANCE.client.authenticate(usernameText, passwordText, hostText);
-    	System.out.println("5");
-    	System.out.println(Server.INSTANCE.client.getMyGraphs(new ArrayList<String>(), 20, 0));
-    	System.out.println("6");
-    	System.out.println("7");
     }
-    
-    private void cancelActionPerformed(ActionEvent evt) {
-        setVisible(false);
+	
+	private void populateFields(){
+		if (Server.INSTANCE.getHost()==null){
+			hostField.setText("www.graphspace.org");
+		}
+		else{
+			hostField.setText(Server.INSTANCE.getHost());
+		}
+		if (Server.INSTANCE.getUsername()!=null){
+			usernameField.setText(Server.INSTANCE.getUsername());
+		}
+		if (Server.INSTANCE.getPassword()!=null){
+			passwordField.setText(Server.INSTANCE.getPassword());
+		}
+	}
+	
+	private void cancelActionPerformed(ActionEvent evt) {
+        this.dispose();
     }
-
 }

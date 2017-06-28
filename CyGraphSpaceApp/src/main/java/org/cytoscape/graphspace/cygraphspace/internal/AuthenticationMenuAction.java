@@ -35,10 +35,6 @@ import org.cytoscape.graphspace.cygraphspace.internal.gui.AuthenticationDialog;
 import javax.swing.*;
 
 
-/**
- * @author David Welker
- * Creates a new menu item in the Apps|NDex menu to select an NDEx server.
- */
 public class AuthenticationMenuAction extends AbstractCyAction
 {
     /**
@@ -46,21 +42,13 @@ public class AuthenticationMenuAction extends AbstractCyAction
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public AuthenticationMenuAction(final String menuTitle, CyApplicationManager cyApplicationManager)
-    {
+	public AuthenticationMenuAction(final String menuTitle, CyApplicationManager cyApplicationManager) {
         super(menuTitle, cyApplicationManager, null, null);
-        // We want this menu item to appear under the App|NDEx menu. The actual name of the menu item is set in
-        // org.cytoscape.ndex.internal.CyActivator as "Select Server"
         setPreferredMenu("Apps.CyGraphSpace");
     }
 
-    /**
-     * This method displays the select server dialog.
-     * It is called when the menu item is selected.  
-     */
     @Override
-	public void actionPerformed(ActionEvent e)
-    {
+	public void actionPerformed(ActionEvent e) {
         JFrame parent = CyObjectManager.INSTANCE.getApplicationFrame();
         AuthenticationDialog dialog = new AuthenticationDialog(parent);
         dialog.setLocationRelativeTo(parent);

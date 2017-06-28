@@ -1,21 +1,29 @@
 package org.cytoscape.graphspace.cygraphspace.internal.singletons;
 
-import org.graphspace.javaclient.Client;
+import java.util.ArrayList;
+
+import org.graphspace.javaclient.CyGraphSpaceClient;
+import org.graphspace.javaclient.model.GSGraphMetaData;
+import org.json.JSONObject;
 
 public enum Server{
 	INSTANCE;
-	public Client client;
+	public CyGraphSpaceClient client;
 	String username;
 	String password;
 	String host;
 	
-	public void authenticate(String username, String password, String host){
+	public void authenticate(String host, String username, String password){
+		this.host = host;
 		this.username = username;
 		this.password = password;
-		this.host = host;
-		client.authenticate(username, password, host);
+		client = new CyGraphSpaceClient(host, username, password);
 	}
-		
+	
+	public boolean isAuthenticated(){
+		return !(this.client==null);
+	}
+	
 	public String getUsername(){
 		return this.username;
 	}
@@ -32,8 +40,11 @@ public enum Server{
 		return this.host;
 	}
 	
-	//TODO: authenticated method in rest api
-	public boolean isAuthenticated(){
-		return true;
+	public ArrayList<GSGraphMetaData> getGraphsMetaData(boolean myGraphs, boolean publicGraphs, boolean sharedGraphs) throws Exception{
+		return this.client.getGraphMetaDataList(myGraphs, publicGraphs, sharedGraphs);
+	}
+	
+	public JSONObject getGraph(String id) throws Exception{
+		return this.client.getGraph(id);
 	}
 }

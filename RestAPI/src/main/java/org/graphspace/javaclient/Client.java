@@ -7,9 +7,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.HttpHost;
 import org.graphspace.javaclient.exceptions.GraphNotFoundException;
 import org.graphspace.javaclient.exceptions.RequestTypeNotDefinedException;
+import org.graphspace.javaclient.model.GSGraph;
+import org.apache.http.HttpHost;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -17,8 +18,6 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 
-import static java.nio.charset.StandardCharsets.*;
-import java.net.URLEncoder;
 /**
  * 
  * @author rishabh
@@ -104,21 +103,40 @@ public class Client {
      * @return
      * @throws Exception
      */
-    private JSONObject postRequest(String path, Map<String, Object> data, Map<String, String> headers) throws Exception{
+    private JSONObject postRequest(String path, Map<String, Object> data, Map<String, String> headers){
     	
-		String queryPath = "http://"+this.host+path;
+		String queryPath = "http://"+this.host+path+"/";
+		JSONObject headersJson = new JSONObject(headers);
+		JSONObject dataJson = new JSONObject(data);
+		Unirest.setProxy(new HttpHost("proxy61.iitd.ernet.in", 3128));
+//		System.out.println(queryPath);
+//		System.out.println(headersJson.toString());
+//		System.out.println(dataJson.toString());
 		try{
+//			Map<String, Object> name = new HashMap<String, Object>();
+//			name.put("name", data.get("name"));
+//			Map<String, Object> isPublic = new HashMap<String, Object>();
+//			name.put("is_public", data.get("is_public"));
+//			Map<String, Object> ownerEmail = new HashMap<String, Object>();
+//			name.put("owner_email", data.get("owner_email"));
+//			Map<String, Object> graphJSON = new HashMap<String, Object>();
+//			name.put("graph_json", data.get("graph_json"));
+//			Map<String, Object> styleJSON = new HashMap<String, Object>();
+//			name.put("style_json", data.get("style_json"));
 			HttpResponse<JsonNode> getResponse = Unirest.post(queryPath)
 					.basicAuth(this.username, this.password)
 					.headers(headers)
-					.fields(data)
+//					.fields(data)
+					.body(dataJson)
 					.asJson();
+//			System.out.println(getResponse.getStatusText());
 			JSONObject response = new JSONObject(getResponse);
 			return response;
 		}
 		catch(Exception e){
-			throw new GraphNotFoundException();
+			e.printStackTrace();
 		}
+		return null;
     }
     
     /**
@@ -204,36 +222,43 @@ public class Client {
     		throw new RequestTypeNotDefinedException();
     	}
     }
-//    
-//    /**
-//     * Posts NetworkX graph to the requesting users account on GraphSpace.
-//     * @param graph
-//     * @return
-//     */
-//    public String postGraph(Graph graph){
-//    	return postGraph(graph, false);
-//    }
-//    
-//    //TODO: Change return type
-//    /**
-//     * Posts NetworkX graph to the requesting users account on GraphSpace.
-//     * @param graph
-//     * @param isGraphPublic
-//     * @return
-//     */
-//    public String postGraph(Graph graph, boolean isGraphPublic){
-//    	int isPublic = (isGraphPublic) ? 1 : 0;
-//    	Map<String, Object> urlParams = new HashMap<String, Object>();
-//    	Map<String, Object> data = new HashMap<String, Object>();
-//    	data.put("name", graph.getName());
-//    	data.put("is_public", isPublic);
-//        data.put("owner_email", username);
-//        data.put("graph_json", graph.computeGraphJSON());
-//        data.put("style_json", graph.getStyleJSON());
-//    	return makeRequest("POST", "/api/v1/graphs", urlParams, data);
-//    	//TODO: return relevant string from the json
-//    }
-//    
+    
+    /**
+     * Posts NetworkX graph to the requesting users account on GraphSpace.
+     * @param graph
+     * @return
+     * @throws Exception 
+     */
+    public JSONObject postGraph(JSONObject graph) throws Exception{
+    	return postGraph(graph, null, false);
+    }
+    
+    public JSONObject postGraph(JSONObject graph, JSONObject styleJSON) throws Exception{
+    	return postGraph(graph, styleJSON, false);
+    }
+    
+    //TODO: Change return type
+    /**
+     * Posts NetworkX graph to the requesting users account on GraphSpace.
+     * @param graph
+     * @param isGraphPublic
+     * @return
+     * @throws Exception 
+     */
+    public JSONObject postGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic) throws Exception{
+    	int isPublic = (isGraphPublic) ? 1 : 0;
+    	Map<String, Object> data = new HashMap<String, Object>();
+    	GSGraph graph = new GSGraph(graphJSON);
+    	graph.setStyleJSON(styleJSON);
+    	data.put("name", graph.getName());
+    	data.put("is_public", isPublic);
+        data.put("owner_email", username);
+        data.put("graph_json", graph.computeGraphJSON());
+        data.put("style_json", graph.getStyleJSON());
+    	return makeRequest("POST", "/api/v1/graphs", null, data);
+    	//TODO: return relevant string from the json
+    }
+    
     /**
      * Get a graph owned by requesting user with the given name.
      * @param name
@@ -254,11 +279,10 @@ public class Client {
      * @throws Exception 
      */
     public JSONObject getGraph(String name, String ownerEmail) throws Exception{
-    	Map<String, Object> data = new HashMap<String, Object>();
     	Map<String, Object> urlParams = new HashMap<String, Object>();
     	urlParams.put("owner_email", ownerEmail);
     	urlParams.put("names[]", name);
-    	JSONObject response = makeRequest("GET", "/api/v1/graphs/", urlParams, data);
+    	JSONObject response = makeRequest("GET", "/api/v1/graphs/", urlParams, null);
 		JSONObject body = response.getJSONObject("body");
 		JSONArray array = body.getJSONArray("array");
 		int total = ((JSONObject) array.get(0)).getInt("total");
@@ -278,10 +302,8 @@ public class Client {
      * @throws Exception 
      */
     public JSONObject getGraphById(String graphId) throws Exception{
-    	Map<String, Object> data = new HashMap<String, Object>();
-    	Map<String, Object> urlParams = new HashMap<String, Object>();
     	String path = "/api/v1/graphs/"+graphId;
-    	return makeRequest("GET", path, urlParams, data);
+    	return makeRequest("GET", path, null, null);
     }
     
     //TODO: For default values of limit and offset
@@ -302,8 +324,7 @@ public class Client {
     		JSONArray tags = new JSONArray(tagsList);
     		query.put("tags[]", tags);
     	}
-    	Map<String, Object> data = new HashMap<String, Object>();
-    	return makeRequest("GET", "/api/v1/graphs", query, data);
+    	return makeRequest("GET", "/api/v1/graphs", query, null);
     }
     
     /**
@@ -321,28 +342,28 @@ public class Client {
     	Map<String, Object> data = new HashMap<String, Object>();
     	return makeRequest("GET", "/api/v1/graphs", query, data);
     }
-//    
-//    //TODO: For default values of limit and offset
-//    /**
-//     * Get graphs shared with the groups where requesting user is a member.
-//     * @param tagsList
-//     * @param limit
-//     * @param offset
-//     * @return
-//     */
-//    public JSONObject getSharedGraphs(ArrayList<String> tagsList, int limit, int offset){
-//		JSONObject query = new JSONObject();
-//		query.append("member_email", this.username);
-//		query.append("limit", limit);
-//    	query.append("offset", offset);
-//    	if (!tagsList.isEmpty()){
-//    		JSONArray tags = new JSONArray(tagsList);
-//    		query.append("tags[]", tags);
-//    	}
-//    	JSONObject data = new JSONObject(); 
-//    	return makeRequest("GET", "/api/v1/graphs/", query, data);
-//    }
-//    
+    
+    //TODO: For default values of limit and offset
+    /**
+     * Get graphs shared with the groups where requesting user is a member.
+     * @param tagsList
+     * @param limit
+     * @param offset
+     * @return
+     * @throws Exception 
+     */
+    public JSONObject getSharedGraphs(ArrayList<String> tagsList, int limit, int offset) throws Exception{
+		Map<String, Object> query = new HashMap<String, Object>();
+		query.put("member_email", this.username);
+		query.put("limit", limit);
+    	query.put("offset", offset);
+    	if (!tagsList.isEmpty()){
+    		JSONArray tags = new JSONArray(tagsList);
+    		query.put("tags[]", tags);
+    	}
+    	return makeRequest("GET", "/api/v1/graphs/", query, null);
+    }
+    
     //TODO: For default values of limit and offset    
     /**
      * Get graphs created by the requesting user.
@@ -385,7 +406,7 @@ public class Client {
     		throw new GraphNotFoundException(name, username);
     	}
     	else{
-    		Graph graph = new Graph(graphJSON);
+    		GSGraph graph = new GSGraph(graphJSON);
     		return makeRequest("DELETE", "/api/v1/graphs/" + graph.getId(), null, null);
     	}
     }
@@ -403,7 +424,7 @@ public class Client {
     public JSONObject updateGraph(String name, String ownerEmail, JSONObject graphJSON, boolean isGraphPublic) throws Exception{
     	Map<String, Object> data = new HashMap<String, Object>();
     	int isPublic = (isGraphPublic) ? 1 : 0;
-    	Graph graph = new Graph(graphJSON);
+    	GSGraph graph = new GSGraph(graphJSON);
     	if (graphJSON!=null){
     		data.put("name", graph.getName());
     		data.put("is_public", isPublic);
@@ -556,7 +577,7 @@ public class Client {
      * @return
      * @throws Exception 
      */
-    public JSONObject updateGraphLayout(String graphId, String layoutId, String layoutName, JSONObject positionsJSON, JSONObject styleJSON, ArrayList isShared) throws Exception{
+    public JSONObject updateGraphLayout(String graphId, String layoutId, String layoutName, JSONObject positionsJSON, JSONObject styleJSON, boolean isShared) throws Exception{
     	/**
     	Sample style_json::
 
@@ -626,9 +647,9 @@ public class Client {
 		if (layoutName != null){
 			data.put("name", layoutName);
 		}
-		if (isShared != null){
-			data.put("is_shared", isShared);
-		}
+		
+		data.put("is_shared", isShared);
+		
 		if (positionsJSON != null){
 			data.put("positions_json", positionsJSON);
 		}
@@ -701,7 +722,7 @@ public class Client {
      * @return
      * @throws Exception 
      */
-    public JSONObject getsharedGraphLayouts(String graphId, int limit, int offset) throws Exception{
+    public JSONObject getSharedGraphLayouts(String graphId, int limit, int offset) throws Exception{
     	Map<String, Object> query = new HashMap<String, Object>();
     	query.put("limit", limit);
     	query.put("offset", offset);

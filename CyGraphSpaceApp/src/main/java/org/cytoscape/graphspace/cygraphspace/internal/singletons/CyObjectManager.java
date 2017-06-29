@@ -34,7 +34,9 @@ import org.cytoscape.application.CyVersion;
 import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.event.CyEventHelper;
 import org.cytoscape.group.CyGroupManager;
+import org.cytoscape.io.read.InputStreamTaskFactory;
 import org.cytoscape.io.util.StreamUtil;
+import org.cytoscape.io.write.CyNetworkViewWriterFactory;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNetworkFactory;
 import org.cytoscape.model.CyNetworkManager;
@@ -65,6 +67,9 @@ public enum CyObjectManager {
     // The network table manager.
     private CyNetworkTableManager networkTableManager;
     
+    private CyNetworkViewWriterFactory cytoscapeJsWriterFactory;
+	private InputStreamTaskFactory cytoscapeJsReaderFactory;
+	
     public File getConfigDir()
     {
         return configDir;
@@ -77,7 +82,15 @@ public enum CyObjectManager {
     {
         this.adapter = appAdapter;
     }
-
+    
+    public void setCytoscapeJsWriterFactory(CyNetworkViewWriterFactory cytoscapeJsWriterFactory){
+    	this.cytoscapeJsWriterFactory = cytoscapeJsWriterFactory;
+    }
+    
+    public void setCytoscapeJsReaderFactory(InputStreamTaskFactory cytoscapeJsReaderFactory){
+    	this.cytoscapeJsReaderFactory = cytoscapeJsReaderFactory;
+    }
+    
     // Trivial Getters
     public CyVersion getCyVersion(){
     	return adapter.getCyVersion();
@@ -108,6 +121,13 @@ public enum CyObjectManager {
     {
         return adapter.getCyNetworkViewManager();
     }
+    public CyNetworkViewWriterFactory getCytoscapeJsWriterFactory(){
+    	return this.cytoscapeJsWriterFactory;
+    }
+    
+    public InputStreamTaskFactory getCytoscapeJsReaderFactory(){
+    	return this.cytoscapeJsReaderFactory;
+    }
     public VisualLexicon getDefaultVisualLexicon() { return adapter.getRenderingEngineManager().getDefaultVisualLexicon(); }
     public JFrame getApplicationFrame() { return adapter.getCySwingApplication().getJFrame(); }
     public DialogTaskManager getTaskManager() { return adapter.getDialogTaskManager(); }
@@ -121,6 +141,7 @@ public enum CyObjectManager {
     public RenderingEngineManager getRenderingEngineManager() { return adapter.getRenderingEngineManager(); }
 
 	public void setNetworkTableManager(CyNetworkTableManager networkTableManager) { this.networkTableManager = networkTableManager; }
+	
     public CyNetworkTableManager getNetworkTableManager() { return networkTableManager; }
 
     // Slightly More Sophisticated Getters

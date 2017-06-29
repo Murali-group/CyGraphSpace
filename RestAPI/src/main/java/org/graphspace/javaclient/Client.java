@@ -81,7 +81,7 @@ public class Client {
     	
 		String queryPath = "http://"+this.host+path;
 		try{
-			Unirest.setProxy(new HttpHost("proxy61.iitd.ernet.in", 3128));
+//			Unirest.setProxy(new HttpHost("proxy61.iitd.ernet.in", 3128));
 			HttpResponse<JsonNode> getResponse = Unirest.get(queryPath)
 					.basicAuth(this.username, this.password)
 					.headers(headers)
@@ -108,7 +108,7 @@ public class Client {
 		String queryPath = "http://"+this.host+path+"/";
 		JSONObject headersJson = new JSONObject(headers);
 		JSONObject dataJson = new JSONObject(data);
-		Unirest.setProxy(new HttpHost("proxy61.iitd.ernet.in", 3128));
+//		Unirest.setProxy(new HttpHost("proxy61.iitd.ernet.in", 3128));
 //		System.out.println(queryPath);
 //		System.out.println(headersJson.toString());
 //		System.out.println(dataJson.toString());

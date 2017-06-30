@@ -8,11 +8,10 @@ import org.cytoscape.application.CyApplicationConfiguration;
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.model.CyNetworkTableManager;
-import org.cytoscape.model.events.NetworkAboutToBeDestroyedListener;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
-import org.cytoscape.io.read.InputStreamTaskFactory;
-import org.cytoscape.io.write.CyNetworkViewWriterFactory;
 import org.cytoscape.service.util.AbstractCyActivator;
+import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
+import org.cytoscape.task.write.ExportNetworkTaskFactory;
 import org.osgi.framework.BundleContext;
 
 public class CyActivator extends AbstractCyActivator {
@@ -63,13 +62,16 @@ public class CyActivator extends AbstractCyActivator {
         manager.setCySwingAppAdapter(appAdapter);
         manager.setNetworkTableManager(networkTableManager);
         
-        CyNetworkViewWriterFactory cytoscapeJsWriterFactory = getService(bc, CyNetworkViewWriterFactory.class,
-				"(id=cytoscapejsNetworkWriterFactory)");
-        CyObjectManager.INSTANCE.setCytoscapeJsWriterFactory(cytoscapeJsWriterFactory);
-		InputStreamTaskFactory cytoscapeJsReaderFactory = getService(bc, InputStreamTaskFactory.class,
-				"(id=cytoscapejsNetworkReaderFactory)");
-		CyObjectManager.INSTANCE.setCytoscapeJsReaderFactory(cytoscapeJsReaderFactory);
-        
-        registerService(bc,new GraphSpaceNetworkAboutToBeDestroyedListener(), NetworkAboutToBeDestroyedListener.class, new Properties());   
+//        CyNetworkViewWriterFactory cytoscapeJsWriterFactory = getService(bc, CyNetworkViewWriterFactory.class,
+//				"(id=cytoscapejsNetworkWriterFactory)");
+//        manager.setCytoscapeJsWriterFactory(cytoscapeJsWriterFactory);
+//		InputStreamTaskFactory cytoscapeJsReaderFactory = getService(bc, InputStreamTaskFactory.class,
+//				"(id=cytoscapejsNetworkReaderFactory)");
+//		manager.setCytoscapeJsReaderFactory(cytoscapeJsReaderFactory);
+		LoadNetworkFileTaskFactory loadNetworkFileTaskFactory = getService(bc, LoadNetworkFileTaskFactory.class);
+		manager.setLoadNetworkFileTaskFactory(loadNetworkFileTaskFactory);
+		ExportNetworkTaskFactory exportNetworkTaskFactory = getService(bc, ExportNetworkTaskFactory.class);
+		manager.setExportNetworkTaskFactory(exportNetworkTaskFactory);
+//        registerService(bc,new GraphSpaceNetworkAboutToBeDestroyedListener(), NetworkAboutToBeDestroyedListener.class, new Properties());   
     }
 }

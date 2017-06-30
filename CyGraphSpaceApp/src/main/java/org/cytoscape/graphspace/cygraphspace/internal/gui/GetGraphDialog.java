@@ -19,11 +19,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import org.cytoscape.session.CyNetworkNaming;
-import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.view.vizmap.VisualStyle;
 import org.cytoscape.work.TaskIterator;
-import org.cytoscape.work.TaskMonitor;
 import org.graphspace.javaclient.model.GSGraphMetaData;
 import org.json.JSONObject;
 
@@ -33,29 +29,17 @@ import javax.swing.JTable;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
 
-import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.*;
-import org.cytoscape.graphspace.cygraphspace.internal.util.HeadlessTaskMonitor;
-import org.cytoscape.graphspace.cygraphspace.io.read.json.CytoscapeJsNetworkReader;
-import org.cytoscape.io.read.CyNetworkReader;
-import org.cytoscape.io.read.InputStreamTaskFactory;
-import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyNetworkFactory;
-import org.cytoscape.model.CyNetworkManager;
-import org.cytoscape.model.subnetwork.CyRootNetwork;
-import org.cytoscape.model.subnetwork.CyRootNetworkManager;
-import org.cytoscape.model.subnetwork.CySubNetwork;
+
+import org.apache.commons.io.IOUtils;
 
 public class GetGraphDialog extends JDialog{
 	private JTextField searchField;
@@ -309,12 +293,26 @@ public class GetGraphDialog extends JDialog{
 //		System.out.println("hum yaha hain: "+graphsTable.getValueAt(graphsTable.getSelectedRow(), 0));
 		String id = graphsTable.getValueAt(graphsTable.getSelectedRow(), 0).toString();
 		try {
-			JSONObject graphJSON = Server.INSTANCE.client.getGraph(id);
-//			String name = graphJSON.getJSONObject("data").getString("name");
+			JSONObject graphJSON = Server.INSTANCE.client.getGraph(id).getJSONObject("body").getJSONObject("object").getJSONObject("graph_json");
+//			System.out.println(graphJSON.toString());
+			String name = graphJSON.getJSONObject("data").getString("name");
 			String str = graphJSON.toString();
+//			String str = "{ \"format_version\" : \"1.0\", \"generated_by\" : \"cytoscape-3.5.1\", \"target_cytoscapejs_version\" : \"~2.1\", \"data\" : { \"shared_name\" : \"test3\", \"name\" : \"test3\", \"SUID\" : 52, \"__Annotations\" : [ ], \"selected\" : true }, \"elements\" : { \"nodes\" : [ { \"data\" : { \"id\" : \"68\", \"shared_name\" : \"Node 3\", \"name\" : \"Node 3\", \"SUID\" : 68, \"selected\" : false }, \"position\" : { \"x\" : -15.0, \"y\" : 18.0 }, \"selected\" : false }, { \"data\" : { \"id\" : \"66\", \"shared_name\" : \"Node 2\", \"name\" : \"Node 2\", \"SUID\" : 66, \"selected\" : false }, \"position\" : { \"x\" : -117.0, \"y\" : -93.0 }, \"selected\" : false }, { \"data\" : { \"id\" : \"64\", \"shared_name\" : \"Node 1\", \"name\" : \"Node 1\", \"SUID\" : 64, \"selected\" : false }, \"position\" : { \"x\" : -196.0, \"y\" : 36.0 }, \"selected\" : false } ], \"edges\" : [ { \"data\" : { \"id\" : \"72\", \"source\" : \"66\", \"target\" : \"68\", \"shared_name\" : \"Node 2 (interacts with) Node 3\", \"name\" : \"Node 2 (interacts with) Node 3\", \"interaction\" : \"interacts with\", \"SUID\" : 72, \"shared_interaction\" : \"interacts with\", \"selected\" : false }, \"selected\" : false }, { \"data\" : { \"id\" : \"70\", \"source\" : \"64\", \"target\" : \"66\", \"shared_name\" : \"Node 1 (interacts with) Node 2\", \"name\" : \"Node 1 (interacts with) Node 2\", \"interaction\" : \"interacts with\", \"SUID\" : 70, \"shared_interaction\" : \"interacts with\", \"selected\" : false }, \"selected\" : false } ] } }";
 //			System.out.println(str);
 			InputStream is = new ByteArrayInputStream(str.getBytes());
-			createNetwork(null, "test", is);
+//			Path tempDir = Files.createTempDirectory("tempCyGraphSpaceDirectory");
+			File tempFile = File.createTempFile("CyGraphSpace", ".cyjs");
+//			tempFile.deleteOnExit();
+			try (FileOutputStream out = new FileOutputStream(tempFile)) {
+	            IOUtils.copy(is, out);
+	        }
+			InputStream is2 = new FileInputStream(tempFile);
+			String fileContents = IOUtils.toString(is2, "UTF-8");
+			System.out.println(fileContents);
+			TaskIterator ti = CyObjectManager.INSTANCE.getLoadNetworkFileTaskFactory().createTaskIterator(tempFile);
+			CyObjectManager.INSTANCE.getTaskManager().execute(ti);
+			tempFile.delete();
+//			createNetwork(null, "test", is);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog((Component)e.getSource(), "Could not get graph", "Error", JOptionPane.ERROR_MESSAGE);
@@ -367,100 +365,99 @@ public class GetGraphDialog extends JDialog{
 //		is.close();
 //	}
 	
-	public void createNetwork(String collection, String title, final InputStream is) {
-		CyObjectManager.INSTANCE.getApplicationManager().setCurrentNetworkView(null);
-		CyObjectManager.INSTANCE.getApplicationManager().setCurrentNetwork(null);
-	
-		String collectionName = null;
-		if (collection != null) {
-			collectionName = collection;
-		}
-		final TaskIterator it;
-		InputStreamTaskFactory cytoscapeJsReaderFactory = CyObjectManager.INSTANCE.getCytoscapeJsReaderFactory();
-		it = cytoscapeJsReaderFactory.createTaskIterator(is, collection);
-		CyNetworkReader reader = (CyNetworkReader) it.next();
-		try {
-			reader.run(new HeadlessTaskMonitor());
-//			CyObjectManager.INSTANCE.adapter.getTaskManager().execute(new TaskIterator(reader));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		CyNetwork[] networks = reader.getNetworks();
-		CyNetwork newNetwork = networks[0];
-		if(title!= null && title.isEmpty() == false) {
-			try {
-				newNetwork.getTable(CyNetwork.class, CyNetwork.LOCAL_ATTRS).getRow(newNetwork.getSUID()).set(CyNetwork.NAME, title);
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
-		addNetwork(networks, reader, collectionName);
-		try {
-			is.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-	private void addNetwork(final CyNetwork[] networks, final CyNetworkReader reader, final String collectionName) {
-		addNetwork(networks, reader, collectionName, false);
-	}
-	
-	private void addNetwork(final CyNetwork[] networks, final CyNetworkReader reader, final String collectionName,
-		final Boolean applyStyle) {
-		
-		final List<CyNetworkView> results = new ArrayList<CyNetworkView>();
-		final Map<CyNetworkView, VisualStyle> styleMap = new HashMap<>();
-
-		final Set<CyRootNetwork> rootNetworks = new HashSet<CyRootNetwork>();
-
-		for (final CyNetwork net : CyObjectManager.INSTANCE.getNetworkManager().getNetworkSet()) {
-			final CyRootNetwork rootNet = CyObjectManager.INSTANCE.getRootNetworkManager().getRootNetwork(net);
-			rootNetworks.add(rootNet);
-		}
-		
-		for (final CyNetwork network : networks) {
-			String networkName = network.getRow(network).get(CyNetwork.NAME, String.class);
-			if (networkName == null || networkName.trim().length() == 0) {
-				if (networkName == null)
-					networkName = collectionName;
-				network.getRow(network).set(CyNetwork.NAME, networkName);
-			}
-			CyObjectManager.INSTANCE.getNetworkManager().addNetwork(network);
-			final int numGraphObjects = network.getNodeCount() + network.getEdgeCount();
-			int viewThreshold = 200000;
-			if (numGraphObjects < viewThreshold) {
-
-				final CyNetworkView view = reader.buildCyNetworkView(network);
-				VisualStyle style = CyObjectManager.INSTANCE.getVisualMappingManager().getVisualStyle(view);
-				if (style == null) {
-					style = CyObjectManager.INSTANCE.getVisualMappingManager().getDefaultVisualStyle();
-				}
-				styleMap.put(view, style);
-				CyObjectManager.INSTANCE.getNetworkViewManager().addNetworkView(view);
-				results.add(view);
-			}
-			
-
-		}
-		// If this is a subnetwork, and there is only one subnetwork in the
-		// root, check the name of the root network
-		// If there is no name yet for the root network, set it the same as its
-		// base subnetwork
-		if (networks.length == 1) {
-			if (networks[0] instanceof CySubNetwork) {
-				CySubNetwork subnet = (CySubNetwork) networks[0];
-				final CyRootNetwork rootNet = subnet.getRootNetwork();
-				String rootNetName = rootNet.getRow(rootNet).get(CyNetwork.NAME, String.class);
-				rootNet.getRow(rootNet).set(CyNetwork.NAME, collectionName);
-				if (rootNetName == null || rootNetName.trim().length() == 0) {
-					// The root network does not have a name yet, set it the same
-					// as the base subnetwork
-					rootNet.getRow(rootNet).set(CyNetwork.NAME, collectionName);
-				}
-			}
-		}
-//		return styleMap;
-	}
+//	public void createNetwork(String collection, String title, final InputStream is) {
+//		CyObjectManager.INSTANCE.getApplicationManager().setCurrentNetworkView(null);
+//		CyObjectManager.INSTANCE.getApplicationManager().setCurrentNetwork(null);
+//	
+//		String collectionName = null;
+//		if (collection != null) {
+//			collectionName = collection;
+//		}
+//		final TaskIterator it;
+//		InputStreamTaskFactory cytoscapeJsReaderFactory = CyObjectManager.INSTANCE.getCytoscapeJsReaderFactory();
+//		it = cytoscapeJsReaderFactory.createTaskIterator(is, collection);
+//		CyNetworkReader reader = (CyNetworkReader) it.next();
+//		try {
+//			reader.run(new HeadlessTaskMonitor());
+////			CyObjectManager.INSTANCE.adapter.getTaskManager().execute(new TaskIterator(reader));
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		CyNetwork[] networks = reader.getNetworks();
+//		CyNetwork newNetwork = networks[0];
+//		if(title!= null && title.isEmpty() == false) {
+//			try {
+//				newNetwork.getTable(CyNetwork.class, CyNetwork.LOCAL_ATTRS).getRow(newNetwork.getSUID()).set(CyNetwork.NAME, title);
+//			} catch(Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		addNetwork(networks, reader, collectionName);
+//		try {
+//			is.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//
+//	}
+//	private void addNetwork(final CyNetwork[] networks, final CyNetworkReader reader, final String collectionName) {
+//		addNetwork(networks, reader, collectionName, false);
+//	}
+//	
+//	private void addNetwork(final CyNetwork[] networks, final CyNetworkReader reader, final String collectionName,
+//		final Boolean applyStyle) {
+//		
+//		final List<CyNetworkView> results = new ArrayList<CyNetworkView>();
+//		final Map<CyNetworkView, VisualStyle> styleMap = new HashMap<>();
+//
+//		final Set<CyRootNetwork> rootNetworks = new HashSet<CyRootNetwork>();
+//
+//		for (final CyNetwork net : CyObjectManager.INSTANCE.getNetworkManager().getNetworkSet()) {
+//			final CyRootNetwork rootNet = CyObjectManager.INSTANCE.getRootNetworkManager().getRootNetwork(net);
+//			rootNetworks.add(rootNet);
+//		}
+//		
+//		for (final CyNetwork network : networks) {
+//			String networkName = network.getRow(network).get(CyNetwork.NAME, String.class);
+//			if (networkName == null || networkName.trim().length() == 0) {
+//				if (networkName == null)
+//					networkName = collectionName;
+//				network.getRow(network).set(CyNetwork.NAME, networkName);
+//			}
+//			CyObjectManager.INSTANCE.getNetworkManager().addNetwork(network);
+//			final int numGraphObjects = network.getNodeCount() + network.getEdgeCount();
+//			int viewThreshold = 200000;
+//			if (numGraphObjects < viewThreshold) {
+//
+//				final CyNetworkView view = reader.buildCyNetworkView(network);
+//				VisualStyle style = CyObjectManager.INSTANCE.getVisualMappingManager().getVisualStyle(view);
+//				if (style == null) {
+//					style = CyObjectManager.INSTANCE.getVisualMappingManager().getDefaultVisualStyle();
+//				}
+//				styleMap.put(view, style);
+//				CyObjectManager.INSTANCE.getNetworkViewManager().addNetworkView(view);
+//				results.add(view);
+//			}
+//			
+//
+//		}
+//		// If this is a subnetwork, and there is only one subnetwork in the
+//		// root, check the name of the root network
+//		// If there is no name yet for the root network, set it the same as its
+//		// base subnetwork
+//		if (networks.length == 1) {
+//			if (networks[0] instanceof CySubNetwork) {
+//				CySubNetwork subnet = (CySubNetwork) networks[0];
+//				final CyRootNetwork rootNet = subnet.getRootNetwork();
+//				String rootNetName = rootNet.getRow(rootNet).get(CyNetwork.NAME, String.class);
+//				rootNet.getRow(rootNet).set(CyNetwork.NAME, collectionName);
+//				if (rootNetName == null || rootNetName.trim().length() == 0) {
+//					// The root network does not have a name yet, set it the same
+//					// as the base subnetwork
+//					rootNet.getRow(rootNet).set(CyNetwork.NAME, collectionName);
+//				}
+//			}
+//		}
+//	}
 
 }

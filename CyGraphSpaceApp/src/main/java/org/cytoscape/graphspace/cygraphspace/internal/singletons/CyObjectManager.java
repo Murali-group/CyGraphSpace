@@ -31,18 +31,15 @@ import java.io.File;
 import org.cytoscape.app.swing.CySwingAppAdapter;
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.CyVersion;
-import org.cytoscape.application.swing.CySwingApplication;
-import org.cytoscape.event.CyEventHelper;
 import org.cytoscape.group.CyGroupManager;
-import org.cytoscape.io.read.InputStreamTaskFactory;
 import org.cytoscape.io.util.StreamUtil;
-import org.cytoscape.io.write.CyNetworkViewWriterFactory;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNetworkFactory;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNetworkTableManager;
 import org.cytoscape.model.subnetwork.CyRootNetworkManager;
-import org.cytoscape.task.create.CreateNetworkViewTaskFactory;
+import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
+import org.cytoscape.task.write.ExportNetworkTaskFactory;
 import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewFactory;
@@ -52,8 +49,6 @@ import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.vizmap.VisualMappingFunctionFactory;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyleFactory;
-import org.cytoscape.work.TaskManager;
-import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.work.swing.DialogTaskManager;
 
 import javax.swing.*;
@@ -67,8 +62,11 @@ public enum CyObjectManager {
     // The network table manager.
     private CyNetworkTableManager networkTableManager;
     
-    private CyNetworkViewWriterFactory cytoscapeJsWriterFactory;
-	private InputStreamTaskFactory cytoscapeJsReaderFactory;
+//    private CyNetworkViewWriterFactory cytoscapeJsWriterFactory;
+//	private InputStreamTaskFactory cytoscapeJsReaderFactory;
+	private LoadNetworkFileTaskFactory loadNetworkFileTaskFactory;
+	private ExportNetworkTaskFactory exportNetworkTaskFactory;
+//	private CyNetworkReader cyNetworkReader;
 	
     public File getConfigDir()
     {
@@ -83,13 +81,25 @@ public enum CyObjectManager {
         this.adapter = appAdapter;
     }
     
-    public void setCytoscapeJsWriterFactory(CyNetworkViewWriterFactory cytoscapeJsWriterFactory){
-    	this.cytoscapeJsWriterFactory = cytoscapeJsWriterFactory;
+//    public void setCytoscapeJsWriterFactory(CyNetworkViewWriterFactory cytoscapeJsWriterFactory){
+//    	this.cytoscapeJsWriterFactory = cytoscapeJsWriterFactory;
+//    }
+//    
+//    public void setCytoscapeJsReaderFactory(InputStreamTaskFactory cytoscapeJsReaderFactory){
+//    	this.cytoscapeJsReaderFactory = cytoscapeJsReaderFactory;
+//    }
+    
+    public void setLoadNetworkFileTaskFactory(LoadNetworkFileTaskFactory loadNetworkFileTaskFactory){
+    	this.loadNetworkFileTaskFactory = loadNetworkFileTaskFactory;
     }
     
-    public void setCytoscapeJsReaderFactory(InputStreamTaskFactory cytoscapeJsReaderFactory){
-    	this.cytoscapeJsReaderFactory = cytoscapeJsReaderFactory;
+    public void setExportNetworkTaskFactory(ExportNetworkTaskFactory exportNetworkTaskFactory){
+    	this.exportNetworkTaskFactory = exportNetworkTaskFactory;
     }
+    
+//    public void setCyNetworkReader(CyNetworkReader cyNetworkReader){
+//    	this.cyNetworkReader = cyNetworkReader;
+//    }
     
     // Trivial Getters
     public CyVersion getCyVersion(){
@@ -121,13 +131,26 @@ public enum CyObjectManager {
     {
         return adapter.getCyNetworkViewManager();
     }
-    public CyNetworkViewWriterFactory getCytoscapeJsWriterFactory(){
-    	return this.cytoscapeJsWriterFactory;
+//    public CyNetworkViewWriterFactory getCytoscapeJsWriterFactory(){
+//    	return this.cytoscapeJsWriterFactory;
+//    }
+//    
+//    public InputStreamTaskFactory getCytoscapeJsReaderFactory(){
+//    	return this.cytoscapeJsReaderFactory;
+//    }
+    
+    public LoadNetworkFileTaskFactory getLoadNetworkFileTaskFactory(){
+    	return this.loadNetworkFileTaskFactory;
     }
     
-    public InputStreamTaskFactory getCytoscapeJsReaderFactory(){
-    	return this.cytoscapeJsReaderFactory;
+    public ExportNetworkTaskFactory getExportNetworkTaskFactory(){
+    	return this.exportNetworkTaskFactory;
     }
+    
+//    public CyNetworkReader getCyNetworkReader(){
+//    	return this.cyNetworkReader;
+//    }
+    
     public VisualLexicon getDefaultVisualLexicon() { return adapter.getRenderingEngineManager().getDefaultVisualLexicon(); }
     public JFrame getApplicationFrame() { return adapter.getCySwingApplication().getJFrame(); }
     public DialogTaskManager getTaskManager() { return adapter.getDialogTaskManager(); }

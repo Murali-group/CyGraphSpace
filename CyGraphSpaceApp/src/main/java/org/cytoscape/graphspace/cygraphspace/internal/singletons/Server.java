@@ -47,4 +47,8 @@ public enum Server{
 	public JSONObject getGraph(String id) throws Exception{
 		return this.client.getGraph(id);
 	}
+	
+	public void postGraph(JSONObject graph) throws Exception{
+		this.client.postGraph(graph);
+	}
 }

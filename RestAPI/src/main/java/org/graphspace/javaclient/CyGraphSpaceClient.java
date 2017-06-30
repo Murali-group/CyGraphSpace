@@ -74,4 +74,9 @@ public class CyGraphSpaceClient{
 	public JSONObject getGraph(String id) throws Exception{
 		return client.getGraphById(id);
 	}
+	
+	public void postGraph(JSONObject graph) throws Exception{
+		String str = client.postGraph(graph).toString();
+		System.out.println(str);
+	}
 }

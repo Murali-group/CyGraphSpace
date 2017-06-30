@@ -10,7 +10,7 @@ public class GraphSpaceNetworkAboutToBeDestroyedListener implements NetworkAbout
 	@Override
 	public void handleEvent(NetworkAboutToBeDestroyedEvent arg0) {
 		CyNetwork cyNetwork = arg0.getNetwork();
-		System.out.println( "Netwwork to be destroyed: " + cyNetwork.getSUID());
+		System.out.println( "Network to be destroyed: " + cyNetwork.getSUID());
 		NetworkManager.INSTANCE.deleteCyNetworkEntry(cyNetwork.getSUID());
 	}
 

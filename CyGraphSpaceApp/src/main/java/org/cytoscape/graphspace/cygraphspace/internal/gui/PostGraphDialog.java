@@ -4,20 +4,27 @@ import javax.swing.JDialog;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
+import org.apache.commons.io.IOUtils;
+import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
+import org.cytoscape.model.CyNetwork;
+import org.cytoscape.work.TaskIterator;
+import org.json.JSONObject;
 
 import java.awt.Component;
 import java.awt.Frame;
 
-import javax.swing.Box;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.awt.event.ActionEvent;
-import javax.swing.JPasswordField;
 
 public class PostGraphDialog extends JDialog {
 	private JTextField hostField;
@@ -91,6 +98,7 @@ public class PostGraphDialog extends JDialog {
 		postGraphButton = new JButton("Export");
 		postGraphButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				exportActionPerformed(e);
 			}
 		});
 		buttonsPanel.add(postGraphButton);
@@ -98,6 +106,7 @@ public class PostGraphDialog extends JDialog {
 		cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				cancelActionPerformed(e);
 			}
 		});
 		buttonsPanel.add(cancelButton);
@@ -114,4 +123,28 @@ public class PostGraphDialog extends JDialog {
 			hostField.setText(Server.INSTANCE.getHost());
 		}
 	}
+	
+	private void exportActionPerformed(ActionEvent evt){
+		try{
+			File tempFile = File.createTempFile("CyGraphSpace", ".cyjs");
+			CyNetwork network = CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork();
+			TaskIterator ti = CyObjectManager.INSTANCE.getExportNetworkTaskFactory().createTaskIterator(network, tempFile);
+			CyObjectManager.INSTANCE.getTaskManager().execute(ti);
+			InputStream is = new FileInputStream(tempFile);
+            String graphJSONString = IOUtils.toString(is);
+            JSONObject graphJSON = new JSONObject(graphJSONString);   
+			Server.INSTANCE.postGraph(graphJSON);
+			this.dispose();
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not post graph", "Error", JOptionPane.ERROR_MESSAGE);
+			this.dispose();
+		}
+	}
+	
+	private void cancelActionPerformed(ActionEvent e){
+		this.dispose();
+	}
+	
 }

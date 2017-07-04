@@ -127,12 +127,15 @@ public class AuthenticationDialog extends JDialog {
     	String hostText = hostField.getText();
     	String usernameText = usernameField.getText();
     	String passwordText = new String(passwordField.getPassword());
+    	Server.INSTANCE.authenticate(hostText, usernameText, passwordText);
     	if (hostText.isEmpty() || usernameText.isEmpty() || passwordText.isEmpty()){
     		JOptionPane.showMessageDialog((Component)evt.getSource(), "Please enter all the values", "Error", JOptionPane.ERROR_MESSAGE);
     	}
+    	else if (!Server.INSTANCE.authenticationValid()){
+        	Server.INSTANCE.authenticate("www.graphspace.org", null, null);
+    		JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not authenticate you. Please ensure the username and password are correct.", "Error", JOptionPane.ERROR_MESSAGE);
+    	}
     	else{
-	    	System.out.println(hostText+" : "+usernameText+" : "+passwordText);
-	    	Server.INSTANCE.authenticate(hostText, usernameText, passwordText);
 	    	System.out.println(Server.INSTANCE.getHost()+" : "+Server.INSTANCE.getUsername()+" : "+Server.INSTANCE.getPassword());
 	    	this.dispose();
     	}

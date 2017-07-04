@@ -37,6 +37,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNetworkFactory;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNetworkTableManager;
+import org.cytoscape.model.CyTableManager;
 import org.cytoscape.model.subnetwork.CyRootNetworkManager;
 import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
 import org.cytoscape.task.write.ExportNetworkTaskFactory;
@@ -67,7 +68,7 @@ public enum CyObjectManager {
 	private LoadNetworkFileTaskFactory loadNetworkFileTaskFactory;
 	private ExportNetworkTaskFactory exportNetworkTaskFactory;
 //	private CyNetworkReader cyNetworkReader;
-	
+	private CyTableManager tableManager;
     public File getConfigDir()
     {
         return configDir;
@@ -164,8 +165,9 @@ public enum CyObjectManager {
     public RenderingEngineManager getRenderingEngineManager() { return adapter.getRenderingEngineManager(); }
 
 	public void setNetworkTableManager(CyNetworkTableManager networkTableManager) { this.networkTableManager = networkTableManager; }
-	
+	public void setTableManager(CyTableManager tableManager) { this.tableManager = tableManager; }
     public CyNetworkTableManager getNetworkTableManager() { return networkTableManager; }
+    public CyTableManager getTableManager() { return this.tableManager; }
 
     // Slightly More Sophisticated Getters
     public CyNetwork getCurrentNetwork()

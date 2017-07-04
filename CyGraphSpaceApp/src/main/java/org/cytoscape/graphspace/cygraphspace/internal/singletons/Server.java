@@ -11,7 +11,8 @@ public enum Server{
 	public CyGraphSpaceClient client;
 	String username;
 	String password;
-	String host;
+	String host = "www.graphspace.org";
+	boolean authenticated = false;
 	
 	public void authenticate(String host, String username, String password){
 		this.host = host;
@@ -22,6 +23,22 @@ public enum Server{
 	
 	public boolean isAuthenticated(){
 		return !(this.client==null);
+	}
+	
+	public boolean authenticationValid(){
+		JSONObject graph;
+		try {
+			graph = getGraphById("21752");
+			System.out.println(graph.toString());
+			if (graph.getInt("status")!= 401){
+				this.authenticated = true;
+				return true;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 	public String getUsername(){
@@ -44,8 +61,16 @@ public enum Server{
 		return this.client.getGraphMetaDataList(myGraphs, publicGraphs, sharedGraphs);
 	}
 	
-	public JSONObject getGraph(String id) throws Exception{
-		return this.client.getGraph(id);
+	public JSONObject getGraphById(String id) throws Exception{
+		return this.client.getGraphById(id);
+	}
+	
+	public JSONObject getGraphByName(String name) throws Exception{
+		return this.client.getGraphByName(name);
+	}
+	
+	public JSONObject updateGraph(String name, JSONObject graphJSON, boolean isGraphPublic) throws Exception{
+		return this.client.updateGraph(name, graphJSON, isGraphPublic);
 	}
 	
 	public void postGraph(JSONObject graph) throws Exception{

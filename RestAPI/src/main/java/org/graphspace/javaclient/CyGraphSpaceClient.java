@@ -52,13 +52,13 @@ public class CyGraphSpaceClient{
 		ArrayList<GSGraphMetaData> graphList = new ArrayList<GSGraphMetaData>();
 		
 		if (myGraphs){
-			int limit = 1000;
+			int limit = 20;
 			int offset = 0;
 			graphList.addAll(graphJSONListToMetaDataArray(client.getMyGraphs(limit, offset)));
 		}
 		
 		if (publicGraphs){
-			int limit = 1000;
+			int limit = 20;
 			int offset = 0;
 			graphList.addAll(graphJSONListToMetaDataArray(client.getPublicGraphs(limit, offset)));
 		}
@@ -71,12 +71,25 @@ public class CyGraphSpaceClient{
 		return graphList;
 	}
 	
-	public JSONObject getGraph(String id) throws Exception{
+	public JSONObject getGraphById(String id) throws Exception{
 		return client.getGraphById(id);
+	}
+	
+	public JSONObject getGraphByName(String name) throws Exception{
+		return client.getGraph(name);
 	}
 	
 	public void postGraph(JSONObject graph) throws Exception{
 		String str = client.postGraph(graph).toString();
 		System.out.println(str);
+	}
+	
+	public JSONObject updateGraph(String name, String ownerEmail, JSONObject graphJSON, boolean isGraphPublic) throws Exception{
+		return client.updateGraph(name, ownerEmail, graphJSON, isGraphPublic);
+	}
+	
+	public JSONObject updateGraph(String name, JSONObject graphJSON, boolean isGraphPublic) throws Exception{
+		String ownerEmail = this.username;
+		return client.updateGraph(name, ownerEmail, graphJSON, isGraphPublic);
 	}
 }

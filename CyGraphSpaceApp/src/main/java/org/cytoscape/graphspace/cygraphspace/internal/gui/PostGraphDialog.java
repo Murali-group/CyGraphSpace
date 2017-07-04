@@ -13,6 +13,7 @@ import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.work.TaskIterator;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.awt.Component;
@@ -23,15 +24,14 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.awt.event.ActionEvent;
 
 public class PostGraphDialog extends JDialog {
 	private JTextField hostField;
 	private JTextField usernameField;
-	private JTextField graphNameField;
 	private JLabel usernameLabel;
-	private JLabel graphNameLabel;
 	private JPanel buttonsPanel;
 	private JButton postGraphButton;
 	private JButton cancelButton;
@@ -46,12 +46,7 @@ public class PostGraphDialog extends JDialog {
 		usernameField = new JTextField();
 		usernameField.setColumns(10);
 		
-		graphNameField = new JTextField();
-		graphNameField.setColumns(10);
-		
 		usernameLabel = new JLabel("Username");
-		
-		graphNameLabel = new JLabel("Graph Name");
 		
 		buttonsPanel = new JPanel();
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
@@ -68,10 +63,6 @@ public class PostGraphDialog extends JDialog {
 							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
 								.addComponent(hostField, GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
 								.addComponent(usernameField)))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(graphNameLabel)
-							.addGap(6)
-							.addComponent(graphNameField))
 						.addComponent(buttonsPanel, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap())
 		);
@@ -86,21 +77,12 @@ public class PostGraphDialog extends JDialog {
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(usernameField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(usernameLabel))
-					.addGap(18)
-					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(graphNameLabel)
-						.addComponent(graphNameField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
+					.addGap(15)
 					.addComponent(buttonsPanel, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap(14, Short.MAX_VALUE))
 		);
 		
 		postGraphButton = new JButton("Export");
-		postGraphButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				exportActionPerformed(e);
-			}
-		});
 		buttonsPanel.add(postGraphButton);
 		
 		cancelButton = new JButton("Cancel");
@@ -112,6 +94,27 @@ public class PostGraphDialog extends JDialog {
 		buttonsPanel.add(cancelButton);
 		getContentPane().setLayout(groupLayout);
 		populateFields();
+		try {
+			JSONObject graphJSON = exportNetworkToJSON();
+			if (updatePossible(graphJSON)){
+				postGraphButton.setText("Update");
+				postGraphButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						updateActionPerformed(e, graphJSON);
+					}
+				});
+			}
+			else{
+				postGraphButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						exportActionPerformed(e, graphJSON);
+					}
+				});
+			}
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		pack();
 	}
 	
@@ -124,23 +127,67 @@ public class PostGraphDialog extends JDialog {
 		}
 	}
 	
-	private void exportActionPerformed(ActionEvent evt){
+	private void updateActionPerformed(ActionEvent evt, JSONObject graphJSON){
 		try{
-			File tempFile = File.createTempFile("CyGraphSpace", ".cyjs");
-			CyNetwork network = CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork();
-			TaskIterator ti = CyObjectManager.INSTANCE.getExportNetworkTaskFactory().createTaskIterator(network, tempFile);
-			CyObjectManager.INSTANCE.getTaskManager().execute(ti);
-			InputStream is = new FileInputStream(tempFile);
-            String graphJSONString = IOUtils.toString(is);
-            JSONObject graphJSON = new JSONObject(graphJSONString);   
-			Server.INSTANCE.postGraph(graphJSON);
+			updateGraph(graphJSON);
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not update graph", "Error", JOptionPane.ERROR_MESSAGE);
 			this.dispose();
 		}
+		this.dispose();
+	}
+	
+	private void exportActionPerformed(ActionEvent evt, JSONObject graphJSON){
+		try{
+			postGraph(graphJSON);
+			}
 		catch (Exception e){
 			e.printStackTrace();
 			JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not post graph", "Error", JOptionPane.ERROR_MESSAGE);
 			this.dispose();
 		}
+		this.dispose();
+	}
+	
+	private boolean updatePossible(JSONObject graphJSON) throws Exception{
+		String name = graphJSON.getString("name");
+		JSONObject responseJSON = Server.INSTANCE.getGraphByName(name);
+		System.out.println(responseJSON);
+		if (responseJSON.getInt("status")==201 || responseJSON.getInt("status")==201){
+			return true;
+		}
+		return false;
+	}
+	
+	private void updateGraph(JSONObject graphJSON) throws Exception{
+		String name = graphJSON.getString("name");
+		JSONObject responseFromGraphSpace = Server.INSTANCE.client.getGraphByName(name);
+		int isPublic = responseFromGraphSpace.getJSONObject("body").getJSONObject("object").getInt("is_public");
+		if (isPublic == 0){
+			Server.INSTANCE.updateGraph(name, graphJSON, false);
+		}
+		else{
+			Server.INSTANCE.updateGraph(name, graphJSON, true);
+		}
+	}
+	
+	private void postGraph(JSONObject graphJSON) throws Exception{
+		Server.INSTANCE.postGraph(graphJSON);
+	}
+	
+	private JSONObject exportNetworkToJSON() throws IOException{
+		File tempFile = File.createTempFile("CyGraphSpaceExport", ".cyjs");
+		CyNetwork network = CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork();
+		TaskIterator ti = CyObjectManager.INSTANCE.getExportNetworkTaskFactory().createTaskIterator(network, tempFile);
+		CyObjectManager.INSTANCE.getTaskManager().execute(ti);
+		InputStream is = new FileInputStream(tempFile);
+		String graphJSONString = IOUtils.toString(is);
+//		System.out.println(graphJSONString);
+		JSONObject graphJSON = new JSONObject(graphJSONString);
+		tempFile.delete();
+        return graphJSON;
 	}
 	
 	private void cancelActionPerformed(ActionEvent e){

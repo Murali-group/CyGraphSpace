@@ -443,6 +443,11 @@ public class Client {
     	}
     }
     
+    public JSONObject updateGraph(String name, JSONObject graphJSON, boolean isGraphPublic) throws Exception{
+    	String ownerEmail = this.username;
+    	return updateGraph(name, ownerEmail, graphJSON, isGraphPublic);
+    }
+    
     /**
      * 
      * @param name

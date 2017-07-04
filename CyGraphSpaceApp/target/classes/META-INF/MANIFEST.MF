@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1498829080947
+Bnd-LastModified: 1499207758512
 Build-Jdk: 1.8.0_101
 Built-By: rishabh
 Bundle-Activator: org.cytoscape.graphspace.cygraphspace.internal.CyActiv
@@ -50,17 +50,18 @@ Import-Package: javax.crypto;resolution:=optional,javax.crypto.spec;reso
  :=optional;version="[3.3,4)",org.cytoscape.model.events;resolution:=opt
  ional;version="[3.3,4)",org.cytoscape.model.subnetwork;resolution:=opti
  onal;version="[3.3,4)",org.cytoscape.service.util;resolution:=optional;
- version="[3.3,4)",org.cytoscape.task.read;resolution:=optional;version=
- "[3.3,4)",org.cytoscape.task.write;resolution:=optional;version="[3.3,4
- )",org.cytoscape.view.layout;resolution:=optional;version="[3.3,4)",org
- .cytoscape.view.model;resolution:=optional;version="[3.3,4)",org.cytosc
- ape.view.presentation;resolution:=optional;version="[3.3,4)",org.cytosc
- ape.view.vizmap;resolution:=optional;version="[3.3,4)",org.cytoscape.wo
- rk;resolution:=optional;version="[3.3,4)",org.cytoscape.work.swing;reso
- lution:=optional;version="[3.3,4)",org.ietf.jgss;resolution:=optional,o
- rg.osgi.framework;resolution:=optional;version="[1.5,2)",org.slf4j;reso
- lution:=optional;version="[1.5,2)",org.w3c.dom;resolution:=optional,org
- .w3c.dom.bootstrap;resolution:=optional,org.w3c.dom.ls;resolution:=opti
- onal,org.xml.sax;resolution:=optional
+ version="[3.3,4)",org.cytoscape.task.edit;resolution:=optional;version=
+ "[3.3,4)",org.cytoscape.task.read;resolution:=optional;version="[3.3,4)
+ ",org.cytoscape.task.write;resolution:=optional;version="[3.3,4)",org.c
+ ytoscape.view.layout;resolution:=optional;version="[3.3,4)",org.cytosca
+ pe.view.model;resolution:=optional;version="[3.3,4)",org.cytoscape.view
+ .presentation;resolution:=optional;version="[3.3,4)",org.cytoscape.view
+ .vizmap;resolution:=optional;version="[3.3,4)",org.cytoscape.work;resol
+ ution:=optional;version="[3.3,4)",org.cytoscape.work.swing;resolution:=
+ optional;version="[3.3,4)",org.ietf.jgss;resolution:=optional,org.osgi.
+ framework;resolution:=optional;version="[1.5,2)",org.slf4j;resolution:=
+ optional;version="[1.5,2)",org.w3c.dom;resolution:=optional,org.w3c.dom
+ .bootstrap;resolution:=optional,org.w3c.dom.ls;resolution:=optional,org
+ .xml.sax;resolution:=optional
 Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
 Tool: Bnd-3.3.0.201609221906

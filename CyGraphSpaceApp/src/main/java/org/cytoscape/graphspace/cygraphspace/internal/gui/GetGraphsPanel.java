@@ -160,10 +160,10 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		);
 		
 		JButton myGraphsPreviousButton = new JButton("< Previous");
-		myGraphsPreviousButton.addActionListener(new MyGraphsPreviousButtonActionListener(this.limit, this.myGraphsOffSet-20));
+		myGraphsPreviousButton.addActionListener(new MyGraphsPreviousButtonActionListener());
 		
 		JButton myGraphsNextButton = new JButton("Next >");
-		myGraphsNextButton.addActionListener(new MyGraphsNextButtonActionListener(this.limit, this.myGraphsOffSet+20));
+		myGraphsNextButton.addActionListener(new MyGraphsNextButtonActionListener());
 		
 		GroupLayout gl_myGraphsPaginationPanel = new GroupLayout(myGraphsPaginationPanel);
 		gl_myGraphsPaginationPanel.setHorizontalGroup(
@@ -216,9 +216,9 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		);
 		
 		JButton sharedGraphsPreviousButton = new JButton("< Previous");
-		sharedGraphsPreviousButton.addActionListener(new SharedGraphsNextButtonActionListener(this.limit, this.sharedGraphsOffSet-20));
+		sharedGraphsPreviousButton.addActionListener(new SharedGraphsNextButtonActionListener());
 		JButton sharedGraphsNextButton = new JButton("Next >");
-		sharedGraphsNextButton.addActionListener(new SharedGraphsNextButtonActionListener(this.limit, this.sharedGraphsOffSet+20));
+		sharedGraphsNextButton.addActionListener(new SharedGraphsNextButtonActionListener());
 		
 		GroupLayout gl_sharedGraphsPaginationPanel = new GroupLayout(sharedGraphsPaginationPanel);
 		gl_sharedGraphsPaginationPanel.setHorizontalGroup(
@@ -843,16 +843,14 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	}
 
 	class MyGraphsNextButtonActionListener implements ActionListener{
-		private int offset;
-		private int limit;
-	    public MyGraphsNextButtonActionListener(int limit, int offset) {
-	    	this.limit = limit;
-	        this.offset = offset;
-	        setMyGraphsOffSet(offset);
+	    public MyGraphsNextButtonActionListener() {
+	    	super();
 	    }
 
 	    public void actionPerformed(ActionEvent e) {
 	        try {
+	        	int offset = myGraphsOffSet+20;
+	        	setMyGraphsOffSet(offset);
 				populateMyGraphs(limit, offset);
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
@@ -862,16 +860,14 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	}
 	
 	class MyGraphsPreviousButtonActionListener implements ActionListener{
-		private int offset;
-		private int limit;
-	    public MyGraphsPreviousButtonActionListener(int limit, int offset) {
-	    	this.limit = limit;
-	        this.offset = offset;
-	        setMyGraphsOffSet(offset);
+	    public MyGraphsPreviousButtonActionListener() {
+	    	super();
 	    }
 
 	    public void actionPerformed(ActionEvent e) {
 	        try {
+	        	int offset = myGraphsOffSet-20;
+	        	setMyGraphsOffSet(offset);
 				populateMyGraphs(limit, offset);
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
@@ -881,16 +877,14 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	}
 	
 	class SharedGraphsNextButtonActionListener implements ActionListener{
-		private int offset;
-		private int limit;
-	    public SharedGraphsNextButtonActionListener(int limit, int offset) {
-	    	this.limit = limit;
-	        this.offset = offset;
-	        setSharedGraphsOffSet(offset);
+	    public SharedGraphsNextButtonActionListener() {
+	    	super();
 	    }
 
 	    public void actionPerformed(ActionEvent e) {
 	        try {
+	        	int offset = sharedGraphsOffSet+20;
+	        	setSharedGraphsOffSet(offset);
 				populateSharedGraphs(limit, offset);
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
@@ -900,16 +894,14 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	}
 	
 	class SharedGraphsPreviousButtonActionListener implements ActionListener{
-		private int offset;
-		private int limit;
-	    public SharedGraphsPreviousButtonActionListener(int limit, int offset) {
-	    	this.limit = limit;
-	        this.offset = offset;
-	        setSharedGraphsOffSet(offset);
+	    public SharedGraphsPreviousButtonActionListener() {
+	    	super();
 	    }
 
 	    public void actionPerformed(ActionEvent e) {
 	        try {
+	        	int offset = sharedGraphsOffSet-20;
+	        	setSharedGraphsOffSet(offset);
 				populateSharedGraphs(limit, offset);
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block

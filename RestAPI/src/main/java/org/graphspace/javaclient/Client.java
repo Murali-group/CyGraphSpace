@@ -286,6 +286,7 @@ public class Client {
     	urlParams.put("owner_email", ownerEmail);
     	urlParams.put("names[]", name);
     	JSONObject response = makeRequest("GET", "/api/v1/graphs/", urlParams, null);
+    	System.out.println(response.toString());
 		JSONObject body = response.getJSONObject("body");
 		JSONArray array = body.getJSONArray("array");
 		int total = ((JSONObject) array.get(0)).getInt("total");

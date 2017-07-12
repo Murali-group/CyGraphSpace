@@ -35,6 +35,7 @@ import org.cytoscape.io.webservice.NetworkImportWebServiceClient;
 import org.cytoscape.io.webservice.SearchWebServiceClient;
 import org.cytoscape.io.webservice.swing.AbstractWebServiceGUIClient;
 import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
+import org.cytoscape.task.read.LoadVizmapFileTaskFactory;
 import org.cytoscape.util.swing.OpenBrowser;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.TaskManager;
@@ -55,6 +56,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	CyGraphSpaceClient client;
 	OpenBrowser openBrowser;
 	LoadNetworkFileTaskFactory loadNetworkFileTaskFactory;
+	LoadVizmapFileTaskFactory loadVizmapFileTaskFactory;
 	TaskManager taskManager;
 	
 //	final JButton searchButton = new JButton(new ImageIcon(getClass().getResource("/search-icon.png")));
@@ -109,7 +111,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		this.client = Server.INSTANCE.client;
 		this.openBrowser = openBrowser;
 		this.loadNetworkFileTaskFactory = CyObjectManager.INSTANCE.getLoadNetworkFileTaskFactory();
-		
+		this.loadVizmapFileTaskFactory = CyObjectManager.INSTANCE.getLoadVizmapFileTaskFactory();
 		parentPanel = new JPanel();
 		super.gui = parentPanel;
 		
@@ -782,18 +784,31 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private void getGraphActionPerformed(ActionEvent e, String id){
 		System.out.println("get graph action performed");
 		try {
+//			System.out.println(Server.INSTANCE.client.getGraphById(id).toString());
 			JSONObject graphJSON = Server.INSTANCE.client.getGraphById(id).getJSONObject("body").getJSONObject("object").getJSONObject("graph_json");
-			String str = graphJSON.toString();
+			JSONObject styleJSON = Server.INSTANCE.client.getGraphById(id).getJSONObject("body").getJSONObject("object").getJSONObject("style_json");
+			String graphJSONString = graphJSON.toString();
+			String styleJSONString = styleJSON.toString();
 //			String str = "{ \"format_version\" : \"1.0\", \"generated_by\" : \"cytoscape-3.5.1\", \"target_cytoscapejs_version\" : \"~2.1\", \"data\" : { \"shared_name\" : \"test3\", \"name\" : \"test3\", \"SUID\" : 52, \"__Annotations\" : [ ], \"selected\" : true }, \"elements\" : { \"nodes\" : [ { \"data\" : { \"id\" : \"68\", \"shared_name\" : \"Node 3\", \"name\" : \"Node 3\", \"SUID\" : 68, \"selected\" : false }, \"position\" : { \"x\" : -15.0, \"y\" : 18.0 }, \"selected\" : false }, { \"data\" : { \"id\" : \"66\", \"shared_name\" : \"Node 2\", \"name\" : \"Node 2\", \"SUID\" : 66, \"selected\" : false }, \"position\" : { \"x\" : -117.0, \"y\" : -93.0 }, \"selected\" : false }, { \"data\" : { \"id\" : \"64\", \"shared_name\" : \"Node 1\", \"name\" : \"Node 1\", \"SUID\" : 64, \"selected\" : false }, \"position\" : { \"x\" : -196.0, \"y\" : 36.0 }, \"selected\" : false } ], \"edges\" : [ { \"data\" : { \"id\" : \"72\", \"source\" : \"66\", \"target\" : \"68\", \"shared_name\" : \"Node 2 (interacts with) Node 3\", \"name\" : \"Node 2 (interacts with) Node 3\", \"interaction\" : \"interacts with\", \"SUID\" : 72, \"shared_interaction\" : \"interacts with\", \"selected\" : false }, \"selected\" : false }, { \"data\" : { \"id\" : \"70\", \"source\" : \"64\", \"target\" : \"66\", \"shared_name\" : \"Node 1 (interacts with) Node 2\", \"name\" : \"Node 1 (interacts with) Node 2\", \"interaction\" : \"interacts with\", \"SUID\" : 70, \"shared_interaction\" : \"interacts with\", \"selected\" : false }, \"selected\" : false } ] } }";
-			InputStream is = new ByteArrayInputStream(str.getBytes());
+			InputStream graphJSONInputStream = new ByteArrayInputStream(graphJSONString.getBytes());
+			InputStream styleJSONInputStream = new ByteArrayInputStream(styleJSONString.getBytes());
 			File tempFile = File.createTempFile("CyGraphSpaceImport", ".cyjs");
 			try (FileOutputStream out = new FileOutputStream(tempFile)) {
-	            IOUtils.copy(is, out);
+	            IOUtils.copy(graphJSONInputStream, out);
 	        }
 			TaskIterator ti = loadNetworkFileTaskFactory.createTaskIterator(tempFile);
 			CyObjectManager.INSTANCE.getTaskManager().execute(ti);
-			System.out.println(str);
+//			System.out.println(str);
 			tempFile.delete();
+			
+//			tempFile = File.createTempFile("CyGraphSpaceStyleImport", ".json");
+//			try (FileOutputStream out = new FileOutputStream(tempFile)) {
+//	            IOUtils.copy(styleJSONInputStream, out);
+//	        }
+//			ti = loadVizmapFileTaskFactory.createTaskIterator(tempFile);
+//			CyObjectManager.INSTANCE.getTaskManager().execute(ti);
+////			System.out.println(str);
+//			tempFile.delete();
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog((Component)e.getSource(), "Could not get graph", "Error", JOptionPane.ERROR_MESSAGE);

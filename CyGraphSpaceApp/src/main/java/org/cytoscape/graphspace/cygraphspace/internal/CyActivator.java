@@ -17,7 +17,9 @@ import org.cytoscape.graphspace.cygraphspace.internal.gui.PostGraphToolBarCompon
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
+import org.cytoscape.task.read.LoadVizmapFileTaskFactory;
 import org.cytoscape.task.write.ExportNetworkTaskFactory;
+import org.cytoscape.task.write.ExportVizmapTaskFactory;
 import org.cytoscape.util.swing.OpenBrowser;
 import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.swing.DialogTaskManager;
@@ -103,6 +105,8 @@ public class CyActivator extends AbstractCyActivator {
 //        registerAllServices(context, action, properties);
         PostGraphToolBarComponent toolBarComponent = new PostGraphToolBarComponent();
         desktop.getJToolBar().add(toolBarComponent);
+        desktop.getJToolBar().repaint();
+        desktop.getJToolBar().updateUI();
 //        CyNetworkViewWriterFactory cytoscapeJsWriterFactory = getService(bc, CyNetworkViewWriterFactory.class,
 //				"(id=cytoscapejsNetworkWriterFactory)");
 //        manager.setCytoscapeJsWriterFactory(cytoscapeJsWriterFactory);
@@ -113,6 +117,10 @@ public class CyActivator extends AbstractCyActivator {
 		manager.setLoadNetworkFileTaskFactory(loadNetworkFileTaskFactory);
 		ExportNetworkTaskFactory exportNetworkTaskFactory = getService(bc, ExportNetworkTaskFactory.class);
 		manager.setExportNetworkTaskFactory(exportNetworkTaskFactory);
+		LoadVizmapFileTaskFactory loadVizmapFileTaskFactory = getService(bc, LoadVizmapFileTaskFactory.class);
+		manager.setLoadVizmapTaskFactory(loadVizmapFileTaskFactory);
+		ExportVizmapTaskFactory exportVizmapTaskFactory = getService(bc, ExportVizmapTaskFactory.class);
+		manager.setExportVizmapTaskFactory(exportVizmapTaskFactory);
 //      registerService(bc,new GraphSpaceNetworkAboutToBeDestroyedListener(), NetworkAboutToBeDestroyedListener.class, new Properties());  
 		
 //		CySwingApplication cytoscapeDesktopService = getService(bc,CySwingApplication.class);

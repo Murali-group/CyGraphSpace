@@ -213,13 +213,8 @@ public class PostGraphDialog extends JDialog {
 		File tempFile = File.createTempFile("CyGraphSpaceExport", ".cyjs");
 		CyNetwork network = CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork();
 		TaskIterator ti = CyObjectManager.INSTANCE.getExportNetworkTaskFactory().createTaskIterator(network, tempFile);
-//		System.out.println("network: " + network.toString());
 		CyObjectManager.INSTANCE.getTaskManager().execute(ti);
-//		CyObjectManager.INSTANCE.getTaskManager().
-//		System.out.println("tempfile: " + tempFile.toString());
 		String graphJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
-//		InputStream is = new FileInputStream(tempFile);
-//		String graphJSONString = IOUtils.toString(is);
 		int count = 0;
 		while(graphJSONString.isEmpty()){
 			try {
@@ -235,13 +230,38 @@ public class PostGraphDialog extends JDialog {
 			}
 		}
 		tempFile.delete();
-//		System.out.println("graphString: "+graphJSONString);
 		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"shared_name\".*", "");
 		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"id_original\".*", "");
 		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"shared_interaction\".*", "");
-//		System.out.println("graphString: "+graphJSONString);
 		JSONObject graphJSON = new JSONObject(graphJSONString);
-//		System.out.println(graphJSON.toString());
+        return graphJSON;
+	}
+	
+	private JSONObject exportStyleToJSON() throws IOException{
+		File tempFile = File.createTempFile("CyGraphSpaceStyleExport", ".json");
+//		CyNetwork network = CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork();
+		TaskIterator ti = CyObjectManager.INSTANCE.getExportVizmapTaskFactory().createTaskIterator(tempFile);
+		CyObjectManager.INSTANCE.getTaskManager().execute(ti);
+		String graphJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
+		int count = 0;
+		while(graphJSONString.isEmpty()){
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			graphJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
+			count++;
+			if (count>=10){
+				return null;
+			}
+		}
+		tempFile.delete();
+		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"shared_name\".*", "");
+		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"id_original\".*", "");
+		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"shared_interaction\".*", "");
+		JSONObject graphJSON = new JSONObject(graphJSONString);
         return graphJSON;
 	}
 	

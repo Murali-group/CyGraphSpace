@@ -52,7 +52,6 @@ public class CyGraphSpaceClient{
 			return graphJSONListToMetaDataArray(client.getMyGraphs(limit, offset));
 		}
 		else if(sharedGraphs){
-			System.out.println(graphJSONListToMetaDataArray(client.getSharedGraphs(null, limit, offset)).toString());
 			return graphJSONListToMetaDataArray(client.getSharedGraphs(null, limit, offset));
 //			graphList.addAll(graphJSONListToMetaDataArray(client.getSharedGraphs(limit, offset)));
 		}

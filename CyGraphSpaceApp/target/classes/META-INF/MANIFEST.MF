@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1499895854204
+Bnd-LastModified: 1499900945686
 Build-Jdk: 1.8.0_101
 Built-By: rishabh
 Bundle-Activator: org.cytoscape.graphspace.cygraphspace.internal.CyActiv

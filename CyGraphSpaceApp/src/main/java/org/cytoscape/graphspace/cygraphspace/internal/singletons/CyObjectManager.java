@@ -43,7 +43,9 @@ import org.cytoscape.model.CyNetworkTableManager;
 import org.cytoscape.model.CyTableManager;
 import org.cytoscape.model.subnetwork.CyRootNetworkManager;
 import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
+import org.cytoscape.task.read.LoadVizmapFileTaskFactory;
 import org.cytoscape.task.write.ExportNetworkTaskFactory;
+import org.cytoscape.task.write.ExportVizmapTaskFactory;
 import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewFactory;
@@ -73,6 +75,8 @@ public enum CyObjectManager {
 	private CyTableManager tableManager;
 	private TaskManager taskManager;
 	private CySwingApplication desktop;
+	private LoadVizmapFileTaskFactory loadVizmapFileTaskFactory;
+	private ExportVizmapTaskFactory exportVizmapTaskFactory;
     public File getConfigDir()
     {
         return configDir;
@@ -102,6 +106,13 @@ public enum CyObjectManager {
     	this.exportNetworkTaskFactory = exportNetworkTaskFactory;
     }
     
+    public void setExportVizmapTaskFactory(ExportVizmapTaskFactory exportVizmapTaskFactory){
+    	this.exportVizmapTaskFactory = exportVizmapTaskFactory;
+    }
+    
+    public void setLoadVizmapTaskFactory(LoadVizmapFileTaskFactory loadVizmapFileTaskFactory){
+    	this.loadVizmapFileTaskFactory = loadVizmapFileTaskFactory;
+    }
 //    public void setCyNetworkReader(CyNetworkReader cyNetworkReader){
 //    	this.cyNetworkReader = cyNetworkReader;
 //    }
@@ -146,6 +157,14 @@ public enum CyObjectManager {
     
     public LoadNetworkFileTaskFactory getLoadNetworkFileTaskFactory(){
     	return this.loadNetworkFileTaskFactory;
+    }
+    
+    public LoadVizmapFileTaskFactory getLoadVizmapFileTaskFactory(){
+    	return this.loadVizmapFileTaskFactory;
+    }
+    
+    public ExportVizmapTaskFactory getExportVizmapTaskFactory(){
+    	return this.exportVizmapTaskFactory;
     }
     
     public ExportNetworkTaskFactory getExportNetworkTaskFactory(){

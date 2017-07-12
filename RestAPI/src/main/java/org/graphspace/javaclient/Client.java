@@ -342,8 +342,8 @@ public class Client {
     	query.put("is_public", 1);
     	query.put("limit", limit);
     	query.put("offset", offset);
-    	Map<String, Object> data = new HashMap<String, Object>();
-    	return makeRequest("GET", "/api/v1/graphs", query, data);
+//    	Map<String, Object> data = new HashMap<String, Object>();
+    	return makeRequest("GET", "/api/v1/graphs", query, null);
     }
     
     //TODO: For default values of limit and offset
@@ -360,11 +360,12 @@ public class Client {
 		query.put("member_email", this.username);
 		query.put("limit", limit);
     	query.put("offset", offset);
-    	if (!tagsList.isEmpty()){
+    	if (tagsList!=null){
     		JSONArray tags = new JSONArray(tagsList);
     		query.put("tags[]", tags);
     	}
-    	return makeRequest("GET", "/api/v1/graphs/", query, null);
+    	System.out.println(query.toString());
+    	return makeRequest("GET", "/api/v1/graphs", query, null);
     }
     
     //TODO: For default values of limit and offset    

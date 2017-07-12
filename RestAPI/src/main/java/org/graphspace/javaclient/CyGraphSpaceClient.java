@@ -48,12 +48,12 @@ public class CyGraphSpaceClient{
 	}
 	
 	public ArrayList<GSGraphMetaData> getGraphMetaDataList(boolean myGraphs, boolean sharedGraphs, boolean publicGraphs, int limit, int offset) throws Exception{
-		ArrayList<GSGraphMetaData> graphList = new ArrayList<GSGraphMetaData>();
 		if (myGraphs){
 			return graphJSONListToMetaDataArray(client.getMyGraphs(limit, offset));
 		}
 		else if(sharedGraphs){
-			return null;
+			System.out.println(graphJSONListToMetaDataArray(client.getSharedGraphs(null, limit, offset)).toString());
+			return graphJSONListToMetaDataArray(client.getSharedGraphs(null, limit, offset));
 //			graphList.addAll(graphJSONListToMetaDataArray(client.getSharedGraphs(limit, offset)));
 		}
 		else{

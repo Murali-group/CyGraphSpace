@@ -100,6 +100,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private int sharedGraphsOffSet = 0;
 	private int publicGraphsOffSet = 0;
 //	private int searchResultsOffSet = 0;
+	private boolean loggedIn = false;
 	public GetGraphsPanel(TaskManager taskManager, OpenBrowser openBrowser) {
 		super("http://www.graphspace.org", "GraphSpace", APP_DESCRIPTION);
 		this.taskManager = taskManager;
@@ -214,9 +215,9 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		);
 		
 		JButton sharedGraphsPreviousButton = new JButton("< Previous");
-//		sharedGraphsPreviousButton.addActionListener(new SharedGraphsNextButtonActionListener(this.limit, this.sharedGraphsOffSet-20));
+		sharedGraphsPreviousButton.addActionListener(new SharedGraphsNextButtonActionListener(this.limit, this.sharedGraphsOffSet-20));
 		JButton sharedGraphsNextButton = new JButton("Next >");
-//		sharedGraphsNextButton.addActionListener(new SharedGraphsNextButtonActionListener(this.limit, this.sharedGraphsOffSet+20));
+		sharedGraphsNextButton.addActionListener(new SharedGraphsNextButtonActionListener(this.limit, this.sharedGraphsOffSet+20));
 		
 		GroupLayout gl_sharedGraphsPaginationPanel = new GroupLayout(sharedGraphsPaginationPanel);
 		gl_sharedGraphsPaginationPanel.setHorizontalGroup(
@@ -308,10 +309,10 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		publicGraphsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		publicGraphsScrollPane.setViewportView(publicGraphsTable);
         
-		JButton searchResultsPreviousButton = new JButton("< Previous");
+//		JButton searchResultsPreviousButton = new JButton("< Previous");
 //		searchResultsPreviousButton.addActionListener(new SearchResultsPreviousButtonActionListener(this.limit, this.searchResultsOffSet-20));
 		
-		JButton searchResultsNextButton = new JButton("Next >");
+//		JButton searchResultsNextButton = new JButton("Next >");
 //		searchResultsNextButton.addActionListener(new SearchResultsNextButtonActionListener(this.limit, this.myGraphsOffSet+20));
         
 //		GroupLayout gl_searchResultsPanel = new GroupLayout(searchResultsPanel);
@@ -577,6 +578,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 				passwordField.setEnabled(false);
 				populateMyGraphs(this.limit, this.myGraphsOffSet);
 				populatePublicGraphs(this.limit, this.publicGraphsOffSet);
+				populateSharedGraphs(this.limit, this.sharedGraphsOffSet);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -588,57 +590,65 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	}
 	
 	private void loginActionPerformed(ActionEvent evt){
-		loginButton.setEnabled(false);
-    	String hostText = hostTextField.getText();
-    	String usernameText = usernameTextField.getText();
-    	String passwordText = new String(passwordField.getPassword());
-    	System.out.println(hostText + " : " + usernameText + " : " + passwordText);
-    	if (hostText.isEmpty() || usernameText.isEmpty() || passwordText.isEmpty()){    		
-    		JOptionPane.showMessageDialog((Component)evt.getSource(), "Please enter all the values", "Error", JOptionPane.ERROR_MESSAGE);
-    		loginButton.setText("Log In");
-    		loginButton.setEnabled(true);
-    	}
-    	else if (!Server.INSTANCE.authenticate(hostText, usernameText, passwordText)){
-    		JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not authenticate you. Please ensure the username and password are correct.", "Error", JOptionPane.ERROR_MESSAGE);
-    		loginButton.setText("Log In");
-    		loginButton.setEnabled(true);
-    	}
-    	else{
-    		try {
-        		loginButton.setText("Wait...");
-        		loginButton.setEnabled(false);
-        		hostTextField.setEnabled(false);
-        		usernameTextField.setEnabled(false);
-        		passwordField.setEnabled(false);
-				populateMyGraphs(this.limit, this.myGraphsOffSet);
-				populatePublicGraphs(this.limit, this.publicGraphsOffSet);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		loginButton.setText("Log Out");
-    		loginButton.setEnabled(true);
-    		hostTextField.setEnabled(false);
-    		usernameTextField.setEnabled(false);
-    		passwordField.setEnabled(false);
-    	}
+		if (!this.loggedIn){
+//			loginButton.setEnabled(false);
+	    	String hostText = hostTextField.getText();
+	    	String usernameText = usernameTextField.getText();
+	    	String passwordText = new String(passwordField.getPassword());
+	    	System.out.println(hostText + " : " + usernameText + " : " + passwordText);
+	    	if (hostText.isEmpty() || usernameText.isEmpty() || passwordText.isEmpty()){    		
+	    		JOptionPane.showMessageDialog((Component)evt.getSource(), "Please enter all the values", "Error", JOptionPane.ERROR_MESSAGE);
+	    		loginButton.setText("Log In");
+	    		loginButton.setEnabled(true);
+	    	}
+	    	else if (!Server.INSTANCE.authenticate(hostText, usernameText, passwordText)){
+	    		JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not authenticate you. Please ensure the username and password are correct.", "Error", JOptionPane.ERROR_MESSAGE);
+	    		loginButton.setText("Log In");
+	    		loginButton.setEnabled(true);
+	    	}
+	    	else{
+	    		try {
+					populateMyGraphs(this.limit, this.myGraphsOffSet);
+					populatePublicGraphs(this.limit, this.publicGraphsOffSet);
+					populateSharedGraphs(this.limit, this.sharedGraphsOffSet);
+					this.loggedIn = true;
+		    		loginButton.setText("Log Out");
+		    		loginButton.setEnabled(true);
+		    		hostTextField.setEnabled(false);
+		    		usernameTextField.setEnabled(false);
+		    		passwordField.setEnabled(false);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    	}
+		}
+		else{
+			Server.INSTANCE.logout();
+			hostTextField.setEnabled(true);
+			usernameTextField.setEnabled(true);
+			passwordField.setEnabled(true);
+			hostTextField.setText("www.graphspace.org");
+			usernameTextField.setText("");
+			passwordField.setText("");
+		}
 	}
 	
 	public TaskIterator createTaskIterator(Object query) {
 		return new TaskIterator();
 	}
 	
-	public void populateTables() throws Exception{
-		System.out.println("populate table action performed");
-		myGraphsTableModel.setRowCount(0);
-		sharedGraphsTableModel.setRowCount(0);
-		publicGraphsTableModel.setRowCount(0);
-//		searchResultsTableModel.setRowCount(0);
-		if (Server.INSTANCE.isAuthenticated()){
-			populateMyGraphs(this.limit, this.myGraphsOffSet);
-			populatePublicGraphs(this.limit, this.publicGraphsOffSet);			
-		}
-	}
+//	public void populateTables() throws Exception{
+//		System.out.println("populate table action performed");
+//		myGraphsTableModel.setRowCount(0);
+//		sharedGraphsTableModel.setRowCount(0);
+//		publicGraphsTableModel.setRowCount(0);
+////		searchResultsTableModel.setRowCount(0);
+//		if (Server.INSTANCE.isAuthenticated()){
+//			populateMyGraphs(this.limit, this.myGraphsOffSet);
+//			populatePublicGraphs(this.limit, this.publicGraphsOffSet);			
+//		}
+//	}
 	
 	private void populateMyGraphs(int limit, int offset) throws Exception{
 		System.out.println("populate my graphs table action performed");
@@ -659,7 +669,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		publicGraphsTableModel.setRowCount(0);
 		ArrayList<GSGraphMetaData> publicGraphsMetaDataList = Server.INSTANCE.client.getGraphMetaDataList(false, false, true, limit, offset);
 		for (GSGraphMetaData gsGraphMetaData : publicGraphsMetaDataList){
-			String access = "PRIVATE";
+//			String access = "PRIVATE";
 //			if (gsGraphMetaData.getAccess()==1){
 //				access = "PUBLIC";
 //			}
@@ -667,6 +677,21 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			publicGraphsTableModel.addRow(row);
 		}
 	}
+	
+	private void populateSharedGraphs(int limit, int offset) throws Exception{
+		System.out.println("populate shared graphs table action performed");
+		sharedGraphsTableModel.setRowCount(0);
+		ArrayList<GSGraphMetaData> sharedGraphsMetaDataList = Server.INSTANCE.client.getGraphMetaDataList(false, true, false, limit, offset);
+		for (GSGraphMetaData gsGraphMetaData : sharedGraphsMetaDataList){
+//			String access = "PRIVATE";
+//			if (gsGraphMetaData.getAccess()==1){
+//				access = "PUBLIC";
+//			}
+			Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
+			sharedGraphsTableModel.addRow(row);
+		}
+	}
+	
 //	void performSearch(final String query){
 //		// searchField.setEnabled(false);
 //		// searchButton.setEnabled(false);
@@ -760,10 +785,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	public void setPublicGraphsOffSet(int offset){
 		this.publicGraphsOffSet = offset;
 	}
-	
-//	public void setSearchResultsOffSet(int offset){
-//		this.searchResultsOffSet = offset;
-//	}
 
 	class MyGraphsNextButtonActionListener implements ActionListener{
 		private int offset;
@@ -802,52 +823,51 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			}
 	    }
 	}
-/*	
-//	class SharedGraphsNextButtonActionListener implements ActionListener{
-//		private int offset;
-//		private int limit;
-//	    public SharedGraphsNextButtonActionListener(int limit, int offset) {
-//	    	this.limit = limit;
-//	        this.offset = offset;
-//	        setSharedGraphsOffSet(offset);
-//	    }
-//
-//	    public void actionPerformed(ActionEvent e) {
-//	        try {
-//				populateSharedGraphs(limit, offset);
-//			} catch (Exception e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//			}
-//	    }
-//	}
-//	
-//	class SharedGraphsPreviousButtonActionListener implements ActionListener{
-//		private int offset;
-//		private int limit;
-//	    public SharedGraphsPreviousButtonActionListener(int limit, int offset) {
-//	    	this.limit = limit;
-//	        this.offset = offset;
-//	        setSharedGraphsOffSet(offset);
-//	    }
-//
-//	    public void actionPerformed(ActionEvent e) {
-//	        try {
-//				populateSharedGraphs(limit, offset);
-//			} catch (Exception e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//			}
-//	    }
-//	}
- * */
+	
+	class SharedGraphsNextButtonActionListener implements ActionListener{
+		private int offset;
+		private int limit;
+	    public SharedGraphsNextButtonActionListener(int limit, int offset) {
+	    	this.limit = limit;
+	        this.offset = offset;
+	        setSharedGraphsOffSet(offset);
+	    }
+
+	    public void actionPerformed(ActionEvent e) {
+	        try {
+				populateSharedGraphs(limit, offset);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+	    }
+	}
+	
+	class SharedGraphsPreviousButtonActionListener implements ActionListener{
+		private int offset;
+		private int limit;
+	    public SharedGraphsPreviousButtonActionListener(int limit, int offset) {
+	    	this.limit = limit;
+	        this.offset = offset;
+	        setSharedGraphsOffSet(offset);
+	    }
+
+	    public void actionPerformed(ActionEvent e) {
+	        try {
+				populateSharedGraphs(limit, offset);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+	    }
+	}
+	
 	class PublicGraphsNextButtonActionListener implements ActionListener{
 		private int offset;
 		private int limit;
 	    public PublicGraphsNextButtonActionListener(int limit, int offset) {
 	    	this.limit = limit;
 	        this.offset = offset;
-	        System.out.println(this.offset);
 	        setPublicGraphsOffSet(this.offset);
 	    }
 

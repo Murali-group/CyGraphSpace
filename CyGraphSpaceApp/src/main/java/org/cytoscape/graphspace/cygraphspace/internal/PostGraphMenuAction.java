@@ -4,8 +4,10 @@ import java.awt.event.ActionEvent;
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.graphspace.cygraphspace.internal.gui.AuthenticationDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.PostGraphDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
+import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 
 import javax.swing.*;
 
@@ -46,9 +48,15 @@ public class PostGraphMenuAction extends AbstractCyAction
             JOptionPane.showMessageDialog(parent, msg, dialogTitle, JOptionPane.ERROR_MESSAGE );
             return;
         }
-        
-        PostGraphDialog dialog = new PostGraphDialog(parent);
-        dialog.setLocationRelativeTo(parent);
-        dialog.setVisible(true);
+        if (Server.INSTANCE.isAuthenticated()){
+        	PostGraphDialog dialog = new PostGraphDialog(parent);
+            dialog.setLocationRelativeTo(parent);
+            dialog.setVisible(true);
+        }
+        else{
+        	AuthenticationDialog dialog = new AuthenticationDialog(parent);
+            dialog.setLocationRelativeTo(parent);
+            dialog.setVisible(true);
+        }
     }
 }

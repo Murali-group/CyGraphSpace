@@ -77,6 +77,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 //	DefaultTableModel searchResultsTableModel;
 //	TableRowSorter<TableModel> searchResultsTableSorter;
 	private JButton importButton;
+	private JButton openInBrowserButton;
 	private JPanel parentPanel;
 	private JPanel sharedGraphsPanel = new JPanel();
 	private JPanel myGraphsPanel = new JPanel();
@@ -377,30 +378,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		resultsPanel.setLayout(gl_resultsPanel);
 		
 		
-		myGraphsTable.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2){
-					String id = myGraphsTable.getValueAt(myGraphsTable.getSelectedRow(), 0).toString();
-					getGraphActionPerformed(e, id);
-				}
-			}
-		});
-		sharedGraphsTable.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2){
-					String id = sharedGraphsTable.getValueAt(sharedGraphsTable.getSelectedRow(), 0).toString();
-					getGraphActionPerformed(e, id);
-				}
-			}
-		});
-		publicGraphsTable.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2){
-					String id = publicGraphsTable.getValueAt(publicGraphsTable.getSelectedRow(), 0).toString();
-					getGraphActionPerformed(e, id);
-				}
-			}
-		});
 //		searchResultsTable.addMouseListener(new MouseAdapter() {
 //			public void mouseClicked(MouseEvent e) {
 //				if (e.getClickCount() == 2){
@@ -410,6 +387,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 //			}
 //		});
 		importButton = new JButton("Import to Cytoscape");
+		importButton.setEnabled(false);
 		importButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -451,7 +429,85 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			}
 		});
 		
-		JButton openInBrowserButton = new JButton("Open in GraphSpace");
+		openInBrowserButton = new JButton("Open in GraphSpace");
+		openInBrowserButton.setEnabled(false);
+		openInBrowserButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String id = "";
+				int selectedTable = tabbedPane.getSelectedIndex();
+				if (selectedTable==0){
+					if (myGraphsTable.getSelectedRow()<=0){
+						id = null;
+					}
+					else{
+						id = myGraphsTable.getValueAt(myGraphsTable.getSelectedRow(), 0).toString();
+					}
+				}
+				else if (selectedTable==1){
+					if (sharedGraphsTable.getSelectedRow()<=0){
+						id = null;
+					}
+					else{
+						id = sharedGraphsTable.getValueAt(sharedGraphsTable.getSelectedRow(), 0).toString();
+					}
+				}
+				else if(selectedTable==2){
+					if (publicGraphsTable.getSelectedRow()<=0){
+						id = null;
+					}
+					else{
+						id = publicGraphsTable.getValueAt(publicGraphsTable.getSelectedRow(), 0).toString();
+					}
+				}
+//				else if (selectedTable==3){
+//					if (searchResultsTable.getSelectedRow()<=0){
+//						id = null;
+//					}
+//					else{
+//						id = searchResultsTable.getValueAt(searchResultsTable.getSelectedRow(), 0).toString();
+//					}
+//				}
+				openInBrowser(id);
+			}
+		});
+		
+		myGraphsTable.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 1){
+					importButton.setEnabled(true);
+					openInBrowserButton.setEnabled(true);
+				}
+				if (e.getClickCount() == 2){
+					String id = myGraphsTable.getValueAt(myGraphsTable.getSelectedRow(), 0).toString();
+					getGraphActionPerformed(e, id);
+				}
+			}
+		});
+		sharedGraphsTable.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 1){
+					importButton.setEnabled(true);
+					openInBrowserButton.setEnabled(true);
+				}
+				if (e.getClickCount() == 2){
+					String id = sharedGraphsTable.getValueAt(sharedGraphsTable.getSelectedRow(), 0).toString();
+					getGraphActionPerformed(e, id);
+				}
+			}
+		});
+		publicGraphsTable.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 1){
+					importButton.setEnabled(true);
+					openInBrowserButton.setEnabled(true);
+				}
+				if (e.getClickCount() == 2){
+					String id = publicGraphsTable.getValueAt(publicGraphsTable.getSelectedRow(), 0).toString();
+					getGraphActionPerformed(e, id);
+				}
+			}
+		});
 		
 		GroupLayout gl_buttonPanel = new GroupLayout(buttonPanel);
 		gl_buttonPanel.setHorizontalGroup(

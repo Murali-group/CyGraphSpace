@@ -23,6 +23,7 @@ import java.awt.Frame;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -93,53 +94,50 @@ public class PostGraphDialog extends JDialog {
 		});
 		buttonsPanel.add(cancelButton);
 		getContentPane().setLayout(groupLayout);
-		
 		populateFields();
-		pack();
 		check();
+		pack();
+
 	}
-	
+
 	public void check(){
 		try {
-			if (!Server.INSTANCE.isAuthenticated()){
-				this.dispose();
-				AuthenticationDialog authDialog = new AuthenticationDialog(new JFrame());
-				authDialog.setLocationRelativeTo(this);
-				authDialog.setVisible(true);
-				authDialog.toFront();
+			System.out.println("host: "+Server.INSTANCE.getHost() + ", username: "+Server.INSTANCE.getUsername()+ ",password: "+Server.INSTANCE.getPassword());
+			JSONObject graphJSON = exportNetworkToJSON();
+			System.out.println(graphJSON.toString());
+//			if (graphJSON == null){
+//				this.dispose();
+//				JOptionPane.showMessageDialog(new JFrame(), "Could not export your network to JSON.", "Dialog", JOptionPane.ERROR_MESSAGE);
+//			}
+			String graphName = graphJSON.getJSONObject("data").getString("name");
+			System.out.println(graphName);
+			if(Server.INSTANCE.updatePossible(graphName)){
+				postGraphButton.setText("Update");
+				postGraphButton.setEnabled(true);
+				postGraphButton.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent evt) {
+						updateActionPerformed(evt, graphJSON);
+					}
+				});
 			}
 			else{
-				JSONObject graphJSON = exportNetworkToJSON();
-				if (graphJSON == null){
-					this.dispose();
-					JOptionPane.showMessageDialog(new JFrame(), "Could not export your network to JSON.", "Dialog", JOptionPane.ERROR_MESSAGE);
-				}
-				String graphName = graphJSON.getJSONObject("data").getString("name");
-				if(Server.INSTANCE.updatePossible(graphName)){
-					postGraphButton.setText("Update");
-					postGraphButton.setEnabled(true);
-					postGraphButton.addActionListener(new ActionListener(){
-						public void actionPerformed(ActionEvent evt) {
-							updateActionPerformed(evt, graphJSON);
-						}
-					});
-				}
-				else{
-					postGraphButton.setText("Export");
-					postGraphButton.setEnabled(true);
-					postGraphButton.addActionListener(new ActionListener(){
-						public void actionPerformed(ActionEvent evt) {
-							exportActionPerformed(evt, graphJSON);
-						}
-					});
-				}
+				postGraphButton.setText("Export");
+				postGraphButton.setEnabled(true);
+				postGraphButton.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent evt) {
+						exportActionPerformed(evt, graphJSON);
+					}
+				});
 			}
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			dispose();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			dispose();
 		}
 	}
 	
@@ -239,6 +237,7 @@ public class PostGraphDialog extends JDialog {
 		tempFile.delete();
 //		System.out.println("graphString: "+graphJSONString);
 		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"shared_name\".*", "");
+		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"id_original\".*", "");
 		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"shared_interaction\".*", "");
 //		System.out.println("graphString: "+graphJSONString);
 		JSONObject graphJSON = new JSONObject(graphJSONString);

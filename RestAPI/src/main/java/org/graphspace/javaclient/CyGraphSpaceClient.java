@@ -105,6 +105,9 @@ public class CyGraphSpaceClient{
 		String ownerEmail = this.username;
 		JSONObject responseJSON = client.getGraphRequest(name, ownerEmail);
 //		System.out.println("status: " + responseJSON.getInt("status"));
+		if (responseJSON==null){
+			return false;
+		}
 		if (responseJSON.getInt("status")==201 || responseJSON.getInt("status")==200){
 			return true;
 		}

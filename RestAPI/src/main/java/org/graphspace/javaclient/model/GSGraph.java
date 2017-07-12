@@ -26,6 +26,10 @@ public class GSGraph{
 		return this.name;
 	}
 	
+	public void setId(String id){
+		this.id = id;
+	}
+	
 	public JSONObject computeGraphJSON(){
 		return this.graph;
 	}

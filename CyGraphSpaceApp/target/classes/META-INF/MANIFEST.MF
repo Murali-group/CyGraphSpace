@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1499207758512
+Bnd-LastModified: 1499867227869
 Build-Jdk: 1.8.0_101
 Built-By: rishabh
 Bundle-Activator: org.cytoscape.graphspace.cygraphspace.internal.CyActiv
@@ -46,22 +46,25 @@ Import-Package: javax.crypto;resolution:=optional,javax.crypto.spec;reso
  g.cytoscape.application;resolution:=optional;version="[3.3,4)",org.cyto
  scape.application.swing;resolution:=optional;version="[3.3,4)",org.cyto
  scape.group;resolution:=optional;version="[3.3,4)",org.cytoscape.io.uti
- l;resolution:=optional;version="[3.3,4)",org.cytoscape.model;resolution
- :=optional;version="[3.3,4)",org.cytoscape.model.events;resolution:=opt
- ional;version="[3.3,4)",org.cytoscape.model.subnetwork;resolution:=opti
- onal;version="[3.3,4)",org.cytoscape.service.util;resolution:=optional;
- version="[3.3,4)",org.cytoscape.task.edit;resolution:=optional;version=
- "[3.3,4)",org.cytoscape.task.read;resolution:=optional;version="[3.3,4)
- ",org.cytoscape.task.write;resolution:=optional;version="[3.3,4)",org.c
- ytoscape.view.layout;resolution:=optional;version="[3.3,4)",org.cytosca
- pe.view.model;resolution:=optional;version="[3.3,4)",org.cytoscape.view
- .presentation;resolution:=optional;version="[3.3,4)",org.cytoscape.view
- .vizmap;resolution:=optional;version="[3.3,4)",org.cytoscape.work;resol
- ution:=optional;version="[3.3,4)",org.cytoscape.work.swing;resolution:=
- optional;version="[3.3,4)",org.ietf.jgss;resolution:=optional,org.osgi.
- framework;resolution:=optional;version="[1.5,2)",org.slf4j;resolution:=
- optional;version="[1.5,2)",org.w3c.dom;resolution:=optional,org.w3c.dom
- .bootstrap;resolution:=optional,org.w3c.dom.ls;resolution:=optional,org
- .xml.sax;resolution:=optional
+ l;resolution:=optional;version="[3.3,4)",org.cytoscape.io.webservice;re
+ solution:=optional;version="[3.3,4)",org.cytoscape.io.webservice.swing;
+ resolution:=optional;version="[3.3,4)",org.cytoscape.model;resolution:=
+ optional;version="[3.3,4)",org.cytoscape.model.events;resolution:=optio
+ nal;version="[3.3,4)",org.cytoscape.model.subnetwork;resolution:=option
+ al;version="[3.3,4)",org.cytoscape.property;resolution:=optional;versio
+ n="[3.3,4)",org.cytoscape.service.util;resolution:=optional;version="[3
+ .3,4)",org.cytoscape.task.read;resolution:=optional;version="[3.3,4)",o
+ rg.cytoscape.task.write;resolution:=optional;version="[3.3,4)",org.cyto
+ scape.util.swing;resolution:=optional;version="[3.3,4)",org.cytoscape.v
+ iew.layout;resolution:=optional;version="[3.3,4)",org.cytoscape.view.mo
+ del;resolution:=optional;version="[3.3,4)",org.cytoscape.view.presentat
+ ion;resolution:=optional;version="[3.3,4)",org.cytoscape.view.vizmap;re
+ solution:=optional;version="[3.3,4)",org.cytoscape.work;resolution:=opt
+ ional;version="[3.3,4)",org.cytoscape.work.swing;resolution:=optional;v
+ ersion="[3.3,4)",org.ietf.jgss;resolution:=optional,org.osgi.framework;
+ resolution:=optional;version="[1.5,2)",org.slf4j;resolution:=optional;v
+ ersion="[1.5,2)",org.w3c.dom;resolution:=optional,org.w3c.dom.bootstrap
+ ;resolution:=optional,org.w3c.dom.ls;resolution:=optional,org.xml.sax;r
+ esolution:=optional
 Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
 Tool: Bnd-3.3.0.201609221906

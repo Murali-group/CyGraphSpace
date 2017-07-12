@@ -26,7 +26,7 @@ public class PostGraphMenuAction extends AbstractCyAction
         super(menuTitle, applicationManager, null, null);
         // We want this menu item to appear under the App|NDEx menu. The actual name of the menu item is set in
         // org.cytoscape.ndex.internal.CyActivator as "Upload Network"
-        setPreferredMenu("Apps.CyGraphSpace");
+        setPreferredMenu("File.Export");
     }
 
     @Override

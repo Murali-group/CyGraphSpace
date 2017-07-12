@@ -108,28 +108,13 @@ public class Client {
 		String queryPath = "http://"+this.host+path+"/";
 		JSONObject headersJson = new JSONObject(headers);
 		JSONObject dataJson = new JSONObject(data);
-//		Unirest.setProxy(new HttpHost("proxy61.iitd.ernet.in", 3128));
-//		System.out.println(queryPath);
-//		System.out.println(headersJson.toString());
-//		System.out.println(dataJson.toString());
 		try{
-//			Map<String, Object> name = new HashMap<String, Object>();
-//			name.put("name", data.get("name"));
-//			Map<String, Object> isPublic = new HashMap<String, Object>();
-//			name.put("is_public", data.get("is_public"));
-//			Map<String, Object> ownerEmail = new HashMap<String, Object>();
-//			name.put("owner_email", data.get("owner_email"));
-//			Map<String, Object> graphJSON = new HashMap<String, Object>();
-//			name.put("graph_json", data.get("graph_json"));
-//			Map<String, Object> styleJSON = new HashMap<String, Object>();
-//			name.put("style_json", data.get("style_json"));
 			HttpResponse<JsonNode> getResponse = Unirest.post(queryPath)
 					.basicAuth(this.username, this.password)
 					.headers(headers)
 //					.fields(data)
 					.body(dataJson)
 					.asJson();
-//			System.out.println(getResponse.getStatusText());
 			JSONObject response = new JSONObject(getResponse);
 			return response;
 		}
@@ -148,21 +133,23 @@ public class Client {
      * @throws GraphNotFoundException 
      * @throws Exception
      */
-    private JSONObject putRequest(String path, Map<String, Object> data, Map<String, String> headers) throws GraphNotFoundException{
-    	
+    private JSONObject putRequest(String path, Map<String, Object> data, Map<String, String> headers){
 		String queryPath = "http://"+this.host+path;
+		JSONObject dataJson = new JSONObject(data);
 		try{
 			HttpResponse<JsonNode> getResponse = Unirest.put(queryPath)
 					.basicAuth(this.username, this.password)
 					.headers(headers)
-					.fields(data)
+//					.fields(data)
+					.body(dataJson)
 					.asJson();
 			JSONObject response = new JSONObject(getResponse);
 			return response;
 		}
 		catch(Exception e){
-			throw new GraphNotFoundException();
+			e.printStackTrace();
 		}
+		return null;
     }
     
     /**
@@ -252,7 +239,7 @@ public class Client {
     	graph.setStyleJSON(styleJSON);
     	data.put("name", graph.getName());
     	data.put("is_public", isPublic);
-        data.put("owner_email", username);
+        data.put("owner_email", this.username);
         data.put("graph_json", graph.computeGraphJSON());
         data.put("style_json", graph.getStyleJSON());
     	return makeRequest("POST", "/api/v1/graphs", null, data);
@@ -288,6 +275,22 @@ public class Client {
 		int total = ((JSONObject) array.get(0)).getInt("total");
     	if (total > 0){
     		return ((JSONArray) ((JSONObject)((JSONArray)((JSONObject)response.getJSONObject("body")).getJSONArray("array")).get(0)).getJSONArray("graphs")).getJSONObject(0);
+    	}
+    	else{
+    		return null;
+    	}
+    }
+    
+    public JSONObject getGraphRequest(String name, String ownerEmail) throws Exception{
+    	Map<String, Object> urlParams = new HashMap<String, Object>();
+    	urlParams.put("owner_email", ownerEmail);
+    	urlParams.put("names[]", name);
+    	JSONObject response = makeRequest("GET", "/api/v1/graphs/", urlParams, null);
+		JSONObject body = response.getJSONObject("body");
+		JSONArray array = body.getJSONArray("array");
+		int total = ((JSONObject) array.get(0)).getInt("total");
+    	if (total > 0){
+    		return response;
     	}
     	else{
     		return null;
@@ -424,23 +427,24 @@ public class Client {
     public JSONObject updateGraph(String name, String ownerEmail, JSONObject graphJSON, boolean isGraphPublic) throws Exception{
     	Map<String, Object> data = new HashMap<String, Object>();
     	int isPublic = (isGraphPublic) ? 1 : 0;
+    	JSONObject graphResponse = getGraphRequest(name, ownerEmail);
+    	String id = String.valueOf(graphResponse.getJSONObject("body").getJSONObject("object").getJSONArray("graphs").getJSONObject(0).getInt("id"));
+    	JSONObject styleJSON = graphResponse.getJSONObject("body").getJSONObject("object").getJSONArray("graphs").getJSONObject(0).getJSONObject("style_json");
     	GSGraph graph = new GSGraph(graphJSON);
+    	graph.setId(id);
+    	graph.setStyleJSON(styleJSON);
     	if (graphJSON!=null){
     		data.put("name", graph.getName());
     		data.put("is_public", isPublic);
+    		data.put("owner_email", this.username);
     		data.put("graph_json", graph.computeGraphJSON());
     		data.put("style_json", graph.getStyleJSON());
+    		return makeRequest("PUT", "/api/v1/graphs/" + graph.getId(), null, data);
     	}
     	else{
-    		data.put("is_public", isPublic);
+    		return null;
     	}
-    	graphJSON = getGraph(name, ownerEmail);
-    	if (graphJSON == null){
-    		throw new GraphNotFoundException(name, username);
-    	}
-    	else{
-    		return makeRequest("PUT", "/api/v1/graphs/" + graph.getId(), data, null);
-    	}
+    	
     }
     
     public JSONObject updateGraph(String name, JSONObject graphJSON, boolean isGraphPublic) throws Exception{

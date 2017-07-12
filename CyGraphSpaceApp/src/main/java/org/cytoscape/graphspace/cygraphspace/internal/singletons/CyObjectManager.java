@@ -28,9 +28,12 @@ package org.cytoscape.graphspace.cygraphspace.internal.singletons;
 
 import java.io.File;
 
+import javax.swing.JFrame;
+
 import org.cytoscape.app.swing.CySwingAppAdapter;
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.CyVersion;
+import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.group.CyGroupManager;
 import org.cytoscape.io.util.StreamUtil;
 import org.cytoscape.model.CyNetwork;
@@ -50,9 +53,8 @@ import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.vizmap.VisualMappingFunctionFactory;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyleFactory;
+import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.swing.DialogTaskManager;
-
-import javax.swing.*;
 
 public enum CyObjectManager {
     INSTANCE;
@@ -69,6 +71,8 @@ public enum CyObjectManager {
 	private ExportNetworkTaskFactory exportNetworkTaskFactory;
 //	private CyNetworkReader cyNetworkReader;
 	private CyTableManager tableManager;
+	private TaskManager taskManager;
+	private CySwingApplication desktop;
     public File getConfigDir()
     {
         return configDir;
@@ -151,10 +155,12 @@ public enum CyObjectManager {
 //    public CyNetworkReader getCyNetworkReader(){
 //    	return this.cyNetworkReader;
 //    }
-    
+    public void setTaskManager(TaskManager taskManager){
+    	this.taskManager = taskManager;
+    }
     public VisualLexicon getDefaultVisualLexicon() { return adapter.getRenderingEngineManager().getDefaultVisualLexicon(); }
     public JFrame getApplicationFrame() { return adapter.getCySwingApplication().getJFrame(); }
-    public DialogTaskManager getTaskManager() { return adapter.getDialogTaskManager(); }
+    public DialogTaskManager getTaskManager() { return this.adapter.getDialogTaskManager(); }
     public CyLayoutAlgorithmManager getLayoutAlgorithmManager() { return adapter.getCyLayoutAlgorithmManager(); }
     public VisualMappingManager getVisualMappingManager() { return adapter.getVisualMappingManager(); }
     public CyGroupManager getCyGroupManager() { return adapter.getCyGroupManager(); }
@@ -168,7 +174,7 @@ public enum CyObjectManager {
 	public void setTableManager(CyTableManager tableManager) { this.tableManager = tableManager; }
     public CyNetworkTableManager getNetworkTableManager() { return networkTableManager; }
     public CyTableManager getTableManager() { return this.tableManager; }
-
+    
     // Slightly More Sophisticated Getters
     public CyNetwork getCurrentNetwork()
     {
@@ -180,6 +186,14 @@ public enum CyObjectManager {
     {
         CyApplicationManager applicationManager = adapter.getCyApplicationManager();
         return applicationManager == null ? null : applicationManager.getCurrentNetworkView();
+    }
+    
+    public void setCySwingApplition(CySwingApplication desktop){
+    	this.desktop = desktop;
+    }
+    
+    public CySwingApplication getCySwingApplition(){
+    	return this.desktop;
     }
 
 }

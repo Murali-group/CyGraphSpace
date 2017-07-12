@@ -282,7 +282,6 @@ public class GetGraphDialog extends JDialog{
 	private void cancelActionPerformed(ActionEvent evt) {
 		System.out.println("cancel action performed");
 		this.dispose();
-//        setVisible(false);
     }
 	
 	private void getGraphActionPerformed(ActionEvent e){
@@ -314,17 +313,18 @@ public class GetGraphDialog extends JDialog{
 	}
 	
 	private void checkBoxClicked(ActionEvent e) throws Exception{
-		populateTable(myGraphsCheckBox.isSelected(), publicGraphsCheckBox.isSelected(), false);
+		populateTable(myGraphsCheckBox.isSelected(), false, publicGraphsCheckBox.isSelected(), 20, 0);
 	}
 	
-	private void populateTable(boolean myGraphsSelected, boolean publicGraphsSelected, boolean sharedGraphsSelected) throws Exception{
+	private void populateTable(boolean myGraphsSelected, boolean sharedGraphsSelected, boolean publicGraphsSelected, int limit, int offset) throws Exception{
 		System.out.println("populate table action performed");
 		graphsTableModel.setRowCount(0);
 		if (!Server.INSTANCE.isAuthenticated()){
-			new AuthenticationDialog(this.parent);
+			AuthenticationDialog authDialog = new AuthenticationDialog(this.parent);
+			authDialog.setVisible(true);
 		}
 		else{
-			ArrayList<GSGraphMetaData> graphsMetaDataList = Server.INSTANCE.client.getGraphMetaDataList(myGraphsSelected, publicGraphsSelected, sharedGraphsSelected);
+			ArrayList<GSGraphMetaData> graphsMetaDataList = Server.INSTANCE.client.getGraphMetaDataList(myGraphsSelected, publicGraphsSelected, sharedGraphsSelected, limit, offset);
 			for (GSGraphMetaData gsGraphMetaData : graphsMetaDataList){
 				String access = "PRIVATE";
 				if (gsGraphMetaData.getAccess()==1){

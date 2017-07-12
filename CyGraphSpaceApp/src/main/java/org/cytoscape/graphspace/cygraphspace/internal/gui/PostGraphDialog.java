@@ -1,6 +1,7 @@
 package org.cytoscape.graphspace.cygraphspace.internal.gui;
 
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
@@ -8,12 +9,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.work.TaskIterator;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.awt.Component;
@@ -29,8 +30,8 @@ import java.io.InputStream;
 import java.awt.event.ActionEvent;
 
 public class PostGraphDialog extends JDialog {
-	private JTextField hostField;
-	private JTextField usernameField;
+	private JLabel hostValueLabel;
+	private JLabel usernameValueLabel;
 	private JLabel usernameLabel;
 	private JPanel buttonsPanel;
 	private JButton postGraphButton;
@@ -40,11 +41,10 @@ public class PostGraphDialog extends JDialog {
 		
 		JLabel hostLabel = new JLabel("Host");
 		
-		hostField = new JTextField();
-		hostField.setColumns(10);
+		hostValueLabel = new JLabel("www.graphspace.org");
 		
-		usernameField = new JTextField();
-		usernameField.setColumns(10);
+		usernameValueLabel = new JLabel("Anonymous");
+		
 		
 		usernameLabel = new JLabel("Username");
 		
@@ -61,8 +61,8 @@ public class PostGraphDialog extends JDialog {
 								.addComponent(usernameLabel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 							.addPreferredGap(ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
 							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-								.addComponent(hostField, GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
-								.addComponent(usernameField)))
+								.addComponent(hostValueLabel, GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+								.addComponent(usernameValueLabel)))
 						.addComponent(buttonsPanel, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap())
 		);
@@ -71,20 +71,20 @@ public class PostGraphDialog extends JDialog {
 				.addGroup(groupLayout.createSequentialGroup()
 					.addGap(24)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(hostField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(hostValueLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(hostLabel))
 					.addGap(18)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(usernameField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(usernameValueLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(usernameLabel))
 					.addGap(15)
 					.addComponent(buttonsPanel, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap(14, Short.MAX_VALUE))
 		);
 		
-		postGraphButton = new JButton("Export");
+		postGraphButton = new JButton("Checking...");
+		postGraphButton.setEnabled(false);
 		buttonsPanel.add(postGraphButton);
-		
 		cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -93,42 +93,84 @@ public class PostGraphDialog extends JDialog {
 		});
 		buttonsPanel.add(cancelButton);
 		getContentPane().setLayout(groupLayout);
+		
 		populateFields();
+		pack();
+		check();
+	}
+	
+	public void check(){
 		try {
-			JSONObject graphJSON = exportNetworkToJSON();
-			if (updatePossible(graphJSON)){
-				postGraphButton.setText("Update");
-				postGraphButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						updateActionPerformed(e, graphJSON);
-					}
-				});
+			if (!Server.INSTANCE.isAuthenticated()){
+				this.dispose();
+				AuthenticationDialog authDialog = new AuthenticationDialog(new JFrame());
+				authDialog.setLocationRelativeTo(this);
+				authDialog.setVisible(true);
+				authDialog.toFront();
 			}
 			else{
-				postGraphButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						exportActionPerformed(e, graphJSON);
-					}
-				});
+				JSONObject graphJSON = exportNetworkToJSON();
+				if (graphJSON == null){
+					this.dispose();
+					JOptionPane.showMessageDialog(new JFrame(), "Could not export your network to JSON.", "Dialog", JOptionPane.ERROR_MESSAGE);
+				}
+				String graphName = graphJSON.getJSONObject("data").getString("name");
+				if(Server.INSTANCE.updatePossible(graphName)){
+					postGraphButton.setText("Update");
+					postGraphButton.setEnabled(true);
+					postGraphButton.addActionListener(new ActionListener(){
+						public void actionPerformed(ActionEvent evt) {
+							updateActionPerformed(evt, graphJSON);
+						}
+					});
+				}
+				else{
+					postGraphButton.setText("Export");
+					postGraphButton.setEnabled(true);
+					postGraphButton.addActionListener(new ActionListener(){
+						public void actionPerformed(ActionEvent evt) {
+							exportActionPerformed(evt, graphJSON);
+						}
+					});
+				}
 			}
-		} catch (Exception e1) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		pack();
 	}
+	
+//	private boolean updatePossible(String graphName){
+//		JSONObject responseJSON;
+//		try {
+//			
+//			responseJSON = Server.INSTANCE.getGraphByName(graphName);
+//			System.out.println(responseJSON);
+//			if (responseJSON.getInt("status")==201 || responseJSON.getInt("status")==200){
+//				return true;
+//			}
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return false;
+//	}
 	
 	private void populateFields(){
 		if (Server.INSTANCE.getUsername() != null){
-			usernameField.setText(Server.INSTANCE.getUsername());
+			usernameValueLabel.setText(Server.INSTANCE.getUsername());
 		}
 		if (Server.INSTANCE.getHost() != null){
-			hostField.setText(Server.INSTANCE.getHost());
+			hostValueLabel.setText(Server.INSTANCE.getHost());
 		}
 	}
 	
 	private void updateActionPerformed(ActionEvent evt, JSONObject graphJSON){
 		try{
+			this.dispose();
 			updateGraph(graphJSON);
 		}
 		catch (Exception e){
@@ -136,40 +178,32 @@ public class PostGraphDialog extends JDialog {
 			JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not update graph", "Error", JOptionPane.ERROR_MESSAGE);
 			this.dispose();
 		}
-		this.dispose();
 	}
 	
 	private void exportActionPerformed(ActionEvent evt, JSONObject graphJSON){
 		try{
+			this.dispose();
 			postGraph(graphJSON);
-			}
+		}
 		catch (Exception e){
 			e.printStackTrace();
 			JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not post graph", "Error", JOptionPane.ERROR_MESSAGE);
 			this.dispose();
 		}
-		this.dispose();
-	}
-	
-	private boolean updatePossible(JSONObject graphJSON) throws Exception{
-		String name = graphJSON.getString("name");
-		JSONObject responseJSON = Server.INSTANCE.getGraphByName(name);
-		System.out.println(responseJSON);
-		if (responseJSON.getInt("status")==201 || responseJSON.getInt("status")==201){
-			return true;
-		}
-		return false;
 	}
 	
 	private void updateGraph(JSONObject graphJSON) throws Exception{
-		String name = graphJSON.getString("name");
+		String name = graphJSON.getJSONObject("data").getString("name");
 		JSONObject responseFromGraphSpace = Server.INSTANCE.client.getGraphByName(name);
-		int isPublic = responseFromGraphSpace.getJSONObject("body").getJSONObject("object").getInt("is_public");
+//		System.out.println(responseFromGraphSpace);
+		int isPublic = responseFromGraphSpace.getInt("is_public");
 		if (isPublic == 0){
-			Server.INSTANCE.updateGraph(name, graphJSON, false);
+			JSONObject response = Server.INSTANCE.updateGraph(name, graphJSON, false);
+			System.out.println(response);
 		}
 		else{
-			Server.INSTANCE.updateGraph(name, graphJSON, true);
+			JSONObject response = Server.INSTANCE.updateGraph(name, graphJSON, true);
+			System.out.println(response);
 		}
 	}
 	
@@ -181,12 +215,34 @@ public class PostGraphDialog extends JDialog {
 		File tempFile = File.createTempFile("CyGraphSpaceExport", ".cyjs");
 		CyNetwork network = CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork();
 		TaskIterator ti = CyObjectManager.INSTANCE.getExportNetworkTaskFactory().createTaskIterator(network, tempFile);
+//		System.out.println("network: " + network.toString());
 		CyObjectManager.INSTANCE.getTaskManager().execute(ti);
-		InputStream is = new FileInputStream(tempFile);
-		String graphJSONString = IOUtils.toString(is);
-//		System.out.println(graphJSONString);
-		JSONObject graphJSON = new JSONObject(graphJSONString);
+//		CyObjectManager.INSTANCE.getTaskManager().
+//		System.out.println("tempfile: " + tempFile.toString());
+		String graphJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
+//		InputStream is = new FileInputStream(tempFile);
+//		String graphJSONString = IOUtils.toString(is);
+		int count = 0;
+		while(graphJSONString.isEmpty()){
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			graphJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
+			count++;
+			if (count>=10){
+				return null;
+			}
+		}
 		tempFile.delete();
+//		System.out.println("graphString: "+graphJSONString);
+		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"shared_name\".*", "");
+		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"shared_interaction\".*", "");
+//		System.out.println("graphString: "+graphJSONString);
+		JSONObject graphJSON = new JSONObject(graphJSONString);
+//		System.out.println(graphJSON.toString());
         return graphJSON;
 	}
 	

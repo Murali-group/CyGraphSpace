@@ -14,24 +14,31 @@ public enum Server{
 	String host = "www.graphspace.org";
 	boolean authenticated = false;
 	
-	public void authenticate(String host, String username, String password){
-		this.host = host;
-		this.username = username;
-		this.password = password;
-		client = new CyGraphSpaceClient(host, username, password);
+	public boolean authenticate(String host, String username, String password){
+//		this.host = host;
+//		this.username = username;
+//		this.password = password;
+		if (authenticationValid(host, username, password)){
+			this.host = host;
+			this.username = username;
+			this.password = password;
+			this.client = new CyGraphSpaceClient(this.host, this.username, this.password);
+			this.authenticated = true;
+			return true;
+		}
+		return false;
 	}
 	
 	public boolean isAuthenticated(){
-		return !(this.client==null);
+		return this.authenticated;
 	}
 	
-	public boolean authenticationValid(){
+	public boolean authenticationValid(String host, String username, String password){
 		JSONObject graph;
 		try {
-			graph = getGraphById("21752");
-			System.out.println(graph.toString());
+			CyGraphSpaceClient cl = new CyGraphSpaceClient(host, username, password);
+			graph = cl.getGraphById("21752");
 			if (graph.getInt("status")!= 401){
-				this.authenticated = true;
 				return true;
 			}
 		} catch (Exception e) {
@@ -57,8 +64,16 @@ public enum Server{
 		return this.host;
 	}
 	
-	public ArrayList<GSGraphMetaData> getGraphsMetaData(boolean myGraphs, boolean publicGraphs, boolean sharedGraphs) throws Exception{
-		return this.client.getGraphMetaDataList(myGraphs, publicGraphs, sharedGraphs);
+	public void logout(){
+		this.host = "www.graphspace.org";
+		this.username = null;
+		this.password = null;
+		this.client = null;
+		this.authenticated = false;
+	}
+	
+	public ArrayList<GSGraphMetaData> getGraphsMetaData(boolean myGraphs, boolean sharedGraphs, boolean publicGraphs, int limit, int offset) throws Exception{
+		return this.client.getGraphMetaDataList(myGraphs, sharedGraphs, publicGraphs, limit, offset);
 	}
 	
 	public JSONObject getGraphById(String id) throws Exception{
@@ -75,5 +90,9 @@ public enum Server{
 	
 	public void postGraph(JSONObject graph) throws Exception{
 		this.client.postGraph(graph);
+	}
+	
+	public boolean updatePossible(String name) throws Exception{
+		return this.client.updatePossible(name);
 	}
 }

@@ -20,6 +20,9 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+                <includes>
+                	<include>graphspace.png</include>
+                </includes>
             </resource>
         </resources>
         <!-- Cytoscape requires Java 1.6 -->

@@ -47,29 +47,38 @@ public class CyGraphSpaceClient{
 		return graphMetaDataList;
 	}
 	
-	public ArrayList<GSGraphMetaData> getGraphMetaDataList(boolean myGraphs, boolean publicGraphs, boolean sharedGraphs) throws Exception{
-		
+	public ArrayList<GSGraphMetaData> getGraphMetaDataList(boolean myGraphs, boolean sharedGraphs, boolean publicGraphs, int limit, int offset) throws Exception{
 		ArrayList<GSGraphMetaData> graphList = new ArrayList<GSGraphMetaData>();
-		
 		if (myGraphs){
-			int limit = 20;
-			int offset = 0;
-			graphList.addAll(graphJSONListToMetaDataArray(client.getMyGraphs(limit, offset)));
+			return graphJSONListToMetaDataArray(client.getMyGraphs(limit, offset));
 		}
-		
-		if (publicGraphs){
-			int limit = 20;
-			int offset = 0;
-			graphList.addAll(graphJSONListToMetaDataArray(client.getPublicGraphs(limit, offset)));
+		else if(sharedGraphs){
+			return null;
+//			graphList.addAll(graphJSONListToMetaDataArray(client.getSharedGraphs(limit, offset)));
 		}
-		
-		//TODO: handle shared graphs
-//		if (sharedGraphs){
-//			
-//		}
-		
-		return graphList;
+		else{
+			return graphJSONListToMetaDataArray(client.getPublicGraphs(limit, offset));
+		}
 	}
+	
+	//TODO: handle shared graphs
+//	public ArrayList<GSGraphMetaData> getGraphMetaDataList(boolean myGraphs, boolean sharedGraphs, boolean publicGraphs) throws Exception{
+//		
+//		ArrayList<GSGraphMetaData> graphList = new ArrayList<GSGraphMetaData>();
+//		
+//		if (myGraphs){
+//			int limit = 20;
+//			int offset = 0;
+//			graphList.addAll(graphJSONListToMetaDataArray(client.getMyGraphs(limit, offset)));
+//		}
+//		
+//		if (publicGraphs){
+//			int limit = 20;
+//			int offset = 0;
+//			graphList.addAll(graphJSONListToMetaDataArray(client.getPublicGraphs(limit, offset)));
+//		}	
+//		return graphList;
+//	}
 	
 	public JSONObject getGraphById(String id) throws Exception{
 		return client.getGraphById(id);
@@ -80,8 +89,7 @@ public class CyGraphSpaceClient{
 	}
 	
 	public void postGraph(JSONObject graph) throws Exception{
-		String str = client.postGraph(graph).toString();
-		System.out.println(str);
+		client.postGraph(graph).toString();
 	}
 	
 	public JSONObject updateGraph(String name, String ownerEmail, JSONObject graphJSON, boolean isGraphPublic) throws Exception{
@@ -91,5 +99,17 @@ public class CyGraphSpaceClient{
 	public JSONObject updateGraph(String name, JSONObject graphJSON, boolean isGraphPublic) throws Exception{
 		String ownerEmail = this.username;
 		return client.updateGraph(name, ownerEmail, graphJSON, isGraphPublic);
+	}
+	
+	public boolean updatePossible(String name) throws Exception{
+		String ownerEmail = this.username;
+		JSONObject responseJSON = client.getGraphRequest(name, ownerEmail);
+//		System.out.println("status: " + responseJSON.getInt("status"));
+		if (responseJSON.getInt("status")==201 || responseJSON.getInt("status")==200){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 }

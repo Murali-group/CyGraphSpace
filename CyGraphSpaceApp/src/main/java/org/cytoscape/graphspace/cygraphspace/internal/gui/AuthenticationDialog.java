@@ -24,8 +24,10 @@ public class AuthenticationDialog extends JDialog {
 	private JTextField hostField;
 	private JTextField usernameField;
 	private JPasswordField passwordField;
+	private JButton signInButton;
+	JButton cancelButton;
 	public AuthenticationDialog(Frame parent) {
-		setTitle("Sign in to the Server");
+		setTitle("Log in to the Server");
 		JLabel hostLabel = new JLabel("Host");
 		
 		hostField = new JTextField();
@@ -42,7 +44,7 @@ public class AuthenticationDialog extends JDialog {
 		
 		JPanel buttonsPanel = new JPanel();
 		
-		JButton signInButton = new JButton("Sign In");
+		signInButton = new JButton("Log In");
 		
 		signInButton.addActionListener(new ActionListener()
         {
@@ -52,7 +54,6 @@ public class AuthenticationDialog extends JDialog {
 					signInActionPerformed(evt);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
-					System.out.println("exception aa gya");
 					e.printStackTrace();
 				}
             }
@@ -61,7 +62,7 @@ public class AuthenticationDialog extends JDialog {
 		buttonsPanel.add(signInButton);
 
 		
-		JButton cancelButton = new JButton("Cancel");
+		cancelButton = new JButton("Cancel");
 		
 		cancelButton.addActionListener(new ActionListener()
         {
@@ -124,19 +125,26 @@ public class AuthenticationDialog extends JDialog {
 	}
 	
 	private void signInActionPerformed(ActionEvent evt) throws Exception{
+		signInButton.setText("Checking");
+		signInButton.setEnabled(false);
+		cancelButton.setEnabled(false);
     	String hostText = hostField.getText();
     	String usernameText = usernameField.getText();
     	String passwordText = new String(passwordField.getPassword());
-    	Server.INSTANCE.authenticate(hostText, usernameText, passwordText);
+    	System.out.println(hostText + " : " + usernameText + " : " + passwordText);
     	if (hostText.isEmpty() || usernameText.isEmpty() || passwordText.isEmpty()){
     		JOptionPane.showMessageDialog((Component)evt.getSource(), "Please enter all the values", "Error", JOptionPane.ERROR_MESSAGE);
+    		signInButton.setText("Log In");
+    		signInButton.setEnabled(true);
+    		cancelButton.setEnabled(true);
     	}
-    	else if (!Server.INSTANCE.authenticationValid()){
-        	Server.INSTANCE.authenticate("www.graphspace.org", null, null);
+    	else if (!Server.INSTANCE.authenticate(hostText, usernameText, passwordText)){
     		JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not authenticate you. Please ensure the username and password are correct.", "Error", JOptionPane.ERROR_MESSAGE);
+    		signInButton.setText("Log In");
+    		signInButton.setEnabled(true);
+    		cancelButton.setEnabled(true);
     	}
     	else{
-	    	System.out.println(Server.INSTANCE.getHost()+" : "+Server.INSTANCE.getUsername()+" : "+Server.INSTANCE.getPassword());
 	    	this.dispose();
     	}
     }

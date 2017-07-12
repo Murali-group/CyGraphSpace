@@ -6,14 +6,11 @@ import javax.swing.JFrame;
 
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.graphspace.cygraphspace.internal.gui.AuthenticationDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.GetGraphDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
+import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 
-/**
- *
- * @author David Welker
- * Creates a new menu item in the Apps|NDex menu to find networks in the currently selected NDEx server.
- */
 public class GetGraphMenuAction extends AbstractCyAction
 {
     /**
@@ -38,9 +35,16 @@ public class GetGraphMenuAction extends AbstractCyAction
     public void actionPerformed(ActionEvent e)
     {
     	JFrame parent = CyObjectManager.INSTANCE.getApplicationFrame();
-        GetGraphDialog dialog = new GetGraphDialog(parent);
-        dialog.setLocationRelativeTo(parent);
-        dialog.setVisible(true);
+    	if (!Server.INSTANCE.isAuthenticated()){
+    		AuthenticationDialog authDialog = new AuthenticationDialog(parent);
+    		authDialog.setLocationRelativeTo(parent);
+            authDialog.setVisible(true);
+    	}
+    	else{
+	        GetGraphDialog dialog = new GetGraphDialog(parent);
+	        dialog.setLocationRelativeTo(parent);
+	        dialog.setVisible(true);
+    	}
     }
     
 }

@@ -77,7 +77,7 @@ public class Client {
      * @return
      * @throws Exception
      */
-    private JSONObject getRequest(String path, Map<String, Object> urlParams, Map<String, String> headers) throws Exception{
+    private JSONObject getRequest(String path, Map<String, Object> urlParams, Map<String, String> headers){
     	
 		String queryPath = "http://"+this.host+path;
 		try{
@@ -91,8 +91,9 @@ public class Client {
 			return response;
 		}
 		catch(Exception e){
-			throw new GraphNotFoundException();
+			e.printStackTrace();
 		}
+		return null;
     }
     
     /**
@@ -160,7 +161,7 @@ public class Client {
      * @return
      * @throws Exception
      */
-    private JSONObject deleteRequest(String path, Map<String, Object> urlParams, Map<String, String> headers) throws Exception{
+    private JSONObject deleteRequest(String path, Map<String, Object> urlParams, Map<String, String> headers){
     	
 		String queryPath = "http://"+this.host+path;
 		try{
@@ -173,8 +174,9 @@ public class Client {
 			return response;
 		}
 		catch(Exception e){
-			throw new GraphNotFoundException();
+			e.printStackTrace();
 		}
+		return null;
     }
     
     /**
@@ -325,8 +327,10 @@ public class Client {
     	query.put("limit", limit);
     	query.put("offset", offset);
     	if (!tagsList.isEmpty()){
-    		JSONArray tags = new JSONArray(tagsList);
-    		query.put("tags[]", tags);
+//    		JSONArray tags = new JSONArray(tagsList);
+    		String[] tags = new String[tagsList.size()];
+    		tags = tagsList.toArray(tags);
+    		query.put("tags[]", tagsList.get(0));
     	}
     	return makeRequest("GET", "/api/v1/graphs", query, null);
     }
@@ -362,8 +366,10 @@ public class Client {
 		query.put("limit", limit);
     	query.put("offset", offset);
     	if (tagsList!=null){
-    		JSONArray tags = new JSONArray(tagsList);
-    		query.put("tags[]", tags);
+//    		JSONArray tags = new JSONArray(tagsList);
+    		String[] tags = new String[tagsList.size()];
+    		tags = tagsList.toArray(tags);
+    		query.put("tags[]", tagsList.get(0));
     	}
     	System.out.println(query.toString());
     	return makeRequest("GET", "/api/v1/graphs", query, null);
@@ -383,8 +389,10 @@ public class Client {
 		query.put("limit", limit);
     	query.put("offset", offset);
     	if (!tagsList.isEmpty()){
-    		JSONArray tags = new JSONArray(tagsList);
-    		query.put("tags[]", tags);
+//    		JSONArray tags = new JSONArray(tagsList);
+    		String[] tags = new String[tagsList.size()];
+    		tags = tagsList.toArray(tags);
+    		query.put("tags[]", tagsList.get(0));
     	}
 		return makeRequest("GET", "/api/v1/graphs/", query, null);
     }

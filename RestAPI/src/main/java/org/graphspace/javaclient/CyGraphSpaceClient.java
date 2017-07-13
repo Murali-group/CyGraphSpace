@@ -60,6 +60,21 @@ public class CyGraphSpaceClient{
 		}
 	}
 	
+	public ArrayList<GSGraphMetaData> searchGraphs(String searchText, boolean myGraphs, boolean sharedGraphs, boolean publicGraphs, int limit, int offset) throws Exception{
+		ArrayList<String> searchTerms = new ArrayList<String>();
+		searchTerms.add("%"+searchText+"%");
+		if (myGraphs){
+			return graphJSONListToMetaDataArray(client.getMyGraphs(searchTerms, limit, offset));
+			
+		}
+		else if(sharedGraphs){
+			return graphJSONListToMetaDataArray(client.getSharedGraphs(searchTerms, limit, offset));
+		}
+		else{
+			return graphJSONListToMetaDataArray(client.getPublicGraphs(searchTerms, limit, offset));
+		}
+	}
+	
 	//TODO: handle shared graphs
 //	public ArrayList<GSGraphMetaData> getGraphMetaDataList(boolean myGraphs, boolean sharedGraphs, boolean publicGraphs) throws Exception{
 //		

@@ -95,4 +95,8 @@ public enum Server{
 	public boolean updatePossible(String name) throws Exception{
 		return this.client.updatePossible(name);
 	}
+	
+	public ArrayList<GSGraphMetaData> searchGraphs(String searchTerm, boolean myGraphs, boolean sharedGraphs, boolean publicGraphs, int limit, int offset) throws Exception{
+		return this.client.searchGraphs(searchTerm, myGraphs, sharedGraphs, publicGraphs, limit, offset);
+	}
 }

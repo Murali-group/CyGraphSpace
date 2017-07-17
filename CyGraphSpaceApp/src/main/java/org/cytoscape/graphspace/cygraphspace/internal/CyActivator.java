@@ -104,9 +104,11 @@ public class CyActivator extends AbstractCyActivator {
 //        properties = new Properties();
 //        registerAllServices(context, action, properties);
         PostGraphToolBarComponent toolBarComponent = new PostGraphToolBarComponent();
-        desktop.getJToolBar().add(toolBarComponent);
-        desktop.getJToolBar().repaint();
-        desktop.getJToolBar().updateUI();
+        registerAllServices(bc, toolBarComponent, new Properties());
+//        toolBarComponent.getComponent().setVisible(true);
+//        desktop.getJToolBar().add(toolBarComponent);
+//        desktop.getJToolBar().updateUI();
+//        desktop.getJToolBar().setVisible(true);
 //        CyNetworkViewWriterFactory cytoscapeJsWriterFactory = getService(bc, CyNetworkViewWriterFactory.class,
 //				"(id=cytoscapejsNetworkWriterFactory)");
 //        manager.setCytoscapeJsWriterFactory(cytoscapeJsWriterFactory);

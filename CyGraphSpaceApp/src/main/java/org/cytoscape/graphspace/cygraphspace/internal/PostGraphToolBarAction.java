@@ -14,7 +14,7 @@ public class PostGraphToolBarAction extends AbstractCyAction{
         super(menuTitle, applicationManager, null, null);
     	PostGraphToolBarComponent toolBarComponent = new PostGraphToolBarComponent();
     	CyObjectManager.INSTANCE.getCySwingApplition().getJToolBar().add(toolBarComponent);
-    	toolBarComponent.setVisible(true);
+//    	toolBarComponent.setVisible(true);
     	CyObjectManager.INSTANCE.getCySwingApplition().getJToolBar().setVisible(true);
     	setMenuGravity(getMenuGravity());
 //        setPreferredMenu("File.Export");
@@ -25,7 +25,7 @@ public class PostGraphToolBarAction extends AbstractCyAction{
     {	
     	PostGraphToolBarComponent toolBarComponent = new PostGraphToolBarComponent();
     	CyObjectManager.INSTANCE.getCySwingApplition().getJToolBar().add(toolBarComponent);
-    	toolBarComponent.setVisible(true);
+//    	toolBarComponent.setVisible(true);
     	CyObjectManager.INSTANCE.getCySwingApplition().getJToolBar().setVisible(true);
     }
 }

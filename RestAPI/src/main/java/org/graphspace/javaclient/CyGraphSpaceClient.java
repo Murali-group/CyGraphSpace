@@ -53,7 +53,6 @@ public class CyGraphSpaceClient{
 		}
 		else if(sharedGraphs){
 			return graphJSONListToMetaDataArray(client.getSharedGraphs(null, limit, offset));
-//			graphList.addAll(graphJSONListToMetaDataArray(client.getSharedGraphs(limit, offset)));
 		}
 		else{
 			return graphJSONListToMetaDataArray(client.getPublicGraphs(limit, offset));
@@ -74,25 +73,6 @@ public class CyGraphSpaceClient{
 			return graphJSONListToMetaDataArray(client.getPublicGraphs(searchTerms, limit, offset));
 		}
 	}
-	
-	//TODO: handle shared graphs
-//	public ArrayList<GSGraphMetaData> getGraphMetaDataList(boolean myGraphs, boolean sharedGraphs, boolean publicGraphs) throws Exception{
-//		
-//		ArrayList<GSGraphMetaData> graphList = new ArrayList<GSGraphMetaData>();
-//		
-//		if (myGraphs){
-//			int limit = 20;
-//			int offset = 0;
-//			graphList.addAll(graphJSONListToMetaDataArray(client.getMyGraphs(limit, offset)));
-//		}
-//		
-//		if (publicGraphs){
-//			int limit = 20;
-//			int offset = 0;
-//			graphList.addAll(graphJSONListToMetaDataArray(client.getPublicGraphs(limit, offset)));
-//		}	
-//		return graphList;
-//	}
 	
 	public JSONObject getGraphById(String id) throws Exception{
 		return client.getGraphById(id);
@@ -118,7 +98,6 @@ public class CyGraphSpaceClient{
 	public boolean updatePossible(String name) throws Exception{
 		String ownerEmail = this.username;
 		JSONObject responseJSON = client.getGraphRequest(name, ownerEmail);
-//		System.out.println("status: " + responseJSON.getInt("status"));
 		if (responseJSON==null){
 			return false;
 		}

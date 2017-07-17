@@ -4,23 +4,20 @@
 
 ## Get Started With Cytoscape
 
-- [Cytoscape](/cytoscape/README)
-  + [Installation](/cytoscape/README#installation)
-  + [Using the Rest API](/cytoscape/README#usage)
-  + [Contribute](/cytoscape/README#contribute)
+## Get Started with GraphSpace Java Client
 
-## Get Started with GraphSpace Rest API
+- [**GraphSpace Java Client**](/graphspace-java-client/README)
+  + [Overview](/graphspace-java-client/README#overview)
+  + [Installation](/graphspace-java-client/README#installation)
+  + [Tutorial](/graphspace-java-client/README#tutorial)
+  + [API Reference](/graphspace-java-client/README#api-reference)
 
-- [GraphSpace-RestAPI](/rest-api/README)
-  + [Installation](/rest-api/README#installation)
-  + [Using the Rest API](/rest-api/README#Usage)
-  + [Contribute](/rest-api/README#Contribute)
+## Get Started with CyGraphSpace
 
-## Get Started with CyGraphSpace App
-
-- [CyGraphSpace App](/cygraphspace/README)
+- [**CyGraphSpace**](/cygraphspace/README)
+  + [Overview](/cygraphspace/README#overview)
   + [Installation](/cygraphspace/README#installation)
-  + [Using the Rest API](/cygraphspace/README#usage)
+  + [Using the app](/cygraphspace/README#usage)
   + [Contribute](/cygraphspace/README#contribute)
 
 ## How to Contribute
@@ -33,7 +30,7 @@ Or just [create an issue](https://github.com/Murali-Group/CyGraphSpace/issues)
 
 ## Learn more about the project
 
-- [GSOC Blog | Rishabh Sethi](https://github.com/cassidoo/getting-a-gig)
+- [GSOC Blog | Rishabh Sethi](#)
 
 - [Wiki](https://github.com/Murali-group/GraphSpace/wiki/gsoc-cygraphspace)
 

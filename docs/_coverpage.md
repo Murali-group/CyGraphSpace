@@ -1,6 +1,6 @@
 <img src="_images/icon.svg" width="50">
 
-# CyGraphSpace <small>under development</small>
+# CyGraphSpace <small>version 0.1.0</small>
 
 > Cytoscape app to synchronize graphs between Cytoscape and GraphSpace
 

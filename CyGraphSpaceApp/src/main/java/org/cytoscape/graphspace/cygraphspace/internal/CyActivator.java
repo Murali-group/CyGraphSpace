@@ -69,12 +69,6 @@ public class CyActivator extends AbstractCyActivator {
         CyNetworkTableManager networkTableManager = getService(context, CyNetworkTableManager.class);
         CyTableManager tableManager = getService(context, CyTableManager.class);
         
-//        final WPClientFactory clientFactory = new WPClientRESTFactoryImpl(appConf);
-//        registerService(context, clientFactory, WPClientFactory.class, new Properties());
-//
-//        final WPClient client = clientFactory.create();
-//        final WPManager manager = new WPManager(registrar,annots );
-//        
 //        final TaskManager taskMgr = getService(context, DialogTaskManager.class);
 //	    final GetGraphsClient guiClient = new GetGraphsClient( taskMgr, client, openBrowser, gpmlReaderFactory);
 //	    registerAllServices(context, guiClient, new Properties());

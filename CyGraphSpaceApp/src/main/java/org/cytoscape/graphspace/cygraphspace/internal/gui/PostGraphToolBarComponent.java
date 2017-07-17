@@ -1,6 +1,7 @@
 package org.cytoscape.graphspace.cygraphspace.internal.gui;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,39 +32,40 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 //		this.setIcon(icon);
 //		this.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("graphspace-icon.png")));
 		button = new JButton();
-		button.setText("GraphSpace");
-//		ImageIcon icon = new ImageIcon(this.getClass().getClassLoader().getResource("graphspace.png").getFile());
-//		button.setIcon(icon);
+//		button.setText("GraphSpace");
+		ImageIcon icon = new ImageIcon(this.getClass().getClassLoader().getResource("graphspaceicon.png"));
+		button.setIcon(icon);
+//		button.setPreferredSize(new Dimension(10,10));
 //		button.setMargin(new Insets(0, 0, 0, 0));
 //		button.setBorder(null);
-//		button.setBorderPainted(false);
-//		button.setFocusPainted(false);
-//		button.setContentAreaFilled(true);
-//		button.addActionListener(new ActionListener(){
-//			public void actionPerformed(ActionEvent evt){
-//				System.out.println("clicked");
-//				JFrame parent = CyObjectManager.INSTANCE.getApplicationFrame();
-//
-//		        CyNetwork currentNetwork = CyObjectManager.INSTANCE.getCurrentNetwork();
-//		        if( currentNetwork == null )
-//		        {
-//		            String msg = "There is no graph to export.";
-//		            String dialogTitle = "No Graph Found";
-//		            JOptionPane.showMessageDialog(parent, msg, dialogTitle, JOptionPane.ERROR_MESSAGE );
-//		            return;
-//		        }
-//		        if (Server.INSTANCE.isAuthenticated()){
-//		        	PostGraphDialog dialog = new PostGraphDialog(parent);
-//		            dialog.setLocationRelativeTo(parent);
-//		            dialog.setVisible(true);
-//		        }
-//		        else{
-//		        	AuthenticationDialog dialog = new AuthenticationDialog(parent);
-//		            dialog.setLocationRelativeTo(parent);
-//		            dialog.setVisible(true);
-//		        }
-//			}
-//		});
+		button.setBorderPainted(false);
+		button.setFocusPainted(false);
+		button.setContentAreaFilled(true);
+		button.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent evt){
+				System.out.println("clicked");
+				JFrame parent = CyObjectManager.INSTANCE.getApplicationFrame();
+
+		        CyNetwork currentNetwork = CyObjectManager.INSTANCE.getCurrentNetwork();
+		        if( currentNetwork == null )
+		        {
+		            String msg = "There is no graph to export.";
+		            String dialogTitle = "No Graph Found";
+		            JOptionPane.showMessageDialog(parent, msg, dialogTitle, JOptionPane.ERROR_MESSAGE );
+		            return;
+		        }
+		        if (Server.INSTANCE.isAuthenticated()){
+		        	PostGraphDialog dialog = new PostGraphDialog(parent);
+		            dialog.setLocationRelativeTo(parent);
+		            dialog.setVisible(true);
+		        }
+		        else{
+		        	AuthenticationDialog dialog = new AuthenticationDialog(parent);
+		            dialog.setLocationRelativeTo(parent);
+		            dialog.setVisible(true);
+		        }
+			}
+		});
 	}
 	/** Returns an ImageIcon, or null if the path was invalid. */
 

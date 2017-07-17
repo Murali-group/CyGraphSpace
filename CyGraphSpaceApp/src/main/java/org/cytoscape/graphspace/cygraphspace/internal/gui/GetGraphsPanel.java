@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -24,6 +25,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
+import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -116,6 +118,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private JButton publicGraphsNextButton;
 	private String searchTerm;
 	private JButton publicGraphsPreviousButton;
+	@SuppressWarnings("serial")
 	public GetGraphsPanel(TaskManager taskManager, OpenBrowser openBrowser) {
 		super("http://www.graphspace.org", "GraphSpace", APP_DESCRIPTION);
 		this.taskManager = taskManager;
@@ -209,7 +212,12 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	            {
 	                "Graph ID", "Graph Name", "Owned By"
 	            }
-	        );
+	        ){
+			@Override
+			public boolean isCellEditable(int row, int column) {
+		        return false;
+		    }
+		};
 		myGraphsTable.setModel(myGraphsTableModel);
         myGraphsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         myGraphsScrollPane.setViewportView(myGraphsTable);
@@ -474,14 +482,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 						id = publicGraphsTable.getValueAt(publicGraphsTable.getSelectedRow(), 0).toString();
 					}
 				}
-//				else if (selectedTable==3){
-//					if (searchResultsTable.getSelectedRow()<=0){
-//						id = null;
-//					}
-//					else{
-//						id = searchResultsTable.getValueAt(searchResultsTable.getSelectedRow(), 0).toString();
-//					}
-//				}
 				openInBrowser(id);
 			}
 		});
@@ -639,7 +639,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			}
 		});
 		
-		importGraphListButton = new JButton("Import Graph List");
+		importGraphListButton = new JButton("Available Graphs");
 		importGraphListButton.setEnabled(false);
 		importGraphListButton.setToolTipText("Import Graphs Meta Data from GraphSpace");
 		importGraphListButton.addActionListener(new ActionListener(){
@@ -776,9 +776,28 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private void importGraphListActionPerformed(){
 		try {
 			this.searchTerm = null;
-			populateMyGraphs(null, this.limit, this.myGraphsOffSet);
-			populateSharedGraphs(null, this.limit, this.sharedGraphsOffSet);
-			populatePublicGraphs(null, this.limit, this.publicGraphsOffSet);
+			JDialog waitDialog = new JDialog();
+			JLabel waitLabel = new JLabel("Graphs are currently being imported from GraphSpace. Please Wait...");
+			waitDialog.setLocationRelativeTo(null);
+			waitDialog.setTitle("Please Wait...");
+			waitDialog.add(waitLabel);
+			waitDialog.pack();
+			waitDialog.setVisible(true);
+			SwingWorker<Integer,Integer> worker = new SwingWorker<Integer, Integer>(){
+
+	            @Override
+	            protected Integer doInBackground() throws Exception{
+	            	{
+	        			populateMyGraphs(null, limit, myGraphsOffSet);
+	        			populateSharedGraphs(null, limit, sharedGraphsOffSet);
+	        			populatePublicGraphs(null, limit, publicGraphsOffSet);
+	        			waitDialog.setVisible(false);
+	                }
+	                return 1;
+	            }
+			};
+			
+			worker.execute();
 			myGraphsNextButton.setEnabled(true);
 			sharedGraphsNextButton.setEnabled(true);
 			publicGraphsNextButton.setEnabled(true);
@@ -900,55 +919,21 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		}
 	}
 	
-//	void performSearch(final String query){
-//		// searchField.setEnabled(false);
-//		// searchButton.setEnabled(false);
-//
-//		SwingUtilities.invokeLater(new Runnable() {
-//			public void run() {
-//				final ResultTask<List<WPPathway>> searchTask = client.newFreeTextSearchTask(query, species);
-//				taskManager.execute(new TaskIterator(searchTask, new AbstractTask() {
-//					public void run(final TaskMonitor monitor) {
-//						final List<WPPathway> results = searchTask.get();
-//						if (results.isEmpty()) {
-//							noResultsLabel.setText(String.format("<html><b>No results for \'%s\'.</b></html>", query));
-//							noResultsLabel.setVisible(true);
-//						} else
-//							noResultsLabel.setVisible(false);
-//
-//						setPathwaysInResultsTable(results);
-//					}
-//				}), new TaskObserver() {
-//					public void taskFinished(ObservableTask t) {
-//					}
-//
-//					public void allFinished(FinishStatus status) {
-//						searchField.setEnabled(true);
-//						searchButton.setEnabled(true);
-//					}
-//				});
-//			}
-//		});
-//	}
-	
 	private void getGraphActionPerformed(ActionEvent e, String id){
 		System.out.println("get graph action performed");
 		try {
-//			System.out.println(Server.INSTANCE.client.getGraphById(id).toString());
 			JSONObject graphJSON = Server.INSTANCE.client.getGraphById(id).getJSONObject("body").getJSONObject("object").getJSONObject("graph_json");
-			JSONObject styleJSON = Server.INSTANCE.client.getGraphById(id).getJSONObject("body").getJSONObject("object").getJSONObject("style_json");
+//			JSONObject styleJSON = Server.INSTANCE.client.getGraphById(id).getJSONObject("body").getJSONObject("object").getJSONObject("style_json");
 			String graphJSONString = graphJSON.toString();
-			String styleJSONString = styleJSON.toString();
-//			String str = "{ \"format_version\" : \"1.0\", \"generated_by\" : \"cytoscape-3.5.1\", \"target_cytoscapejs_version\" : \"~2.1\", \"data\" : { \"shared_name\" : \"test3\", \"name\" : \"test3\", \"SUID\" : 52, \"__Annotations\" : [ ], \"selected\" : true }, \"elements\" : { \"nodes\" : [ { \"data\" : { \"id\" : \"68\", \"shared_name\" : \"Node 3\", \"name\" : \"Node 3\", \"SUID\" : 68, \"selected\" : false }, \"position\" : { \"x\" : -15.0, \"y\" : 18.0 }, \"selected\" : false }, { \"data\" : { \"id\" : \"66\", \"shared_name\" : \"Node 2\", \"name\" : \"Node 2\", \"SUID\" : 66, \"selected\" : false }, \"position\" : { \"x\" : -117.0, \"y\" : -93.0 }, \"selected\" : false }, { \"data\" : { \"id\" : \"64\", \"shared_name\" : \"Node 1\", \"name\" : \"Node 1\", \"SUID\" : 64, \"selected\" : false }, \"position\" : { \"x\" : -196.0, \"y\" : 36.0 }, \"selected\" : false } ], \"edges\" : [ { \"data\" : { \"id\" : \"72\", \"source\" : \"66\", \"target\" : \"68\", \"shared_name\" : \"Node 2 (interacts with) Node 3\", \"name\" : \"Node 2 (interacts with) Node 3\", \"interaction\" : \"interacts with\", \"SUID\" : 72, \"shared_interaction\" : \"interacts with\", \"selected\" : false }, \"selected\" : false }, { \"data\" : { \"id\" : \"70\", \"source\" : \"64\", \"target\" : \"66\", \"shared_name\" : \"Node 1 (interacts with) Node 2\", \"name\" : \"Node 1 (interacts with) Node 2\", \"interaction\" : \"interacts with\", \"SUID\" : 70, \"shared_interaction\" : \"interacts with\", \"selected\" : false }, \"selected\" : false } ] } }";
+//			String styleJSONString = styleJSON.toString();
 			InputStream graphJSONInputStream = new ByteArrayInputStream(graphJSONString.getBytes());
-			InputStream styleJSONInputStream = new ByteArrayInputStream(styleJSONString.getBytes());
+//			InputStream styleJSONInputStream = new ByteArrayInputStream(styleJSONString.getBytes());
 			File tempFile = File.createTempFile("CyGraphSpaceImport", ".cyjs");
 			try (FileOutputStream out = new FileOutputStream(tempFile)) {
 	            IOUtils.copy(graphJSONInputStream, out);
 	        }
 			TaskIterator ti = loadNetworkFileTaskFactory.createTaskIterator(tempFile);
 			CyObjectManager.INSTANCE.getTaskManager().execute(ti);
-//			System.out.println(str);
 			tempFile.delete();
 			
 //			tempFile = File.createTempFile("CyGraphSpaceStyleImport", ".json");
@@ -967,18 +952,18 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	}
 	
 	public void openInBrowser(String id){
+		if (id==null){
+			JOptionPane.showMessageDialog(new JDialog(), "Please select a graph", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		openBrowser.openURL(Server.INSTANCE.getHost()+"/graphs/"+id);
 	}
+	
 	private void getGraphActionPerformed(MouseEvent e, String id){
 		System.out.println("get graph action performed");
-//		if (resultsTable.getSelectedRow()<0){
-//			JOptionPane.showMessageDialog((Component)e.getSource(), "No graph is selected", "Error", JOptionPane.ERROR_MESSAGE);
-//		}
-//		String id = resultsTable.getValueAt(resultsTable.getSelectedRow(), 0).toString();
 		try {
 			JSONObject graphJSON = Server.INSTANCE.client.getGraphById(id).getJSONObject("body").getJSONObject("object").getJSONObject("graph_json");
 			String str = graphJSON.toString();
-//			String str = "{ \"format_version\" : \"1.0\", \"generated_by\" : \"cytoscape-3.5.1\", \"target_cytoscapejs_version\" : \"~2.1\", \"data\" : { \"shared_name\" : \"test3\", \"name\" : \"test3\", \"SUID\" : 52, \"__Annotations\" : [ ], \"selected\" : true }, \"elements\" : { \"nodes\" : [ { \"data\" : { \"id\" : \"68\", \"shared_name\" : \"Node 3\", \"name\" : \"Node 3\", \"SUID\" : 68, \"selected\" : false }, \"position\" : { \"x\" : -15.0, \"y\" : 18.0 }, \"selected\" : false }, { \"data\" : { \"id\" : \"66\", \"shared_name\" : \"Node 2\", \"name\" : \"Node 2\", \"SUID\" : 66, \"selected\" : false }, \"position\" : { \"x\" : -117.0, \"y\" : -93.0 }, \"selected\" : false }, { \"data\" : { \"id\" : \"64\", \"shared_name\" : \"Node 1\", \"name\" : \"Node 1\", \"SUID\" : 64, \"selected\" : false }, \"position\" : { \"x\" : -196.0, \"y\" : 36.0 }, \"selected\" : false } ], \"edges\" : [ { \"data\" : { \"id\" : \"72\", \"source\" : \"66\", \"target\" : \"68\", \"shared_name\" : \"Node 2 (interacts with) Node 3\", \"name\" : \"Node 2 (interacts with) Node 3\", \"interaction\" : \"interacts with\", \"SUID\" : 72, \"shared_interaction\" : \"interacts with\", \"selected\" : false }, \"selected\" : false }, { \"data\" : { \"id\" : \"70\", \"source\" : \"64\", \"target\" : \"66\", \"shared_name\" : \"Node 1 (interacts with) Node 2\", \"name\" : \"Node 1 (interacts with) Node 2\", \"interaction\" : \"interacts with\", \"SUID\" : 70, \"shared_interaction\" : \"interacts with\", \"selected\" : false }, \"selected\" : false } ] } }";
 			InputStream is = new ByteArrayInputStream(str.getBytes());
 			File tempFile = File.createTempFile("CyGraphSpaceImport", ".cyjs");
 			try (FileOutputStream out = new FileOutputStream(tempFile)) {
@@ -1076,8 +1061,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	}
 	
 	class PublicGraphsNextButtonActionListener implements ActionListener{
-//		private int offset;
-//		private int limit;
 	    public PublicGraphsNextButtonActionListener() {
 	    	super();
 	    }

@@ -21,7 +21,7 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                	<include>graphspace.png</include>
+                	<include>graphspaceicon.png</include>
                 </includes>
             </resource>
         </resources>

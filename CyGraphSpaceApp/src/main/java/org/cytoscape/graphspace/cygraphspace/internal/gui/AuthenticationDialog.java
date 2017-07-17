@@ -46,8 +46,7 @@ public class AuthenticationDialog extends JDialog {
 		
 		signInButton = new JButton("Log In");
 		
-		signInButton.addActionListener(new ActionListener()
-        {
+		signInButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt)
             {
                 try {
@@ -139,7 +138,7 @@ public class AuthenticationDialog extends JDialog {
     		cancelButton.setEnabled(true);
     	}
     	else if (!Server.INSTANCE.authenticate(hostText, usernameText, passwordText)){
-    		JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not authenticate you. Please ensure the username and password are correct.", "Error", JOptionPane.ERROR_MESSAGE);
+    		JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not authenticate you. Please ensure the username and password are correct and that you are connected to the internet.", "Error", JOptionPane.ERROR_MESSAGE);
     		signInButton.setText("Log In");
     		signInButton.setEnabled(true);
     		cancelButton.setEnabled(true);

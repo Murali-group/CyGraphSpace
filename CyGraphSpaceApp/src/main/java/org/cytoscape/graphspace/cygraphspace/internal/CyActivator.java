@@ -37,13 +37,13 @@ public class CyActivator extends AbstractCyActivator {
         Properties properties = null;
         BundleContext bc = context;
 
-        action = new AuthenticationMenuAction("Log in/Change host", applicationManager);
-        properties = new Properties();
-        registerAllServices(context, action, properties);
-        
-        action = new GetGraphMenuAction("Import Graphs", applicationManager);
-        properties = new Properties();
-        registerAllServices(context, action, properties);
+//        action = new AuthenticationMenuAction("Log in/Change host", applicationManager);
+//        properties = new Properties();
+//        registerAllServices(context, action, properties);
+//        
+//        action = new GetGraphMenuAction("Import Graphs", applicationManager);
+//        properties = new Properties();
+//        registerAllServices(context, action, properties);
         
         action = new PostGraphMenuAction("Network to GraphSpace", applicationManager);
         properties = new Properties();

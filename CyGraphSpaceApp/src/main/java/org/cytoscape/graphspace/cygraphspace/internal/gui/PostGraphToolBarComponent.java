@@ -113,27 +113,6 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		System.out.println("clicked");
-		JFrame parent = CyObjectManager.INSTANCE.getApplicationFrame();
-
-        CyNetwork currentNetwork = CyObjectManager.INSTANCE.getCurrentNetwork();
-        if( currentNetwork == null )
-        {
-            String msg = "There is no graph to export.";
-            String dialogTitle = "No Graph Found";
-            JOptionPane.showMessageDialog(parent, msg, dialogTitle, JOptionPane.ERROR_MESSAGE );
-            return;
-        }
-        if (Server.INSTANCE.isAuthenticated()){
-        	PostGraphDialog dialog = new PostGraphDialog(parent);
-            dialog.setLocationRelativeTo(parent);
-            dialog.setVisible(true);
-        }
-        else{
-        	AuthenticationDialog dialog = new AuthenticationDialog(parent);
-            dialog.setLocationRelativeTo(parent);
-            dialog.setVisible(true);
-        }
 	}
 	@Override
 	public void menuSelected(MenuEvent e) {
@@ -213,7 +192,7 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 	@Override
 	public boolean isInToolBar() {
 		// TODO Auto-generated method stub
-		return true;
+		return false;
 	}
 	@Override
 	public void updateEnableState() {

@@ -14,8 +14,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -47,6 +49,7 @@ import org.graphspace.javaclient.model.GSGraphMetaData;
 import org.json.JSONObject;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -118,6 +121,9 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private JButton publicGraphsNextButton;
 	private String searchTerm;
 	private JButton publicGraphsPreviousButton;
+	private JInternalFrame myGraphsLoadingFrame;
+	private JInternalFrame sharedGraphsLoadingFrame;
+	private JInternalFrame publicGraphsLoadingFrame;
 	@SuppressWarnings("serial")
 	public GetGraphsPanel(TaskManager taskManager, OpenBrowser openBrowser) {
 		super("http://www.graphspace.org", "GraphSpace", APP_DESCRIPTION);
@@ -129,6 +135,21 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		this.loadVizmapFileTaskFactory = CyObjectManager.INSTANCE.getLoadVizmapFileTaskFactory();
 		parentPanel = new JPanel();
 		super.gui = parentPanel;
+		myGraphsLoadingFrame = new JInternalFrame();
+		ImageIcon loading = new ImageIcon(this.getClass().getClassLoader().getResource("loading.gif"));
+		myGraphsLoadingFrame.add(new JLabel("", loading, JLabel.CENTER));
+		myGraphsLoadingFrame.setSize(400, 300);
+		myGraphsLoadingFrame.setVisible(true);
+		
+		sharedGraphsLoadingFrame = new JInternalFrame();
+		sharedGraphsLoadingFrame.add(new JLabel("", loading, JLabel.CENTER));
+		sharedGraphsLoadingFrame.setSize(400, 300);
+		sharedGraphsLoadingFrame.setVisible(true);
+		
+		publicGraphsLoadingFrame = new JInternalFrame();
+		publicGraphsLoadingFrame.add(new JLabel("", loading, JLabel.CENTER));
+		publicGraphsLoadingFrame.setSize(400, 300);
+		publicGraphsLoadingFrame.setVisible(true);
 		
 		JPanel resultsPanel = new JPanel();
 		GroupLayout gl_panel = new GroupLayout(parentPanel);
@@ -221,7 +242,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		myGraphsTable.setModel(myGraphsTableModel);
         myGraphsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         myGraphsScrollPane.setViewportView(myGraphsTable);
-        
+//        myGraphsScrollPane.setViewportView((Component)loadingFrame);
         
 		GroupLayout gl_sharedGraphsPanel = new GroupLayout(sharedGraphsPanel);
 		gl_sharedGraphsPanel.setHorizontalGroup(
@@ -776,13 +797,19 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private void importGraphListActionPerformed(){
 		try {
 			this.searchTerm = null;
-			JDialog waitDialog = new JDialog();
-			JLabel waitLabel = new JLabel("Graphs are currently being imported from GraphSpace. Please Wait...");
-			waitDialog.setLocationRelativeTo(null);
-			waitDialog.setTitle("Please Wait...");
-			waitDialog.add(waitLabel);
-			waitDialog.pack();
-			waitDialog.setVisible(true);
+//			JDialog waitDialog = new JDialog();
+//			JLabel waitLabel = new JLabel("Graphs are currently being imported from GraphSpace. Please Wait...");
+//			waitDialog.setLocationRelativeTo(null);
+//			waitDialog.setTitle("Please Wait...");
+//			waitDialog.getContentPane().add(waitLabel);
+//			waitDialog.pack();
+//			waitDialog.setVisible(true);
+			myGraphsLoadingFrame.setVisible(true);
+			sharedGraphsLoadingFrame.setVisible(true);
+			publicGraphsLoadingFrame.setVisible(true);
+			myGraphsScrollPane.setViewportView(myGraphsLoadingFrame);
+			sharedGraphsScrollPane.setViewportView(sharedGraphsLoadingFrame);
+			publicGraphsScrollPane.setViewportView(publicGraphsLoadingFrame);
 			SwingWorker<Integer,Integer> worker = new SwingWorker<Integer, Integer>(){
 
 	            @Override
@@ -791,8 +818,13 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	        			populateMyGraphs(null, limit, myGraphsOffSet);
 	        			populateSharedGraphs(null, limit, sharedGraphsOffSet);
 	        			populatePublicGraphs(null, limit, publicGraphsOffSet);
-	        			waitDialog.setVisible(false);
-	                }
+	        			myGraphsScrollPane.setViewportView(myGraphsTable);
+	        			sharedGraphsScrollPane.setViewportView(sharedGraphsTable);
+	        			publicGraphsScrollPane.setViewportView(publicGraphsTable);
+	        			myGraphsLoadingFrame.setVisible(false);
+	        			sharedGraphsLoadingFrame.setVisible(false);
+	        			publicGraphsLoadingFrame.setVisible(false);
+	        		}
 	                return 1;
 	            }
 			};
@@ -833,24 +865,47 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			myGraphsTableModel.setRowCount(0);
 			sharedGraphsTableModel.setRowCount(0);
 			publicGraphsTableModel.setRowCount(0);
+			myGraphsLoadingFrame.setVisible(true);
+			sharedGraphsLoadingFrame.setVisible(true);
+			publicGraphsLoadingFrame.setVisible(true);
+			myGraphsScrollPane.setViewportView(myGraphsLoadingFrame);
+			sharedGraphsScrollPane.setViewportView(sharedGraphsLoadingFrame);
+			publicGraphsScrollPane.setViewportView(publicGraphsLoadingFrame);
 			myGraphsOffSet = 0;
 			sharedGraphsOffSet = 0;
 			publicGraphsOffSet = 0;
-			ArrayList<GSGraphMetaData> myGraphsSearchResults = Server.INSTANCE.searchGraphs(this.searchTerm, true, false, false, limit, myGraphsOffSet);
-			ArrayList<GSGraphMetaData> sharedGraphsSearchResults = Server.INSTANCE.searchGraphs(this.searchTerm, false, true, false, limit, sharedGraphsOffSet);
-			ArrayList<GSGraphMetaData> publicGraphsSearchResults = Server.INSTANCE.searchGraphs(this.searchTerm, false, false, true, limit, publicGraphsOffSet);
-			for (GSGraphMetaData gsGraphMetaData : myGraphsSearchResults){
-				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
-				myGraphsTableModel.addRow(row);
-			}
-			for (GSGraphMetaData gsGraphMetaData : sharedGraphsSearchResults){
-				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
-				sharedGraphsTableModel.addRow(row);
-			}
-			for (GSGraphMetaData gsGraphMetaData : publicGraphsSearchResults){
-				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
-				publicGraphsTableModel.addRow(row);
-			}
+			SwingWorker<Integer,Integer> worker = new SwingWorker<Integer, Integer>(){
+
+	            @Override
+	            protected Integer doInBackground() throws Exception{
+	            	{
+	            		ArrayList<GSGraphMetaData> myGraphsSearchResults = Server.INSTANCE.searchGraphs(searchTerm, true, false, false, limit, myGraphsOffSet);
+	        			ArrayList<GSGraphMetaData> sharedGraphsSearchResults = Server.INSTANCE.searchGraphs(searchTerm, false, true, false, limit, sharedGraphsOffSet);
+	        			ArrayList<GSGraphMetaData> publicGraphsSearchResults = Server.INSTANCE.searchGraphs(searchTerm, false, false, true, limit, publicGraphsOffSet);
+	        			for (GSGraphMetaData gsGraphMetaData : myGraphsSearchResults){
+	        				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
+	        				myGraphsTableModel.addRow(row);
+	        			}
+	        			for (GSGraphMetaData gsGraphMetaData : sharedGraphsSearchResults){
+	        				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
+	        				sharedGraphsTableModel.addRow(row);
+	        			}
+	        			for (GSGraphMetaData gsGraphMetaData : publicGraphsSearchResults){
+	        				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
+	        				publicGraphsTableModel.addRow(row);
+	        			}
+	        			myGraphsScrollPane.setViewportView(myGraphsTable);
+	        			sharedGraphsScrollPane.setViewportView(sharedGraphsTable);
+	        			publicGraphsScrollPane.setViewportView(publicGraphsTable);
+	        			myGraphsLoadingFrame.setVisible(false);
+	        			sharedGraphsLoadingFrame.setVisible(false);
+	        			publicGraphsLoadingFrame.setVisible(false);
+	        		}
+	                return 1;
+	            }
+			};
+			
+			worker.execute();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1001,7 +1056,25 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	        try {
 	        	int offset = myGraphsOffSet+20;
 	        	setMyGraphsOffSet(offset);
-				populateMyGraphs(searchTerm, limit, offset);
+	        	myGraphsTableModel.setRowCount(0);
+				myGraphsLoadingFrame.setVisible(true);
+				myGraphsScrollPane.setViewportView(myGraphsLoadingFrame);
+				SwingWorker<Integer,Integer> worker = new SwingWorker<Integer, Integer>(){
+
+		            @Override
+		            protected Integer doInBackground() throws Exception{
+		            	{
+		            		populateMyGraphs(searchTerm, limit, offset);
+		            		myGraphsScrollPane.setViewportView(myGraphsTable);
+		        			myGraphsLoadingFrame.setVisible(false);
+		        			
+		        		}
+		                return 1;
+		            }
+				};
+				
+				worker.execute();
+//				populateMyGraphs(searchTerm, limit, offset);
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -1018,7 +1091,24 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	        try {
 	        	int offset = myGraphsOffSet-20;
 	        	setMyGraphsOffSet(offset);
-				populateMyGraphs(searchTerm, limit, offset);
+	        	myGraphsTableModel.setRowCount(0);
+				myGraphsLoadingFrame.setVisible(true);
+				myGraphsScrollPane.setViewportView(myGraphsLoadingFrame);
+				SwingWorker<Integer,Integer> worker = new SwingWorker<Integer, Integer>(){
+
+		            @Override
+		            protected Integer doInBackground() throws Exception{
+		            	{
+		            		populateMyGraphs(searchTerm, limit, offset);
+		            		myGraphsScrollPane.setViewportView(myGraphsTable);
+		        			myGraphsLoadingFrame.setVisible(false);
+		        			
+		        		}
+		                return 1;
+		            }
+				};
+				worker.execute();
+				
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -1035,7 +1125,24 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	        try {
 	        	int offset = sharedGraphsOffSet+20;
 	        	setSharedGraphsOffSet(offset);
-				populateSharedGraphs(searchTerm, limit, offset);
+	        	sharedGraphsTableModel.setRowCount(0);
+				sharedGraphsLoadingFrame.setVisible(true);
+				sharedGraphsScrollPane.setViewportView(sharedGraphsLoadingFrame);
+				SwingWorker<Integer,Integer> worker = new SwingWorker<Integer, Integer>(){
+
+		            @Override
+		            protected Integer doInBackground() throws Exception{
+		            	{
+		            		populateSharedGraphs(searchTerm, limit, offset);
+		            		sharedGraphsScrollPane.setViewportView(sharedGraphsTable);
+		        			sharedGraphsLoadingFrame.setVisible(false);
+		        			
+		        		}
+		                return 1;
+		            }
+				};
+				
+				worker.execute();
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -1052,7 +1159,23 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	        try {
 	        	int offset = sharedGraphsOffSet-20;
 	        	setSharedGraphsOffSet(offset);
-				populateSharedGraphs(searchTerm, limit, offset);
+	        	sharedGraphsTableModel.setRowCount(0);
+				sharedGraphsLoadingFrame.setVisible(true);
+				sharedGraphsScrollPane.setViewportView(sharedGraphsLoadingFrame);
+				SwingWorker<Integer,Integer> worker = new SwingWorker<Integer, Integer>(){
+
+		            @Override
+		            protected Integer doInBackground() throws Exception{
+		            	{
+		            		populateMyGraphs(searchTerm, limit, offset);
+		            		sharedGraphsScrollPane.setViewportView(sharedGraphsTable);
+		        			sharedGraphsLoadingFrame.setVisible(false);
+
+		        		}
+		                return 1;
+		            }
+				};
+				worker.execute();
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -1069,7 +1192,23 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	        try {
 	        	int offset = publicGraphsOffSet+20;
 	        	setPublicGraphsOffSet(offset);
-				populatePublicGraphs(searchTerm, limit, offset);
+	        	publicGraphsTableModel.setRowCount(0);
+				publicGraphsLoadingFrame.setVisible(true);
+				publicGraphsScrollPane.setViewportView(publicGraphsLoadingFrame);
+				SwingWorker<Integer,Integer> worker = new SwingWorker<Integer, Integer>(){
+
+		            @Override
+		            protected Integer doInBackground() throws Exception{
+		            	{
+		            		populatePublicGraphs(searchTerm, limit, offset);
+		            		publicGraphsScrollPane.setViewportView(publicGraphsTable);
+		        			publicGraphsLoadingFrame.setVisible(false);
+		        			
+		        		}
+		                return 1;
+		            }
+				};
+				worker.execute();
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -1086,7 +1225,24 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	        try {
 	        	int offset = publicGraphsOffSet-20;
 	        	setPublicGraphsOffSet(offset);
-				populatePublicGraphs(searchTerm, limit, offset);
+	        	publicGraphsTableModel.setRowCount(0);
+				publicGraphsLoadingFrame.setVisible(true);
+				publicGraphsScrollPane.setViewportView(publicGraphsLoadingFrame);
+				SwingWorker<Integer,Integer> worker = new SwingWorker<Integer, Integer>(){
+
+		            @Override
+		            protected Integer doInBackground() throws Exception{
+		            	{
+		            		populatePublicGraphs(searchTerm, limit, offset);
+		            		publicGraphsScrollPane.setViewportView(publicGraphsTable);
+		        			publicGraphsLoadingFrame.setVisible(false);
+		        			
+		        		}
+		                return 1;
+		            }
+				};
+				
+				worker.execute();
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

@@ -22,6 +22,7 @@
                 <directory>src/main/resources</directory>
                 <includes>
                 	<include>graphspaceicon.png</include>
+                	<include>loading.gif</include>
                 </includes>
             </resource>
         </resources>

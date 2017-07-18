@@ -56,7 +56,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.JTabbedPane;
 
 public class GetGraphsPanel extends AbstractWebServiceGUIClient
-		implements NetworkImportWebServiceClient, SearchWebServiceClient {
+		implements NetworkImportWebServiceClient{
 	static final String APP_DESCRIPTION = "<html>" + "CyGraphSpace App is used to import and export graphs from "
 			+ "<a href=\"http://www.grapshace.org\">GraphSpace</a> website. ";
 
@@ -719,6 +719,8 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private void populate(){
 		if (Server.INSTANCE.isAuthenticated()){
 			try {
+				System.out.println("haan");
+				this.loggedIn = true;
 				loginButton.setText("Log Out");
 				hostTextField.setText(Server.INSTANCE.getHost());
 				usernameTextField.setText(Server.INSTANCE.getUsername());
@@ -726,15 +728,13 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 				hostTextField.setEnabled(false);
 				usernameTextField.setEnabled(false);
 				passwordField.setEnabled(false);
-//				populateMyGraphs(null, this.limit, this.myGraphsOffSet);
-//				populatePublicGraphs(null, this.limit, this.publicGraphsOffSet);
-//				populateSharedGraphs(null, this.limit, this.sharedGraphsOffSet);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		else{
+			System.out.println("nhi");
 			loginButton.setText("Log In");
 		}
 	}

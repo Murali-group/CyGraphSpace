@@ -1,6 +1,9 @@
 package org.cytoscape.graphspace.cygraphspace.internal;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.model.CyNetwork;
@@ -57,6 +60,14 @@ public class PostGraphMenuAction extends AbstractCyAction
         	AuthenticationDialog dialog = new AuthenticationDialog(parent);
             dialog.setLocationRelativeTo(parent);
             dialog.setVisible(true);
+            dialog.addWindowListener(new WindowAdapter(){
+            	@Override
+            	public void windowClosed(WindowEvent e){
+            		PostGraphDialog postDialog = new PostGraphDialog(parent);
+                    postDialog.setLocationRelativeTo(parent);
+                    postDialog.setVisible(true);
+            	}
+            });
         }
     }
 }

@@ -130,7 +130,6 @@ public class AuthenticationDialog extends JDialog {
     	String hostText = hostField.getText();
     	String usernameText = usernameField.getText();
     	String passwordText = new String(passwordField.getPassword());
-    	System.out.println(hostText + " : " + usernameText + " : " + passwordText);
     	if (hostText.isEmpty() || usernameText.isEmpty() || passwordText.isEmpty()){
     		JOptionPane.showMessageDialog((Component)evt.getSource(), "Please enter all the values", "Error", JOptionPane.ERROR_MESSAGE);
     		signInButton.setText("Log In");
@@ -144,6 +143,8 @@ public class AuthenticationDialog extends JDialog {
     		cancelButton.setEnabled(true);
     	}
     	else{
+    		System.out.println(hostText + " : " + usernameText + " : " + passwordText);
+    		System.out.println(Server.INSTANCE.getHost()+Server.INSTANCE.getUsername()+Server.INSTANCE.getPassword());
 	    	this.dispose();
     	}
     }

@@ -62,15 +62,32 @@ public class CyGraphSpaceClient{
 	public ArrayList<GSGraphMetaData> searchGraphs(String searchText, boolean myGraphs, boolean sharedGraphs, boolean publicGraphs, int limit, int offset) throws Exception{
 		ArrayList<String> searchTerms = new ArrayList<String>();
 		searchTerms.add("%"+searchText+"%");
+		ArrayList<GSGraphMetaData> searchResults;
+		ArrayList<GSGraphMetaData> graphsByTags;
+		ArrayList<GSGraphMetaData> graphsByNames;
 		if (myGraphs){
-			return graphJSONListToMetaDataArray(client.getMyGraphs(searchTerms, limit, offset));
-			
+			searchResults = new ArrayList<GSGraphMetaData>();
+			graphsByTags = graphJSONListToMetaDataArray(client.getMyGraphs(searchTerms, limit, offset));
+			graphsByNames = graphJSONListToMetaDataArray(client.getMyGraphsByNames(searchTerms, limit, offset));
+			searchResults.addAll(graphsByTags);
+			searchResults.addAll(graphsByNames);
+			return searchResults;
 		}
 		else if(sharedGraphs){
-			return graphJSONListToMetaDataArray(client.getSharedGraphs(searchTerms, limit, offset));
+			searchResults = new ArrayList<GSGraphMetaData>();
+			graphsByTags = graphJSONListToMetaDataArray(client.getSharedGraphs(searchTerms, limit, offset));
+			graphsByNames = graphJSONListToMetaDataArray(client.getSharedGraphsByNames(searchTerms, limit, offset));
+			searchResults.addAll(graphsByTags);
+			searchResults.addAll(graphsByNames);
+			return searchResults;
 		}
 		else{
-			return graphJSONListToMetaDataArray(client.getPublicGraphs(searchTerms, limit, offset));
+			searchResults = new ArrayList<GSGraphMetaData>();
+			graphsByTags = graphJSONListToMetaDataArray(client.getPublicGraphs(searchTerms, limit, offset));
+			graphsByNames = graphJSONListToMetaDataArray(client.getPublicGraphsByNames(searchTerms, limit, offset));
+			searchResults.addAll(graphsByTags);
+			searchResults.addAll(graphsByNames);
+			return searchResults;
 		}
 	}
 	

@@ -335,6 +335,19 @@ public class Client {
     	return makeRequest("GET", "/api/v1/graphs", query, null);
     }
     
+    public JSONObject getPublicGraphsByNames(ArrayList<String> graphNames, int limit, int offset) throws Exception{
+    	Map<String, Object> query = new HashMap<String, Object>();
+    	query.put("is_public", 1);
+    	query.put("limit", limit);
+    	query.put("offset", offset);
+    	if (!graphNames.isEmpty()){
+    		String[] names = new String[graphNames.size()];
+    		names = graphNames.toArray(names);
+    		query.put("names[]", graphNames.get(0));
+    	}
+    	return makeRequest("GET", "/api/v1/graphs", query, null);
+    }
+    
     /**
      * 
      * @param limit
@@ -375,6 +388,21 @@ public class Client {
     	return makeRequest("GET", "/api/v1/graphs", query, null);
     }
     
+    public JSONObject getSharedGraphsByNames(ArrayList<String> graphNames, int limit, int offset) throws Exception{
+		Map<String, Object> query = new HashMap<String, Object>();
+		query.put("member_email", this.username);
+		query.put("limit", limit);
+    	query.put("offset", offset);
+    	if (!graphNames.isEmpty()){
+    		String[] names = new String[graphNames.size()];
+    		names = graphNames.toArray(names);
+    		query.put("names[]", graphNames.get(0));
+    	}
+    	System.out.println(query.toString());
+    	return makeRequest("GET", "/api/v1/graphs", query, null);
+    }
+    
+    
     //TODO: For default values of limit and offset    
     /**
      * Get graphs created by the requesting user.
@@ -393,6 +421,19 @@ public class Client {
     		String[] tags = new String[tagsList.size()];
     		tags = tagsList.toArray(tags);
     		query.put("tags[]", tagsList.get(0));
+    	}
+		return makeRequest("GET", "/api/v1/graphs/", query, null);
+    }
+    
+    public JSONObject getMyGraphsByNames(ArrayList<String> graphNames, int limit, int offset) throws Exception{
+    	Map<String, Object> query = new HashMap<String, Object>();
+		query.put("owner_email", this.username);
+		query.put("limit", limit);
+    	query.put("offset", offset);
+    	if (!graphNames.isEmpty()){
+    		String[] names = new String[graphNames.size()];
+    		names = graphNames.toArray(names);
+    		query.put("names[]", graphNames.get(0));
     	}
 		return makeRequest("GET", "/api/v1/graphs/", query, null);
     }

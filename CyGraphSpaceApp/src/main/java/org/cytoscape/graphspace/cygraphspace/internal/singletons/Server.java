@@ -1,6 +1,7 @@
 package org.cytoscape.graphspace.cygraphspace.internal.singletons;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.graphspace.javaclient.CyGraphSpaceClient;
 import org.graphspace.javaclient.model.GSGraphMetaData;
@@ -84,12 +85,12 @@ public enum Server{
 		return this.client.getGraphByName(name);
 	}
 	
-	public JSONObject updateGraph(String name, JSONObject graphJSON, boolean isGraphPublic) throws Exception{
-		return this.client.updateGraph(name, graphJSON, isGraphPublic);
+	public JSONObject updateGraph(String name, JSONObject graphJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
+		return this.client.updateGraph(name, graphJSON, isGraphPublic, tagsList);
 	}
 	
-	public void postGraph(JSONObject graph) throws Exception{
-		this.client.postGraph(graph);
+	public JSONObject postGraph(JSONObject graph, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
+		return this.client.postGraph(graph, styleJSON, isGraphPublic, tagsList);
 	}
 	
 	public boolean updatePossible(String name) throws Exception{

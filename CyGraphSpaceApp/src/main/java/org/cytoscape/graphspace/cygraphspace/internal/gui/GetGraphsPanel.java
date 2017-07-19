@@ -719,7 +719,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private void populate(){
 		if (Server.INSTANCE.isAuthenticated()){
 			try {
-				System.out.println("haan");
 				this.loggedIn = true;
 				loginButton.setText("Log Out");
 				hostTextField.setText(Server.INSTANCE.getHost());
@@ -734,7 +733,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			}
 		}
 		else{
-			System.out.println("nhi");
 			loginButton.setText("Log In");
 		}
 	}

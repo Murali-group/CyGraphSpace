@@ -43,6 +43,7 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 		button.setBorderPainted(false);
 		button.setFocusPainted(false);
 		button.setContentAreaFilled(true);
+		button.setToolTipText("Export To GraphSpace");
 		button.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt){
 				System.out.println("clicked");

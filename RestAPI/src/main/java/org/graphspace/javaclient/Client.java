@@ -218,14 +218,14 @@ public class Client {
      * @return
      * @throws Exception 
      */
-    public JSONObject postGraph(JSONObject graph) throws Exception{
-    	return postGraph(graph, null, false);
-    }
-    
-    public JSONObject postGraph(JSONObject graph, JSONObject styleJSON) throws Exception{
-    	return postGraph(graph, styleJSON, false);
-    }
-    
+//    public JSONObject postGraph(JSONObject graph, ArrayList<String> tagsList) throws Exception{
+//    	return postGraph(graph, null, false, tagsList);
+//    }
+//    
+//    public JSONObject postGraph(JSONObject graph, JSONObject styleJSON, ArrayList<String> tagsList) throws Exception{
+//    	return postGraph(graph, styleJSON, false, tagsList);
+//    }
+//    
     //TODO: Change return type
     /**
      * Posts NetworkX graph to the requesting users account on GraphSpace.
@@ -234,8 +234,14 @@ public class Client {
      * @return
      * @throws Exception 
      */
-    public JSONObject postGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic) throws Exception{
-    	int isPublic = (isGraphPublic) ? 1 : 0;
+    public JSONObject postGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
+    	int isPublic;
+    	if (isGraphPublic){
+    		isPublic = 1;
+    	}
+    	else{
+    		isPublic = 0;
+    	}
     	Map<String, Object> data = new HashMap<String, Object>();
     	GSGraph graph = new GSGraph(graphJSON);
     	graph.setStyleJSON(styleJSON);
@@ -244,6 +250,17 @@ public class Client {
         data.put("owner_email", this.username);
         data.put("graph_json", graph.computeGraphJSON());
         data.put("style_json", graph.getStyleJSON());
+        System.out.println("tags list: " + tagsList.toString());
+        if (!tagsList.isEmpty()){
+    		String[] tags = new String[tagsList.size()];
+    		tags = tagsList.toArray(tags);
+    		data.put("tags", tagsList);
+    	}
+        System.out.println("\n\n\n");
+        System.out.println("------------------------------------------------------------------------------------");
+        System.out.println("name: " + graph.getName() + " is public: " + isPublic + " ownerEmail: " + this.username);
+        System.out.println("graph_json: " + graph.computeGraphJSON());
+        System.out.println("style_json: " + graph.getStyleJSON());
     	return makeRequest("POST", "/api/v1/graphs", null, data);
     	//TODO: return relevant string from the json
     }
@@ -330,7 +347,7 @@ public class Client {
 //    		JSONArray tags = new JSONArray(tagsList);
     		String[] tags = new String[tagsList.size()];
     		tags = tagsList.toArray(tags);
-    		query.put("tags[]", tagsList.get(0));
+    		query.put("tags[]", tags.toString());
     	}
     	return makeRequest("GET", "/api/v1/graphs", query, null);
     }
@@ -343,7 +360,7 @@ public class Client {
     	if (!graphNames.isEmpty()){
     		String[] names = new String[graphNames.size()];
     		names = graphNames.toArray(names);
-    		query.put("names[]", graphNames.get(0));
+    		query.put("names[]", names.toString());
     	}
     	return makeRequest("GET", "/api/v1/graphs", query, null);
     }
@@ -382,7 +399,7 @@ public class Client {
 //    		JSONArray tags = new JSONArray(tagsList);
     		String[] tags = new String[tagsList.size()];
     		tags = tagsList.toArray(tags);
-    		query.put("tags[]", tagsList.get(0));
+    		query.put("tags[]", tags.toString());
     	}
     	System.out.println(query.toString());
     	return makeRequest("GET", "/api/v1/graphs", query, null);
@@ -396,7 +413,7 @@ public class Client {
     	if (!graphNames.isEmpty()){
     		String[] names = new String[graphNames.size()];
     		names = graphNames.toArray(names);
-    		query.put("names[]", graphNames.get(0));
+    		query.put("names[]", names.toString());
     	}
     	System.out.println(query.toString());
     	return makeRequest("GET", "/api/v1/graphs", query, null);
@@ -420,7 +437,7 @@ public class Client {
 //    		JSONArray tags = new JSONArray(tagsList);
     		String[] tags = new String[tagsList.size()];
     		tags = tagsList.toArray(tags);
-    		query.put("tags[]", tagsList.get(0));
+    		query.put("tags[]", tags.toString());
     	}
 		return makeRequest("GET", "/api/v1/graphs/", query, null);
     }
@@ -433,7 +450,7 @@ public class Client {
     	if (!graphNames.isEmpty()){
     		String[] names = new String[graphNames.size()];
     		names = graphNames.toArray(names);
-    		query.put("names[]", graphNames.get(0));
+    		query.put("names[]", names.toString());
     	}
 		return makeRequest("GET", "/api/v1/graphs/", query, null);
     }
@@ -475,9 +492,16 @@ public class Client {
      * @return
      * @throws Exception 
      */
-    public JSONObject updateGraph(String name, String ownerEmail, JSONObject graphJSON, boolean isGraphPublic) throws Exception{
+    public JSONObject updateGraph(String name, String ownerEmail, JSONObject graphJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
     	Map<String, Object> data = new HashMap<String, Object>();
-    	int isPublic = (isGraphPublic) ? 1 : 0;
+    	int isPublic;
+    	if (isGraphPublic){
+    		isPublic = 1;
+    	}
+    	else{
+    		isPublic = 0;
+    	}
+//    	int isPublic = (isGraphPublic) ? 1 : 0;
     	JSONObject graphResponse = getGraphRequest(name, ownerEmail);
     	String id = String.valueOf(graphResponse.getJSONObject("body").getJSONObject("object").getJSONArray("graphs").getJSONObject(0).getInt("id"));
     	JSONObject styleJSON = graphResponse.getJSONObject("body").getJSONObject("object").getJSONArray("graphs").getJSONObject(0).getJSONObject("style_json");
@@ -490,6 +514,11 @@ public class Client {
     		data.put("owner_email", this.username);
     		data.put("graph_json", graph.computeGraphJSON());
     		data.put("style_json", graph.getStyleJSON());
+    		if (!tagsList.isEmpty()){
+        		String[] tags = new String[tagsList.size()];
+        		tags = tagsList.toArray(tags);
+        		data.put("tags", tagsList);
+        	}
     		return makeRequest("PUT", "/api/v1/graphs/" + graph.getId(), null, data);
     	}
     	else{
@@ -498,30 +527,30 @@ public class Client {
     	
     }
     
-    public JSONObject updateGraph(String name, JSONObject graphJSON, boolean isGraphPublic) throws Exception{
-    	String ownerEmail = this.username;
-    	return updateGraph(name, ownerEmail, graphJSON, isGraphPublic);
-    }
-    
-    /**
-     * 
-     * @param name
-     * @return
-     * @throws Exception 
-     */
-    public JSONObject makeGraphPublic(String name) throws Exception{
-    	return updateGraph(name, username, null, true);
-    }
-    
-    /**
-     * 
-     * @param name
-     * @return
-     * @throws Exception 
-     */
-    public JSONObject makeGraphPrivate(String name) throws Exception{
-    	return updateGraph(name, username, null, false);
-    }
+//    public JSONObject updateGraph(String name, JSONObject graphJSON, boolean isGraphPublic) throws Exception{
+//    	String ownerEmail = this.username;
+//    	return updateGraph(name, ownerEmail, graphJSON, isGraphPublic);
+//    }
+//    
+//    /**
+//     * 
+//     * @param name
+//     * @return
+//     * @throws Exception 
+//     */
+//    public JSONObject makeGraphPublic(String name) throws Exception{
+//    	return updateGraph(name, username, null, true);
+//    }
+//    
+//    /**
+//     * 
+//     * @param name
+//     * @return
+//     * @throws Exception 
+//     */
+//    public JSONObject makeGraphPrivate(String name) throws Exception{
+//    	return updateGraph(name, username, null, false);
+//    }
     
     //TODO: change return type
     /**

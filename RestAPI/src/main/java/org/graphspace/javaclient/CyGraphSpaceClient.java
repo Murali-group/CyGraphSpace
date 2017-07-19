@@ -1,8 +1,6 @@
 package org.graphspace.javaclient;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.graphspace.javaclient.model.GSGraphMetaData;
 import org.json.JSONArray;
@@ -99,17 +97,21 @@ public class CyGraphSpaceClient{
 		return client.getGraph(name);
 	}
 	
-	public void postGraph(JSONObject graph) throws Exception{
-		client.postGraph(graph).toString();
+	public JSONObject postGraph(JSONObject graph, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
+		return client.postGraph(graph, styleJSON, isGraphPublic, tagsList);
 	}
 	
-	public JSONObject updateGraph(String name, String ownerEmail, JSONObject graphJSON, boolean isGraphPublic) throws Exception{
-		return client.updateGraph(name, ownerEmail, graphJSON, isGraphPublic);
+	public JSONObject updateGraph(String name, String ownerEmail, JSONObject graphJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
+		return client.updateGraph(name, ownerEmail, graphJSON, isGraphPublic, tagsList);
 	}
 	
-	public JSONObject updateGraph(String name, JSONObject graphJSON, boolean isGraphPublic) throws Exception{
+	public JSONObject updateGraph(String name, JSONObject graphJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
 		String ownerEmail = this.username;
-		return client.updateGraph(name, ownerEmail, graphJSON, isGraphPublic);
+		return client.updateGraph(name, ownerEmail, graphJSON, isGraphPublic, tagsList);
+	}
+	
+	public JSONObject postGraphLayout(String graphId, String layoutName, JSONObject positionsJSON, JSONObject styleJSON, boolean isGraphShared) throws Exception{
+		return client.postGraphLayout(graphId, layoutName, positionsJSON, styleJSON, isGraphShared);
 	}
 	
 	public boolean updatePossible(String name) throws Exception{

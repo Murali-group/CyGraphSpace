@@ -15,6 +15,7 @@ import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.work.TaskIterator;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.awt.Component;
@@ -28,7 +29,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.awt.event.ActionEvent;
+import javax.swing.JCheckBox;
+import javax.swing.JSpinner;
+import javax.swing.JComboBox;
 
 public class PostGraphDialog extends JDialog {
 	private JLabel hostValueLabel;
@@ -37,6 +44,11 @@ public class PostGraphDialog extends JDialog {
 	private JPanel buttonsPanel;
 	private JButton postGraphButton;
 	private JButton cancelButton;
+	private JLabel tagsLabel;
+	private JTextField tagsTextField;
+	private JLabel tagsMessageLabel;
+	private JLabel groupsLabel;
+	private JCheckBox makeGraphPublicCheckBox;
 	public PostGraphDialog(Frame parent) {
 		this.setTitle("Export Graphs to GraphSpace");
 		
@@ -50,21 +62,33 @@ public class PostGraphDialog extends JDialog {
 		usernameLabel = new JLabel("Username");
 		
 		buttonsPanel = new JPanel();
+		
+		JPanel tagsPanel = new JPanel();
+		
+		makeGraphPublicCheckBox = new JCheckBox("Make Graph Public");
+		
+		JPanel panel = new JPanel();
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.TRAILING)
+			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(makeGraphPublicCheckBox)
 						.addGroup(groupLayout.createSequentialGroup()
 							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
 								.addComponent(hostLabel)
 								.addComponent(usernameLabel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-							.addPreferredGap(ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
-							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-								.addComponent(hostValueLabel, GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
-								.addComponent(usernameValueLabel)))
-						.addComponent(buttonsPanel, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addGap(48)
+							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(usernameValueLabel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(hostValueLabel, GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)))
+						.addComponent(buttonsPanel, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+								.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
+								.addComponent(tagsPanel, GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE))
+							.addGap(10)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -72,16 +96,75 @@ public class PostGraphDialog extends JDialog {
 				.addGroup(groupLayout.createSequentialGroup()
 					.addGap(24)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(hostValueLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(hostValueLabel)
 						.addComponent(hostLabel))
 					.addGap(18)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(usernameValueLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(usernameLabel))
-					.addGap(15)
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(usernameLabel)
+						.addComponent(usernameValueLabel))
+					.addGap(18)
+					.addComponent(tagsPanel, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(makeGraphPublicCheckBox)
+					.addPreferredGap(ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
 					.addComponent(buttonsPanel, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(14, Short.MAX_VALUE))
+					.addContainerGap())
 		);
+		
+		groupsLabel = new JLabel("Share With");
+		
+		JComboBox groupsComboBox = new JComboBox();
+		GroupLayout gl_panel = new GroupLayout(panel);
+		gl_panel.setHorizontalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addComponent(groupsLabel, GroupLayout.PREFERRED_SIZE, 108, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(groupsComboBox, 0, 450, Short.MAX_VALUE)
+					.addContainerGap())
+		);
+		gl_panel.setVerticalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(groupsLabel)
+						.addComponent(groupsComboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap())
+		);
+		panel.setLayout(gl_panel);
+		
+		tagsLabel = new JLabel("Tags");
+		
+		tagsTextField = new JTextField();
+		tagsTextField.setColumns(10);
+		
+		tagsMessageLabel = new JLabel("For multiple tags, separate the tags using commas");
+		GroupLayout gl_tagsPanel = new GroupLayout(tagsPanel);
+		gl_tagsPanel.setHorizontalGroup(
+			gl_tagsPanel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_tagsPanel.createSequentialGroup()
+					.addComponent(tagsLabel, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE)
+					.addGap(71)
+					.addGroup(gl_tagsPanel.createParallelGroup(Alignment.TRAILING)
+						.addComponent(tagsMessageLabel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE)
+						.addComponent(tagsTextField, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE))
+					.addContainerGap())
+		);
+		gl_tagsPanel.setVerticalGroup(
+			gl_tagsPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_tagsPanel.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_tagsPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tagsLabel)
+						.addComponent(tagsTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tagsMessageLabel)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		tagsPanel.setLayout(gl_tagsPanel);
 		
 		postGraphButton = new JButton("Checking...");
 		postGraphButton.setEnabled(false);
@@ -104,7 +187,7 @@ public class PostGraphDialog extends JDialog {
 		try {
 			System.out.println("host: "+Server.INSTANCE.getHost() + ", username: "+Server.INSTANCE.getUsername()+ ",password: "+Server.INSTANCE.getPassword());
 			JSONObject graphJSON = exportNetworkToJSON();
-			System.out.println(graphJSON.toString());
+			JSONObject styleJSON = exportStyleToJSON();
 //			if (graphJSON == null){
 //				this.dispose();
 //				JOptionPane.showMessageDialog(new JFrame(), "Could not export your network to JSON.", "Dialog", JOptionPane.ERROR_MESSAGE);
@@ -114,18 +197,55 @@ public class PostGraphDialog extends JDialog {
 			if(Server.INSTANCE.updatePossible(graphName)){
 				postGraphButton.setText("Update");
 				postGraphButton.setEnabled(true);
+				JSONObject responseFromGraphSpace = Server.INSTANCE.client.getGraphByName(graphName);
+				int isPublic = responseFromGraphSpace.getInt("is_public");
+				if (isPublic == 1){
+					makeGraphPublicCheckBox.setSelected(true);
+				}
+				JSONArray tagsArr = responseFromGraphSpace.getJSONArray("tags");
+				String tagsListText = "";
+				for (int i=0; i<tagsArr.length(); i++){
+					tagsListText += tagsArr.getString(i)+", ";
+				}
+				if (tagsListText.length()>2){
+					tagsListText = tagsListText.substring(0, tagsListText.length()-2);
+				}
+				tagsTextField.setText(tagsListText);
 				postGraphButton.addActionListener(new ActionListener(){
 					public void actionPerformed(ActionEvent evt) {
-						updateActionPerformed(evt, graphJSON);
+						boolean isGraphPublic;
+						ArrayList<String> tagsList;
+						if (makeGraphPublicCheckBox.isSelected()){
+							isGraphPublic = true;
+						}
+						else{
+							isGraphPublic = false;
+						}
+						String tagsListText = tagsTextField.getText();
+						tagsList = new ArrayList<String>(Arrays.asList(tagsListText.split("\\s*,\\s*")));
+						System.out.println(tagsList.toString());
+						updateActionPerformed(evt, graphJSON, styleJSON, isGraphPublic, tagsList);
 					}
 				});
 			}
 			else{
 				postGraphButton.setText("Export");
 				postGraphButton.setEnabled(true);
+//				postGraphButton.addActionListener(new ExportActionListener(graphJSON, styleJSON, isGraphPublic, tagsList));
 				postGraphButton.addActionListener(new ActionListener(){
 					public void actionPerformed(ActionEvent evt) {
-						exportActionPerformed(evt, graphJSON);
+						boolean isGraphPublic;
+						ArrayList<String> tagsList;
+						if (makeGraphPublicCheckBox.isSelected()){
+							isGraphPublic = true;
+						}
+						else{
+							isGraphPublic = false;
+						}
+						String tagsListText = tagsTextField.getText();
+						tagsList = new ArrayList<String>(Arrays.asList(tagsListText.split("\\s*,\\s*")));
+						System.out.println(tagsList.toString());
+						exportActionPerformed(evt, graphJSON, styleJSON, isGraphPublic, (ArrayList<String>)tagsList);
 					}
 				});
 			}
@@ -166,10 +286,10 @@ public class PostGraphDialog extends JDialog {
 		}
 	}
 	
-	private void updateActionPerformed(ActionEvent evt, JSONObject graphJSON){
+	private void updateActionPerformed(ActionEvent evt, JSONObject graphJSON, JSONObject styleJSON, boolean isPublic, ArrayList<String> tagsList){
 		try{
 			this.dispose();
-			updateGraph(graphJSON);
+			updateGraph(graphJSON, styleJSON, isPublic, tagsList);
 		}
 		catch (Exception e){
 			e.printStackTrace();
@@ -178,10 +298,10 @@ public class PostGraphDialog extends JDialog {
 		}
 	}
 	
-	private void exportActionPerformed(ActionEvent evt, JSONObject graphJSON){
+	private void exportActionPerformed(ActionEvent evt, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList){
 		try{
 			this.dispose();
-			postGraph(graphJSON);
+			postGraph(graphJSON, styleJSON, isGraphPublic, tagsList);
 		}
 		catch (Exception e){
 			e.printStackTrace();
@@ -190,23 +310,24 @@ public class PostGraphDialog extends JDialog {
 		}
 	}
 	
-	private void updateGraph(JSONObject graphJSON) throws Exception{
+	private void updateGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isPublic, ArrayList<String> tagsList) throws Exception{
 		String name = graphJSON.getJSONObject("data").getString("name");
 		JSONObject responseFromGraphSpace = Server.INSTANCE.client.getGraphByName(name);
+		Server.INSTANCE.updateGraph(name, graphJSON, isPublic, tagsList);
 //		System.out.println(responseFromGraphSpace);
-		int isPublic = responseFromGraphSpace.getInt("is_public");
-		if (isPublic == 0){
-			JSONObject response = Server.INSTANCE.updateGraph(name, graphJSON, false);
-			System.out.println(response);
-		}
-		else{
-			JSONObject response = Server.INSTANCE.updateGraph(name, graphJSON, true);
-			System.out.println(response);
-		}
+//		int isPublic = responseFromGraphSpace.getInt("is_public");
+//		if (isPublic == 0){
+//			JSONObject response = Server.INSTANCE.updateGraph(name, graphJSON, false);
+//			System.out.println(response);
+//		}
+//		else{
+//			JSONObject response = Server.INSTANCE.updateGraph(name, graphJSON, true);
+//			System.out.println(response);
+//		}
 	}
 	
-	private void postGraph(JSONObject graphJSON) throws Exception{
-		Server.INSTANCE.postGraph(graphJSON);
+	private void postGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
+		Server.INSTANCE.postGraph(graphJSON, styleJSON, isGraphPublic, tagsList);
 	}
 	
 	private JSONObject exportNetworkToJSON() throws IOException{
@@ -242,31 +363,54 @@ public class PostGraphDialog extends JDialog {
 //		CyNetwork network = CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork();
 		TaskIterator ti = CyObjectManager.INSTANCE.getExportVizmapTaskFactory().createTaskIterator(tempFile);
 		CyObjectManager.INSTANCE.getTaskManager().execute(ti);
-		String graphJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
+		String styleJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
 		int count = 0;
-		while(graphJSONString.isEmpty()){
+		while(styleJSONString.isEmpty()){
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			graphJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
+			styleJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
 			count++;
 			if (count>=10){
 				return null;
 			}
 		}
 		tempFile.delete();
-		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"shared_name\".*", "");
-		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"id_original\".*", "");
-		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"shared_interaction\".*", "");
-		JSONObject graphJSON = new JSONObject(graphJSONString);
-        return graphJSON;
+		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"shared_name\".*", "");
+		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"id_original\".*", "");
+		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"shared_interaction\".*", "");
+		JSONArray styleJSONArray = new JSONArray(styleJSONString);
+        return styleJSONArray.getJSONObject(0);
 	}
 	
 	private void cancelActionPerformed(ActionEvent e){
 		this.dispose();
 	}
 	
+	private class ExportActionListener implements ActionListener{
+		private JSONObject graphJSON;
+		private JSONObject styleJSON;
+		private boolean isGraphPublic;
+		private ArrayList<String> tagsList;
+		
+		public ExportActionListener(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList){
+			this.graphJSON = graphJSON;
+			this.styleJSON = styleJSON;
+			this.isGraphPublic = isGraphPublic;
+			this.tagsList = tagsList;
+		}
+		
+		public void actionPerformed(ActionEvent e){
+			try {
+				exportActionPerformed(e, graphJSON, styleJSON, isGraphPublic, tagsList);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
+	}
 }

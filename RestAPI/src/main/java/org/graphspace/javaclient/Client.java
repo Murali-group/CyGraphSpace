@@ -11,6 +11,7 @@ import org.graphspace.javaclient.exceptions.GraphNotFoundException;
 import org.graphspace.javaclient.exceptions.RequestTypeNotDefinedException;
 import org.graphspace.javaclient.model.GSGraph;
 import org.apache.http.HttpHost;
+import org.apache.http.entity.mime.content.StringBody;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -234,7 +235,7 @@ public class Client {
      * @return
      * @throws Exception 
      */
-    public JSONObject postGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
+	public JSONObject postGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
     	int isPublic;
     	if (isGraphPublic){
     		isPublic = 1;
@@ -251,11 +252,19 @@ public class Client {
         data.put("graph_json", graph.computeGraphJSON());
         data.put("style_json", graph.getStyleJSON());
         System.out.println("tags list: " + tagsList.toString());
-        if (!tagsList.isEmpty()){
-    		String[] tags = new String[tagsList.size()];
-    		tags = tagsList.toArray(tags);
-    		data.put("tags", tagsList);
-    	}
+        data.put("tags[]", tagsList.get(0));
+//        if (!tagsList.isEmpty()){
+//        	for (int i=0; i<tagsList.size(); i++){
+//        		data.put("tags[]", new StringBody(tagsList.get(i)));
+//        	}
+//        }
+//        if (!tagsList.isEmpty()){
+////    		String[] tags = new String[tagsList.size()];
+////    		tags = tagsList.toArray(tags);
+//        	JSONArray tags = new JSONArray(tagsList);
+//    		data.put("tags", tags);
+//    	}
+        
         System.out.println("\n\n\n");
         System.out.println("------------------------------------------------------------------------------------");
         System.out.println("name: " + graph.getName() + " is public: " + isPublic + " ownerEmail: " + this.username);
@@ -514,11 +523,19 @@ public class Client {
     		data.put("owner_email", this.username);
     		data.put("graph_json", graph.computeGraphJSON());
     		data.put("style_json", graph.getStyleJSON());
-    		if (!tagsList.isEmpty()){
-        		String[] tags = new String[tagsList.size()];
-        		tags = tagsList.toArray(tags);
-        		data.put("tags", tagsList);
-        	}
+//    		if (!tagsList.isEmpty()){
+//            	for (int i=0; i<tagsList.size(); i++){
+//            		data.put("tags[]", tagsList.get(i));
+//            	}
+//            }
+    		data.put("tags[]", tagsList.get(0));
+//    		System.out.println("update tags list: " + tagsList.toString());
+//    		if (!tagsList.isEmpty()){
+////        		String[] tags = new String[tagsList.size()];
+////        		tags = tagsList.toArray(tags);
+//    			JSONArray tags = new JSONArray(tagsList);
+//        		data.put("tags", tags);
+//        	}
     		return makeRequest("PUT", "/api/v1/graphs/" + graph.getId(), null, data);
     	}
     	else{

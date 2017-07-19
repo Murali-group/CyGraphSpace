@@ -327,7 +327,7 @@ public class PostGraphDialog extends JDialog {
 	}
 	
 	private void postGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
-		Server.INSTANCE.postGraph(graphJSON, styleJSON, isGraphPublic, tagsList);
+		System.out.println(Server.INSTANCE.postGraph(graphJSON, styleJSON, isGraphPublic, tagsList).toString());
 	}
 	
 	private JSONObject exportNetworkToJSON() throws IOException{
@@ -354,6 +354,8 @@ public class PostGraphDialog extends JDialog {
 		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"shared_name\".*", "");
 		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"id_original\".*", "");
 		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"shared_interaction\".*", "");
+		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"source_original\".*", "");
+		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"target_original\".*", "");
 		JSONObject graphJSON = new JSONObject(graphJSONString);
         return graphJSON;
 	}
@@ -382,6 +384,8 @@ public class PostGraphDialog extends JDialog {
 		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"shared_name\".*", "");
 		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"id_original\".*", "");
 		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"shared_interaction\".*", "");
+		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"source_original\".*", "");
+		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"target_original\".*", "");
 		JSONArray styleJSONArray = new JSONArray(styleJSONString);
         return styleJSONArray.getJSONObject(0);
 	}

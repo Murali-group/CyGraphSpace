@@ -62,11 +62,13 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 		        
 		        loadingFrame = new JFrame("Checking if update Possible");
 				ImageIcon loading = new ImageIcon(this.getClass().getClassLoader().getResource("loading.gif"));
-				JLabel loadingLabel = new JLabel("Checking if you're trying to update an existing graph", loading, JLabel.CENTER);
-				loadingLabel.setHorizontalTextPosition(JLabel.CENTER);
-				loadingLabel.setVerticalTextPosition(JLabel.BOTTOM);
-				loadingFrame.add(loadingLabel);
+				JLabel loadingLabel = new JLabel("", loading, JLabel.CENTER);
+//				loadingLabel.setHorizontalTextPosition(JLabel.CENTER);
+//				loadingLabel.setVerticalTextPosition(JLabel.BOTTOM);
+				loadingFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				loadingFrame.setSize(400, 300);
+				loadingFrame.add(loadingLabel);
+				loadingFrame.setLocationRelativeTo(parent);
 		        if( currentNetwork == null )
 		        {
 		            String msg = "There is no graph to export.";

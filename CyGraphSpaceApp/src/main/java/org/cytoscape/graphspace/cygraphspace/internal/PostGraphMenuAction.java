@@ -53,14 +53,15 @@ public class PostGraphMenuAction extends AbstractCyAction
 
         CyNetwork currentNetwork = CyObjectManager.INSTANCE.getCurrentNetwork();
         
-        loadingFrame = new JFrame("Checking if update Possible");
+        JFrame loadingFrame = new JFrame("Checking if update Possible");
 		ImageIcon loading = new ImageIcon(this.getClass().getClassLoader().getResource("loading.gif"));
-		JLabel loadingLabel = new JLabel("Checking if you're trying to update an existing graph", loading, JLabel.CENTER);
-		loadingLabel.setHorizontalTextPosition(JLabel.CENTER);
-		loadingLabel.setVerticalTextPosition(JLabel.BOTTOM);
+		JLabel loadingLabel = new JLabel("", loading, JLabel.CENTER);
+//		loadingLabel.setHorizontalTextPosition(JLabel.CENTER);
+//		loadingLabel.setVerticalTextPosition(JLabel.BOTTOM);
 		loadingFrame.add(loadingLabel);
+	    loadingFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		loadingFrame.setSize(400, 300);
-		
+		loadingFrame.setLocationRelativeTo(parent);
         if( currentNetwork == null )
         {
             String msg = "There is no graph to export.";
@@ -71,7 +72,7 @@ public class PostGraphMenuAction extends AbstractCyAction
         if (Server.INSTANCE.isAuthenticated()){
 			loadingFrame.setVisible(true);
     		try {
-				populate(parent);
+				populate(parent, loadingFrame);
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -86,7 +87,7 @@ public class PostGraphMenuAction extends AbstractCyAction
             	public void windowClosed(WindowEvent e){
 					loadingFrame.setVisible(true);
             		try {
-						populate(parent);
+						populate(parent, loadingFrame);
 					} catch (Exception e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -96,7 +97,7 @@ public class PostGraphMenuAction extends AbstractCyAction
         }
     }
     
-    private void populate(Frame parent) throws Exception{
+    private void populate(Frame parent, JFrame loadingFrame) throws Exception{
 		JSONObject graphJSON = exportNetworkToJSON();
 		JSONObject styleJSON = exportStyleToJSON();
 		String graphName = graphJSON.getJSONObject("data").getString("name");

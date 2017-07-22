@@ -187,6 +187,7 @@ public class UpdateGraphDialog extends JDialog {
 		if (Server.INSTANCE.getHost() != null){
 			hostValueLabel.setText(Server.INSTANCE.getHost());
 		}
+		graphNameValue.setText(graphName);
 	}
 	
 	private void updateActionPerformed(ActionEvent evt, JSONObject graphJSON, JSONObject styleJSON, boolean isPublic){

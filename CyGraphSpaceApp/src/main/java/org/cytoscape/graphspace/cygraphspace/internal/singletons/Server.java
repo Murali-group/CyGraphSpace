@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.graphspace.javaclient.CyGraphSpaceClient;
 import org.graphspace.javaclient.model.GSGraphMetaData;
+import org.graphspace.javaclient.model.GSGroupMetaData;
 import org.json.JSONObject;
 
 public enum Server{
@@ -99,5 +100,13 @@ public enum Server{
 	
 	public ArrayList<GSGraphMetaData> searchGraphs(String searchTerm, boolean myGraphs, boolean sharedGraphs, boolean publicGraphs, int limit, int offset) throws Exception{
 		return this.client.searchGraphs(searchTerm, myGraphs, sharedGraphs, publicGraphs, limit, offset);
+	}
+	
+	public ArrayList<GSGroupMetaData> getMyGroups(int limit, int offset) throws Exception{
+		return this.client.getMyGroups(limit, offset);
+	}
+	
+	public JSONObject addGroupGraph(String graphId, String name, String groupId) throws Exception{
+		return this.client.addGroupGraph(graphId, name, groupId);
 	}
 }

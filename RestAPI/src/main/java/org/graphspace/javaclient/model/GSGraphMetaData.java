@@ -1,16 +1,18 @@
 package org.graphspace.javaclient.model;
 
+import java.util.ArrayList;
+
 public class GSGraphMetaData{
 	private String name;
 	private int id;
-	private String ownedBy;
-	private int access;
+	private String owner;
+	private ArrayList<String> tags;
 	
-	public GSGraphMetaData(String name, int id, String ownedBy, int access){
+	public GSGraphMetaData(String name, int id, String owner, ArrayList<String> tags){
 		this.name = name;
 		this.id = id;
-		this.ownedBy = ownedBy;
-		this.access = access;
+		this.owner = owner;
+		this.tags = tags;
 	}
 	
 	public String getName(){
@@ -21,11 +23,11 @@ public class GSGraphMetaData{
 		return this.id;
 	}
 	
-	public String getOwnedBy(){
-		return this.ownedBy;
+	public String getOwner(){
+		return this.owner;
 	}
 	
-	public int getAccess(){
-		return this.access;
+	public ArrayList<String> getTags(){
+		return this.tags;
 	}
 }

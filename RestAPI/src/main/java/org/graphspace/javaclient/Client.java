@@ -30,7 +30,6 @@ public class Client {
 	String username;
 	String password;
 	final String defaultHost = "www.graphspace.org";
-	
     public void authenticate(String host, String username, String password){
     	this.host = host;
     	this.username = username;
@@ -835,5 +834,57 @@ public class Client {
     	query.put("is_shared", 1);
     	String path = String.format("/api/v1/graphs/%s/layouts/", graphId);
     	return makeRequest("GET", path, query, null);
+    }
+    
+    
+    
+    /**
+     * GROUPS
+     * @throws Exception 
+     */
+    
+    public JSONObject getGroup(String name) throws Exception{
+    	Map<String, Object> urlParams = new HashMap<String, Object>();
+    	urlParams.put("member_email", this.username);
+    	urlParams.put("name", name);
+    	JSONObject response = makeRequest("GET", "/api/v1/groups", urlParams, null);
+    	JSONObject body = response.getJSONObject("body");
+		JSONArray array = body.getJSONArray("array");
+    	int total = ((JSONObject) array.get(0)).getInt("total");
+    	if(total>0){
+    		return response.getJSONArray("groups").getJSONObject(0);
+    	}
+    	return null;
+    }
+    
+    public JSONObject getMyGroups(int limit, int offset) throws Exception{
+    	Map<String, Object> query = new HashMap<String, Object>();
+    	query.put("limit", limit);
+    	query.put("offset", offset);
+    	query.put("owner_email", this.username);
+    	return makeRequest("GET", "/api/v1/groups/", query, null);
+    }
+    
+    public JSONObject addGroupGraph(String graphId, String name, String groupId) throws Exception{
+    	if (groupId != null){
+    		Map<String, Object> data = new HashMap<String, Object>();
+    		data.put("graph_id", graphId);
+    		return makeRequest("POST", "/api/v1/groups/"+groupId+"/graphs", null, data);
+    	}
+    	if (name != null){
+    		JSONObject response = getGraph(name);
+    		if (response!=null){
+    			int id = response.getInt("id");
+    			Map<String, Object> data = new HashMap<String, Object>();
+    			data.put("graph_id", graphId);
+    			return makeRequest("POST", "/api/v1/groups/"+String.valueOf(groupId)+"/graphs", null, data);
+    		}
+    		else{
+    			return null;
+    		}
+    	}
+    	else{
+    		return null;
+    	}
     }
 }

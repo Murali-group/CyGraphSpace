@@ -7,7 +7,7 @@ import javax.swing.JFrame;
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.AuthenticationDialog;
-import org.cytoscape.graphspace.cygraphspace.internal.gui.GetGraphDialog;
+//import org.cytoscape.graphspace.cygraphspace.internal.gui.GetGraphDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 
@@ -41,9 +41,9 @@ public class GetGraphMenuAction extends AbstractCyAction
             authDialog.setVisible(true);
     	}
     	else{
-	        GetGraphDialog dialog = new GetGraphDialog(parent);
-	        dialog.setLocationRelativeTo(parent);
-	        dialog.setVisible(true);
+//	        GetGraphDialog dialog = new GetGraphDialog(parent);
+//	        dialog.setLocationRelativeTo(parent);
+//	        dialog.setVisible(true);
     	}
     }
     

@@ -3,6 +3,7 @@ package org.graphspace.javaclient;
 import java.util.ArrayList;
 
 import org.graphspace.javaclient.model.GSGraphMetaData;
+import org.graphspace.javaclient.model.GSGroupMetaData;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -38,8 +39,13 @@ public class CyGraphSpaceClient{
 			String name = graph.getString("name");
 			int id = graph.getInt("id");
 			String ownedBy = graph.getString("owner_email");
+			ArrayList<String> tags = new ArrayList<String>();
+			JSONArray tagsJSONArray = graph.getJSONArray("tags");
+			for (int i=0; i<tagsJSONArray.length(); i++){
+				tags.add(tagsJSONArray.getString(i));
+			}
 			int access = graph.getInt("is_public");
-			GSGraphMetaData graphMetaData = new GSGraphMetaData(name, id, ownedBy, access);
+			GSGraphMetaData graphMetaData = new GSGraphMetaData(name, id, ownedBy, tags);
 			graphMetaDataList.add(graphMetaData);
 		}
 		return graphMetaDataList;
@@ -126,5 +132,23 @@ public class CyGraphSpaceClient{
 		else{
 			return false;
 		}
+	}
+	
+	public ArrayList<GSGroupMetaData> getMyGroups(int limit, int offset) throws Exception{
+		ArrayList<GSGroupMetaData> myGroups = new ArrayList<GSGroupMetaData>();
+		JSONArray groups = client.getMyGroups(limit, offset).getJSONArray("groups");
+		for (int i=0; i<groups.length(); i++){
+			JSONObject groupJSON = groups.getJSONObject(i);
+			String name = groupJSON.getString("name");
+			String ownerEmail = groupJSON.getString("owner_email");
+			int id = groupJSON.getInt("id");
+			GSGroupMetaData groupMetaData = new GSGroupMetaData(name, id, ownerEmail);
+			myGroups.add(groupMetaData);
+		}
+		return myGroups;
+	}
+	
+	public JSONObject addGroupGraph(String graphId, String name, String groupId) throws Exception{
+		return addGroupGraph(graphId, name, groupId);
 	}
 }

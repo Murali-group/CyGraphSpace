@@ -113,7 +113,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private int publicGraphsOffSet = 0;
 //	private int searchResultsOffSet = 0;
 	private boolean loggedIn = false;
-	private JButton importGraphListButton;
 	private JButton myGraphsNextButton;
 	private JButton myGraphsPreviousButton;
 	private JButton sharedGraphsPreviousButton;
@@ -121,10 +120,11 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private JButton publicGraphsNextButton;
 	private String searchTerm;
 	private JButton publicGraphsPreviousButton;
-	private JInternalFrame myGraphsLoadingFrame;
-	private JInternalFrame sharedGraphsLoadingFrame;
-	private JInternalFrame publicGraphsLoadingFrame;
-	@SuppressWarnings("serial")
+	private JPanel myGraphsLoadingFrame;
+	private JPanel sharedGraphsLoadingFrame;
+	private JPanel publicGraphsLoadingFrame;
+	private JButton clearSearchButton;
+	@SuppressWarnings({ "serial", "static-access" })
 	public GetGraphsPanel(TaskManager taskManager, OpenBrowser openBrowser) {
 		super("http://www.graphspace.org", "GraphSpace", APP_DESCRIPTION);
 		this.taskManager = taskManager;
@@ -135,21 +135,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		this.loadVizmapFileTaskFactory = CyObjectManager.INSTANCE.getLoadVizmapFileTaskFactory();
 		parentPanel = new JPanel();
 		super.gui = parentPanel;
-		myGraphsLoadingFrame = new JInternalFrame();
-		ImageIcon loading = new ImageIcon(this.getClass().getClassLoader().getResource("loading.gif"));
-		myGraphsLoadingFrame.add(new JLabel("", loading, JLabel.CENTER));
-		myGraphsLoadingFrame.setSize(400, 300);
-		myGraphsLoadingFrame.setVisible(true);
-		
-		sharedGraphsLoadingFrame = new JInternalFrame();
-		sharedGraphsLoadingFrame.add(new JLabel("", loading, JLabel.CENTER));
-		sharedGraphsLoadingFrame.setSize(400, 300);
-		sharedGraphsLoadingFrame.setVisible(true);
-		
-		publicGraphsLoadingFrame = new JInternalFrame();
-		publicGraphsLoadingFrame.add(new JLabel("", loading, JLabel.CENTER));
-		publicGraphsLoadingFrame.setSize(400, 300);
-		publicGraphsLoadingFrame.setVisible(true);
 		
 		JPanel resultsPanel = new JPanel();
 		GroupLayout gl_panel = new GroupLayout(parentPanel);
@@ -197,27 +182,27 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 					.addComponent(myGraphsPaginationPanel, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE))
 		);
 		
-		myGraphsPreviousButton = new JButton("< Previous");
+		myGraphsPreviousButton = new JButton("< Previous Page");
 		myGraphsPreviousButton.addActionListener(new MyGraphsPreviousButtonActionListener());
 		
-		myGraphsNextButton = new JButton("Next >");
+		myGraphsNextButton = new JButton("Next Page >");
 		myGraphsNextButton.addActionListener(new MyGraphsNextButtonActionListener());
 		
 		GroupLayout gl_myGraphsPaginationPanel = new GroupLayout(myGraphsPaginationPanel);
 		gl_myGraphsPaginationPanel.setHorizontalGroup(
-			gl_myGraphsPaginationPanel.createParallelGroup(Alignment.LEADING)
+			gl_myGraphsPaginationPanel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_myGraphsPaginationPanel.createSequentialGroup()
 					.addComponent(myGraphsPreviousButton)
-					.addPreferredGap(ComponentPlacement.RELATED, 711, Short.MAX_VALUE)
-					.addComponent(myGraphsNextButton, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED, 692, Short.MAX_VALUE)
+					.addComponent(myGraphsNextButton))
 		);
 		gl_myGraphsPaginationPanel.setVerticalGroup(
-			gl_myGraphsPaginationPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_myGraphsPaginationPanel.createSequentialGroup()
+			gl_myGraphsPaginationPanel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(Alignment.LEADING, gl_myGraphsPaginationPanel.createSequentialGroup()
 					.addGroup(gl_myGraphsPaginationPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(myGraphsPreviousButton)
-						.addComponent(myGraphsNextButton))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addComponent(myGraphsNextButton)
+						.addComponent(myGraphsPreviousButton))
+					.addContainerGap(31, Short.MAX_VALUE))
 		);
 		myGraphsPaginationPanel.setLayout(gl_myGraphsPaginationPanel);
 		
@@ -227,11 +212,11 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		myGraphsTableModel = new DefaultTableModel(
 	            new Object [][]
 	            {
-	                {null, null, null}
+	                {null, null, null, null}
 	            },
 	            new String []
 	            {
-	                "Graph ID", "Graph Name", "Owned By"
+	                "Graph ID", "Graph Name", "Owner", "Tags"
 	            }
 	        ){
 			@Override
@@ -241,6 +226,10 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		};
 		myGraphsTable.setModel(myGraphsTableModel);
         myGraphsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        myGraphsTable.getColumn("Graph ID").setPreferredWidth(Math.round((myGraphsTable.getPreferredSize().width)* 0.15f));
+        myGraphsTable.getColumn("Graph Name").setPreferredWidth(Math.round((myGraphsTable.getPreferredSize().width)* 0.25f));
+        myGraphsTable.getColumn("Owner").setPreferredWidth(Math.round((myGraphsTable.getPreferredSize().width)* 0.25f));
+        myGraphsTable.getColumn("Tags").setPreferredWidth(Math.round((myGraphsTable.getPreferredSize().width)* 0.35f));
         myGraphsScrollPane.setViewportView(myGraphsTable);
 //        myGraphsScrollPane.setViewportView((Component)loadingFrame);
         
@@ -258,26 +247,26 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 					.addComponent(sharedGraphsPaginationPanel, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE))
 		);
 		
-		sharedGraphsPreviousButton = new JButton("< Previous");
+		sharedGraphsPreviousButton = new JButton("< Previous Page");
 		sharedGraphsPreviousButton.addActionListener(new SharedGraphsPreviousButtonActionListener());
-		sharedGraphsNextButton = new JButton("Next >");
+		sharedGraphsNextButton = new JButton("Next Page >");
 		sharedGraphsNextButton.addActionListener(new SharedGraphsNextButtonActionListener());
 		
 		GroupLayout gl_sharedGraphsPaginationPanel = new GroupLayout(sharedGraphsPaginationPanel);
 		gl_sharedGraphsPaginationPanel.setHorizontalGroup(
-			gl_sharedGraphsPaginationPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_sharedGraphsPaginationPanel.createSequentialGroup()
-					.addComponent(sharedGraphsPreviousButton, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 719, Short.MAX_VALUE)
-					.addComponent(sharedGraphsNextButton, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE))
+			gl_sharedGraphsPaginationPanel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_sharedGraphsPaginationPanel.createSequentialGroup()
+					.addComponent(sharedGraphsPreviousButton)
+					.addPreferredGap(ComponentPlacement.RELATED, 692, Short.MAX_VALUE)
+					.addComponent(sharedGraphsNextButton))
 		);
 		gl_sharedGraphsPaginationPanel.setVerticalGroup(
-			gl_sharedGraphsPaginationPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_sharedGraphsPaginationPanel.createSequentialGroup()
+			gl_sharedGraphsPaginationPanel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(Alignment.LEADING, gl_sharedGraphsPaginationPanel.createSequentialGroup()
 					.addGroup(gl_sharedGraphsPaginationPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(sharedGraphsNextButton)
 						.addComponent(sharedGraphsPreviousButton))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap(31, Short.MAX_VALUE))
 		);
 		sharedGraphsPaginationPanel.setLayout(gl_sharedGraphsPaginationPanel);
 		
@@ -287,21 +276,32 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		sharedGraphsTableModel = new DefaultTableModel(
 	            new Object [][]
 	            {
-	                {null, null, null}
+	                {null, null, null, null}
 	            },
 	            new String []
 	            {
-	                "Graph ID", "Graph Name", "Owned By"
+	                "Graph ID", "Graph Name", "Owner", "Tags"
 	            }
-	        );
+	        ){
+			@Override
+			public boolean isCellEditable(int row, int column) {
+		        return false;
+		    }
+		};
 		sharedGraphsTable.setModel(sharedGraphsTableModel);
 		sharedGraphsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		sharedGraphsScrollPane.setViewportView(sharedGraphsTable);
+		
+        sharedGraphsTable.getColumn("Graph ID").setPreferredWidth(Math.round((sharedGraphsTable.getPreferredSize().width)* 0.15f));
+        sharedGraphsTable.getColumn("Graph Name").setPreferredWidth(Math.round((sharedGraphsTable.getPreferredSize().width)* 0.25f));
+        sharedGraphsTable.getColumn("Owner").setPreferredWidth(Math.round((sharedGraphsTable.getPreferredSize().width)* 0.25f));
+        sharedGraphsTable.getColumn("Tags").setPreferredWidth(Math.round((sharedGraphsTable.getPreferredSize().width)* 0.35f));
+
+        sharedGraphsScrollPane.setViewportView(sharedGraphsTable);
         
-		publicGraphsPreviousButton = new JButton("< Previous");
+		publicGraphsPreviousButton = new JButton("< Previous Page");
 		publicGraphsPreviousButton.addActionListener(new PublicGraphsPreviousButtonActionListener());
 		
-		publicGraphsNextButton = new JButton("Next >");
+		publicGraphsNextButton = new JButton("Next Page >");
 		publicGraphsNextButton.addActionListener(new PublicGraphsNextButtonActionListener());
         
 		GroupLayout gl_publicGraphsPanel = new GroupLayout(publicGraphsPanel);
@@ -320,18 +320,17 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		GroupLayout gl_publicGraphsPaginationPanel = new GroupLayout(publicGraphsPaginationPanel);
 		gl_publicGraphsPaginationPanel.setHorizontalGroup(
 			gl_publicGraphsPaginationPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_publicGraphsPaginationPanel.createSequentialGroup()
-					.addComponent(publicGraphsPreviousButton, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 719, Short.MAX_VALUE)
-					.addComponent(publicGraphsNextButton, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
+				.addGroup(gl_publicGraphsPaginationPanel.createSequentialGroup()
+					.addComponent(publicGraphsPreviousButton)
+					.addPreferredGap(ComponentPlacement.RELATED, 692, Short.MAX_VALUE)
+					.addComponent(publicGraphsNextButton))
 		);
 		gl_publicGraphsPaginationPanel.setVerticalGroup(
 			gl_publicGraphsPaginationPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_publicGraphsPaginationPanel.createSequentialGroup()
 					.addGroup(gl_publicGraphsPaginationPanel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(publicGraphsNextButton)
-						.addComponent(publicGraphsPreviousButton))
+						.addComponent(publicGraphsPreviousButton)
+						.addComponent(publicGraphsNextButton))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		publicGraphsPaginationPanel.setLayout(gl_publicGraphsPaginationPanel);
@@ -342,72 +341,27 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		publicGraphsTableModel = new DefaultTableModel(
 	            new Object [][]
 	            {
-	                {null, null, null}
+	                {null, null, null, null}
 	            },
 	            new String []
 	            {
-	                "Graph ID", "Graph Name", "Owned By"
+	                "Graph ID", "Graph Name", "Owner", "Tags"
 	            }
-	        );
+	        ){
+			@Override
+			public boolean isCellEditable(int row, int column) {
+		        return false;
+		    }
+		};
 		publicGraphsTable.setModel(publicGraphsTableModel);
 		publicGraphsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+        publicGraphsTable.getColumn("Graph ID").setPreferredWidth(Math.round((publicGraphsTable.getPreferredSize().width)* 0.15f));
+        publicGraphsTable.getColumn("Graph Name").setPreferredWidth(Math.round((publicGraphsTable.getPreferredSize().width)* 0.25f));
+        publicGraphsTable.getColumn("Owner").setPreferredWidth(Math.round((publicGraphsTable.getPreferredSize().width)* 0.25f));
+        publicGraphsTable.getColumn("Tags").setPreferredWidth(Math.round((publicGraphsTable.getPreferredSize().width)* 0.35f));
+        
 		publicGraphsScrollPane.setViewportView(publicGraphsTable);
-        
-//		JButton searchResultsPreviousButton = new JButton("< Previous");
-//		searchResultsPreviousButton.addActionListener(new SearchResultsPreviousButtonActionListener(this.limit, this.searchResultsOffSet-20));
-		
-//		JButton searchResultsNextButton = new JButton("Next >");
-//		searchResultsNextButton.addActionListener(new SearchResultsNextButtonActionListener(this.limit, this.myGraphsOffSet+20));
-        
-//		GroupLayout gl_searchResultsPanel = new GroupLayout(searchResultsPanel);
-//		gl_searchResultsPanel.setHorizontalGroup(
-//			gl_searchResultsPanel.createParallelGroup(Alignment.LEADING)
-//				.addComponent(searchResultsScrollPane, GroupLayout.DEFAULT_SIZE, 921, Short.MAX_VALUE)
-//				.addComponent(searchResultsPaginationPanel, GroupLayout.DEFAULT_SIZE, 921, Short.MAX_VALUE)
-//		);
-//		gl_searchResultsPanel.setVerticalGroup(
-//			gl_searchResultsPanel.createParallelGroup(Alignment.TRAILING)
-//				.addGroup(gl_searchResultsPanel.createSequentialGroup()
-//					.addComponent(searchResultsScrollPane, GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
-//					.addPreferredGap(ComponentPlacement.RELATED)
-//					.addComponent(searchResultsPaginationPanel, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE))
-//		);
-//		GroupLayout gl_searchResultsPaginationPanel = new GroupLayout(searchResultsPaginationPanel);
-//		gl_searchResultsPaginationPanel.setHorizontalGroup(
-//			gl_searchResultsPaginationPanel.createParallelGroup(Alignment.LEADING)
-//				.addGroup(gl_searchResultsPaginationPanel.createSequentialGroup()
-//					.addComponent(searchResultsPreviousButton, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)
-//					.addGap(719)
-//					.addComponent(searchResultsNextButton, GroupLayout.PREFERRED_SIZE, 105, GroupLayout.PREFERRED_SIZE)
-//					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-//		);
-//		gl_searchResultsPaginationPanel.setVerticalGroup(
-//			gl_searchResultsPaginationPanel.createParallelGroup(Alignment.LEADING)
-//				.addGroup(gl_searchResultsPaginationPanel.createSequentialGroup()
-//					.addGroup(gl_searchResultsPaginationPanel.createParallelGroup(Alignment.BASELINE)
-//						.addComponent(searchResultsNextButton)
-//						.addComponent(searchResultsPreviousButton))
-//					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-//		);
-//		searchResultsPaginationPanel.setLayout(gl_searchResultsPaginationPanel);
-//		
-//		searchResultsTable = new JTable();
-//		searchResultsScrollPane.setRowHeaderView(searchResultsTable);
-//		searchResultsPanel.setLayout(gl_searchResultsPanel);
-//		searchResultsTableModel = new DefaultTableModel(
-//	            new Object [][]
-//	            {
-//	                {null, null, null, null}
-//	            },
-//	            new String []
-//	            {
-//	                "Graph ID", "Graph Name", "Owned By"
-//	            }
-//	        );
-//		searchResultsTable.setModel(searchResultsTableModel);
-//		searchResultsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//		searchResultsScrollPane.setViewportView(searchResultsTable);
-		
 		
 		GroupLayout gl_resultsPanel = new GroupLayout(resultsPanel);
 		gl_resultsPanel.setHorizontalGroup(
@@ -612,6 +566,15 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 				searchPerformed();
 			}
 		});
+		
+		clearSearchButton = new JButton("Clear Search");
+		clearSearchButton.setEnabled(false);
+		clearSearchButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				clearSearch();
+			}
+			
+		});
 		GroupLayout gl_searchPanel = new GroupLayout(searchPanel);
 		gl_searchPanel.setHorizontalGroup(
 			gl_searchPanel.createParallelGroup(Alignment.LEADING)
@@ -619,9 +582,11 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 					.addContainerGap()
 					.addComponent(searchLabel)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(searchField, GroupLayout.PREFERRED_SIZE, 706, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+					.addComponent(searchField, GroupLayout.DEFAULT_SIZE, 649, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(searchButton, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(clearSearchButton)
 					.addContainerGap())
 		);
 		gl_searchPanel.setVerticalGroup(
@@ -630,8 +595,9 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGroup(gl_searchPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(searchField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(searchButton)
-						.addComponent(searchLabel))
+						.addComponent(searchLabel)
+						.addComponent(clearSearchButton)
+						.addComponent(searchButton))
 					.addContainerGap())
 		);
 		searchPanel.setLayout(gl_searchPanel);
@@ -659,15 +625,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 				loginActionPerformed(e);
 			}
 		});
-		
-		importGraphListButton = new JButton("Available Graphs");
-		importGraphListButton.setEnabled(false);
-		importGraphListButton.setToolTipText("Import Graphs Meta Data from GraphSpace");
-		importGraphListButton.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				importGraphListActionPerformed();
-			}
-		});
 		GroupLayout gl_loginPanel = new GroupLayout(loginPanel);
 		gl_loginPanel.setHorizontalGroup(
 			gl_loginPanel.createParallelGroup(Alignment.LEADING)
@@ -675,19 +632,17 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 					.addContainerGap()
 					.addComponent(hostLabel)
 					.addGap(3)
-					.addComponent(hostTextField, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+					.addComponent(hostTextField, GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(usernameLabel)
 					.addGap(4)
-					.addComponent(usernameTextField, GroupLayout.PREFERRED_SIZE, 143, GroupLayout.PREFERRED_SIZE)
+					.addComponent(usernameTextField, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(passwordLabel, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(passwordField, GroupLayout.PREFERRED_SIZE, 147, GroupLayout.PREFERRED_SIZE)
+					.addGap(3)
+					.addComponent(passwordField, GroupLayout.PREFERRED_SIZE, 197, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(loginButton, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(importGraphListButton, GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		gl_loginPanel.setVerticalGroup(
@@ -697,14 +652,31 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 					.addGroup(gl_loginPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(hostTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(hostLabel)
-						.addComponent(usernameLabel)
+						.addComponent(loginButton)
+						.addComponent(passwordField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(usernameTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(passwordLabel)
-						.addComponent(passwordField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(loginButton)
-						.addComponent(importGraphListButton))
+						.addComponent(usernameLabel))
 					.addGap(10))
 		);
+		
+		myGraphsLoadingFrame = new JPanel();
+		ImageIcon loading = new ImageIcon(this.getClass().getClassLoader().getResource("loading.gif"));
+		myGraphsLoadingFrame.add(new JLabel("Importing Graphs", loading, JLabel.CENTER));
+		myGraphsLoadingFrame.setSize(myGraphsPanel.WIDTH, myGraphsPanel.HEIGHT);
+		myGraphsLoadingFrame.setVisible(true);
+		
+		sharedGraphsLoadingFrame = new JPanel();
+		sharedGraphsLoadingFrame.add(new JLabel("Importing Graphs", loading, JLabel.CENTER));
+		sharedGraphsLoadingFrame.setSize(sharedGraphsPanel.WIDTH, sharedGraphsPanel.HEIGHT);
+		sharedGraphsLoadingFrame.setVisible(true);
+		
+		publicGraphsLoadingFrame = new JPanel();
+		publicGraphsLoadingFrame.add(new JLabel("Importing Graphs", loading, JLabel.CENTER));
+		publicGraphsLoadingFrame.setSize(publicGraphsPanel.WIDTH, publicGraphsPanel.HEIGHT);
+		publicGraphsLoadingFrame.setVisible(true);
+		
+		
 		loginPanel.setLayout(gl_loginPanel);
 		parentPanel.setLayout(gl_panel);
 		myGraphsNextButton.setEnabled(false);
@@ -737,6 +709,11 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		}
 	}
 	
+	private void clearSearch(){
+		importGraphListActionPerformed();
+		clearSearchButton.setEnabled(false);
+	}
+	
 	private void loginActionPerformed(ActionEvent evt){
 		if (!this.loggedIn){
 //			loginButton.setEnabled(false);
@@ -757,12 +734,12 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	    	else{
 	    		try {
 	    			this.loggedIn = true;
-	    			importGraphListButton.setEnabled(true);
 	    			loginButton.setText("Log Out");
 		    		loginButton.setEnabled(true);
 		    		hostTextField.setEnabled(false);
 		    		usernameTextField.setEnabled(false);
 		    		passwordField.setEnabled(false);
+		    		importGraphListActionPerformed();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -774,7 +751,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			hostTextField.setEnabled(true);
 			usernameTextField.setEnabled(true);
 			passwordField.setEnabled(true);
-			importGraphListButton.setEnabled(false);
 			myGraphsTableModel.setRowCount(0);
 			sharedGraphsTableModel.setRowCount(0);
 			publicGraphsTableModel.setRowCount(0);
@@ -857,6 +833,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 //	}
 	
 	private void searchPerformed(){
+		clearSearchButton.setEnabled(true);
 		this.searchTerm = searchField.getText();
 		System.out.println(searchTerm);
 		try {
@@ -881,15 +858,36 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	        			ArrayList<GSGraphMetaData> sharedGraphsSearchResults = Server.INSTANCE.searchGraphs(searchTerm, false, true, false, limit, sharedGraphsOffSet);
 	        			ArrayList<GSGraphMetaData> publicGraphsSearchResults = Server.INSTANCE.searchGraphs(searchTerm, false, false, true, limit, publicGraphsOffSet);
 	        			for (GSGraphMetaData gsGraphMetaData : myGraphsSearchResults){
-	        				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
+	        				String tags = "";
+	        				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
+	        					tags += gsGraphMetaData.getTags().get(i)+", ";
+	        				}
+	        				if(tags.length()>0){
+	        					tags = tags.substring(0, tags.length()-2);
+	        				}
+	        				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
 	        				myGraphsTableModel.addRow(row);
 	        			}
 	        			for (GSGraphMetaData gsGraphMetaData : sharedGraphsSearchResults){
-	        				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
+	        				String tags = "";
+	        				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
+	        					tags += gsGraphMetaData.getTags().get(i)+", ";
+	        				}
+	        				if(tags.length()>0){
+	        					tags = tags.substring(0, tags.length()-2);
+	        				}
+	        				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
 	        				sharedGraphsTableModel.addRow(row);
 	        			}
 	        			for (GSGraphMetaData gsGraphMetaData : publicGraphsSearchResults){
-	        				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
+	        				String tags = "";
+	        				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
+	        					tags += gsGraphMetaData.getTags().get(i)+", ";
+	        				}
+	        				if(tags.length()>0){
+	        					tags = tags.substring(0, tags.length()-2);
+	        				}
+	        				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
 	        				publicGraphsTableModel.addRow(row);
 	        			}
 	        			myGraphsScrollPane.setViewportView(myGraphsTable);
@@ -911,20 +909,32 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	}
 	private void populateMyGraphs(String searchTerm, int limit, int offset) throws Exception{
 		if (searchTerm == null){
-			System.out.println("populate my graphs table action performed");
 			myGraphsTableModel.setRowCount(0);
 			ArrayList<GSGraphMetaData> myGraphsMetaDataList = Server.INSTANCE.client.getGraphMetaDataList(true, false, false, limit, offset);
 			for (GSGraphMetaData gsGraphMetaData : myGraphsMetaDataList){
-				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
+				String tags = "";
+				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
+					tags += gsGraphMetaData.getTags().get(i)+", ";
+				}
+				if(tags.length()>0){
+					tags = tags.substring(0, tags.length()-2);
+				}
+				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
 				myGraphsTableModel.addRow(row);
 			}
 		}
 		else{
-			System.out.println("populate my graphs table action performed");
 			myGraphsTableModel.setRowCount(0);
 			ArrayList<GSGraphMetaData> myGraphsSearchResults = Server.INSTANCE.searchGraphs(searchTerm, true, false, false, limit, offset);
 			for (GSGraphMetaData gsGraphMetaData : myGraphsSearchResults){
-				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
+				String tags = "";
+				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
+					tags += gsGraphMetaData.getTags().get(i)+", ";
+				}
+				if(tags.length()>0){
+					tags = tags.substring(0, tags.length()-2);
+				}
+				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
 				myGraphsTableModel.addRow(row);
 			}
 		}
@@ -936,7 +946,14 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			publicGraphsTableModel.setRowCount(0);
 			ArrayList<GSGraphMetaData> publicGraphsMetaDataList = Server.INSTANCE.client.getGraphMetaDataList(false, false, true, limit, offset);
 			for (GSGraphMetaData gsGraphMetaData : publicGraphsMetaDataList){
-				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
+				String tags = "";
+				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
+					tags += gsGraphMetaData.getTags().get(i)+", ";
+				}
+				if(tags.length()>0){
+					tags = tags.substring(0, tags.length()-2);
+				}
+				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
 				publicGraphsTableModel.addRow(row);
 			}
 		}
@@ -945,7 +962,14 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			publicGraphsTableModel.setRowCount(0);
 			ArrayList<GSGraphMetaData> publicGraphsSearchResults = Server.INSTANCE.searchGraphs(searchTerm, false, false, true, limit, offset);
 			for (GSGraphMetaData gsGraphMetaData : publicGraphsSearchResults){
-				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
+				String tags = "";
+				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
+					tags += gsGraphMetaData.getTags().get(i)+", ";
+				}
+				if(tags.length()>0){
+					tags = tags.substring(0, tags.length()-2);
+				}
+				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
 				publicGraphsTableModel.addRow(row);
 			}
 		}
@@ -957,7 +981,14 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			sharedGraphsTableModel.setRowCount(0);
 			ArrayList<GSGraphMetaData> sharedGraphsMetaDataList = Server.INSTANCE.client.getGraphMetaDataList(false, true, false, limit, offset);
 			for (GSGraphMetaData gsGraphMetaData : sharedGraphsMetaDataList){
-				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
+				String tags = "";
+				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
+					tags += gsGraphMetaData.getTags().get(i)+", ";
+				}
+				if(tags.length()>0){
+					tags = tags.substring(0, tags.length()-2);
+				}
+				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
 				sharedGraphsTableModel.addRow(row);
 			}
 		}
@@ -966,7 +997,14 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			sharedGraphsTableModel.setRowCount(0);
 			ArrayList<GSGraphMetaData> sharedGraphsSearchResults = Server.INSTANCE.searchGraphs(searchTerm, false, true, false, limit, offset);
 			for (GSGraphMetaData gsGraphMetaData : sharedGraphsSearchResults){
-				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwnedBy()};
+				String tags = "";
+				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
+					tags += gsGraphMetaData.getTags().get(i)+", ";
+				}
+				if(tags.length()>0){
+					tags = tags.substring(0, tags.length()-2);
+				}
+				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
 				sharedGraphsTableModel.addRow(row);
 			}
 		}
@@ -1247,4 +1285,14 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			}
 	    }
 	}
+//	private static void setWidthAsPercentages(JTable table,
+//	        double... percentages) {
+//	    final double factor = 10000;
+//	 
+//	    TableModel model = table.getModel();
+//	    for (int columnIndex = 0; columnIndex < percentages.length; columnIndex++) {
+//	        TableColumn column = model.getColumn(columnIndex);
+//	        column.setPreferredWidth((int) (percentages[columnIndex] * factor));
+//	    }
+//	}
 }

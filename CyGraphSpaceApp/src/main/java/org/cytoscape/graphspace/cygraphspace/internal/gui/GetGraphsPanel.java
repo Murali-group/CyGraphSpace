@@ -8,16 +8,12 @@ import java.awt.event.MouseEvent;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,26 +22,29 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.RowFilter;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+//import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
-import org.cytoscape.graphspace.cygraphspace.internal.util.ResultTask;
+import org.cytoscape.graphspace.cygraphspace.internal.util.CyGraphSpaceClient;
+import org.cytoscape.graphspace.cygraphspace.internal.io.read.json.CustomCytoscapeJsNetworkReader;
+import org.cytoscape.graphspace.cygraphspace.internal.io.read.json.CustomCytoscapeJsNetworkReaderFactory;
 import org.cytoscape.io.webservice.NetworkImportWebServiceClient;
-import org.cytoscape.io.webservice.SearchWebServiceClient;
 import org.cytoscape.io.webservice.swing.AbstractWebServiceGUIClient;
+import org.cytoscape.model.CyNetwork;
 import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
 import org.cytoscape.task.read.LoadVizmapFileTaskFactory;
 import org.cytoscape.util.swing.OpenBrowser;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.TaskManager;
-import org.graphspace.javaclient.CyGraphSpaceClient;
+import org.cytoscape.work.TaskMonitor;
 import org.graphspace.javaclient.model.GSGraphMetaData;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -65,6 +64,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	OpenBrowser openBrowser;
 	LoadNetworkFileTaskFactory loadNetworkFileTaskFactory;
 	LoadVizmapFileTaskFactory loadVizmapFileTaskFactory;
+	CustomCytoscapeJsNetworkReaderFactory cytoscapeJsNetworkReaderFactory;
 	TaskManager taskManager;
 	
 //	final JButton searchButton = new JButton(new ImageIcon(getClass().getResource("/search-icon.png")));
@@ -129,10 +129,11 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		super("http://www.graphspace.org", "GraphSpace", APP_DESCRIPTION);
 		this.taskManager = taskManager;
 //		this.taskManager = CyObjectManager.INSTANCE.getTaskManager();
-		this.client = Server.INSTANCE.client;
+//		this.client = Server.INSTANCE.client;
 		this.openBrowser = openBrowser;
 		this.loadNetworkFileTaskFactory = CyObjectManager.INSTANCE.getLoadNetworkFileTaskFactory();
 		this.loadVizmapFileTaskFactory = CyObjectManager.INSTANCE.getLoadVizmapFileTaskFactory();
+		this.cytoscapeJsNetworkReaderFactory = CyObjectManager.INSTANCE.getCytoscapeJsNetworkReaderFactory();
 		parentPanel = new JPanel();
 		super.gui = parentPanel;
 		
@@ -612,7 +613,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		JLabel passwordLabel = new JLabel("Password");
 		
 		hostTextField = new JTextField();
-		hostTextField.setText("www.graphspace.org");
+		hostTextField.setText("http://www.graphspace.org");
 		hostTextField.setColumns(10);
 		
 		passwordField = new JPasswordField();
@@ -691,7 +692,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private void populate(){
 		if (Server.INSTANCE.isAuthenticated()){
 			try {
-				this.loggedIn = true;
+				this.loggedIn = false;
 				loginButton.setText("Log Out");
 				hostTextField.setText(Server.INSTANCE.getHost());
 				usernameTextField.setText(Server.INSTANCE.getUsername());
@@ -716,6 +717,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	
 	private void loginActionPerformed(ActionEvent evt){
 		if (!this.loggedIn){
+			System.out.println("login performed");
 //			loginButton.setEnabled(false);
 	    	String hostText = hostTextField.getText();
 	    	String usernameText = usernameTextField.getText();
@@ -747,7 +749,9 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	    	}
 		}
 		else{
+			this.loggedIn = false;
 			Server.INSTANCE.logout();
+			System.out.println("logout performed");
 			hostTextField.setEnabled(true);
 			usernameTextField.setEnabled(true);
 			passwordField.setEnabled(true);
@@ -756,9 +760,10 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			publicGraphsTableModel.setRowCount(0);
 			importButton.setEnabled(false);
 			openInBrowserButton.setEnabled(false);
-			hostTextField.setText("www.graphspace.org");
+			hostTextField.setText("http://www.graphspace.org");
 			usernameTextField.setText("");
 			passwordField.setText("");
+			loginButton.setText("Log In");
 			myGraphsNextButton.setEnabled(false);
 			sharedGraphsNextButton.setEnabled(false);
 			publicGraphsNextButton.setEnabled(false);
@@ -910,7 +915,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private void populateMyGraphs(String searchTerm, int limit, int offset) throws Exception{
 		if (searchTerm == null){
 			myGraphsTableModel.setRowCount(0);
-			ArrayList<GSGraphMetaData> myGraphsMetaDataList = Server.INSTANCE.client.getGraphMetaDataList(true, false, false, limit, offset);
+			ArrayList<GSGraphMetaData> myGraphsMetaDataList = CyGraphSpaceClient.getGraphMetaDataList(true, false, false, limit, offset);
 			for (GSGraphMetaData gsGraphMetaData : myGraphsMetaDataList){
 				String tags = "";
 				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
@@ -944,7 +949,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		if(searchTerm==null){
 			System.out.println("populate public graphs table action performed");
 			publicGraphsTableModel.setRowCount(0);
-			ArrayList<GSGraphMetaData> publicGraphsMetaDataList = Server.INSTANCE.client.getGraphMetaDataList(false, false, true, limit, offset);
+			ArrayList<GSGraphMetaData> publicGraphsMetaDataList = CyGraphSpaceClient.getGraphMetaDataList(false, false, true, limit, offset);
 			for (GSGraphMetaData gsGraphMetaData : publicGraphsMetaDataList){
 				String tags = "";
 				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
@@ -960,7 +965,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		else{
 			System.out.println("populate public graphs table action performed");
 			publicGraphsTableModel.setRowCount(0);
-			ArrayList<GSGraphMetaData> publicGraphsSearchResults = Server.INSTANCE.searchGraphs(searchTerm, false, false, true, limit, offset);
+			ArrayList<GSGraphMetaData> publicGraphsSearchResults = CyGraphSpaceClient.searchGraphs(searchTerm, false, false, true, limit, offset);
 			for (GSGraphMetaData gsGraphMetaData : publicGraphsSearchResults){
 				String tags = "";
 				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
@@ -979,7 +984,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		if(searchTerm==null){
 			System.out.println("populate shared graphs table action performed");
 			sharedGraphsTableModel.setRowCount(0);
-			ArrayList<GSGraphMetaData> sharedGraphsMetaDataList = Server.INSTANCE.client.getGraphMetaDataList(false, true, false, limit, offset);
+			ArrayList<GSGraphMetaData> sharedGraphsMetaDataList = CyGraphSpaceClient.getGraphMetaDataList(false, true, false, limit, offset);
 			for (GSGraphMetaData gsGraphMetaData : sharedGraphsMetaDataList){
 				String tags = "";
 				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
@@ -1010,23 +1015,77 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		}
 	}
 	
-	private void getGraphActionPerformed(ActionEvent e, String id){
+	private void getGraphActionPerformed(ActionEvent e, String graphId){
 		System.out.println("get graph action performed");
 		try {
-			JSONObject graphJSON = Server.INSTANCE.client.getGraphById(id).getJSONObject("body").getJSONObject("object").getJSONObject("graph_json");
-//			JSONObject styleJSON = Server.INSTANCE.client.getGraphById(id).getJSONObject("body").getJSONObject("object").getJSONObject("style_json");
+			int id = Integer.valueOf(graphId);
+			JSONObject graphJSON = CyGraphSpaceClient.getGraphById(id).getJSONObject("body").getJSONObject("object").getJSONObject("graph_json");
+			JSONArray styleJSON = CyGraphSpaceClient.getGraphById(id).getJSONObject("body").getJSONObject("object").getJSONObject("style_json").getJSONArray("style");
 			String graphJSONString = graphJSON.toString();
-//			String styleJSONString = styleJSON.toString();
+			String styleJSONString = styleJSON.toString();
 			InputStream graphJSONInputStream = new ByteArrayInputStream(graphJSONString.getBytes());
-//			InputStream styleJSONInputStream = new ByteArrayInputStream(styleJSONString.getBytes());
+			InputStream styleJSONInputStream = new ByteArrayInputStream(styleJSONString.getBytes());
 			File tempFile = File.createTempFile("CyGraphSpaceImport", ".cyjs");
 			try (FileOutputStream out = new FileOutputStream(tempFile)) {
 	            IOUtils.copy(graphJSONInputStream, out);
 	        }
+//			String styleJSONStringTest = IOUtils.toString(styleJSONInputStream, "UTF-8");
+//			System.out.println("style JSON: ===========" + styleJSONStringTest);
+//			String graphJSONStringTest = FileUtils.readFileToString(tempFile, "UTF-8");
+//			int count = 0;
+//			while(graphJSONString.isEmpty()){
+//				try {
+//					Thread.sleep(1000);
+//				} catch (InterruptedException ex) {
+//					// TODO Auto-generated catch block
+//					ex.printStackTrace();
+//				}
+//				graphJSONStringTest = FileUtils.readFileToString(tempFile, "UTF-8");
+//				count++;
+//				if (count>=10){
+//					return;
+//				}
+//			}
 			TaskIterator ti = loadNetworkFileTaskFactory.createTaskIterator(tempFile);
 			CyObjectManager.INSTANCE.getTaskManager().execute(ti);
 			tempFile.delete();
 			
+			System.out.println("11");
+			CustomCytoscapeJsNetworkReader reader = new CustomCytoscapeJsNetworkReader(null, styleJSONInputStream,
+					CyObjectManager.INSTANCE.getApplicationManager(), CyObjectManager.INSTANCE.getCyNetworkFactory(),
+					CyObjectManager.INSTANCE.getCyNetworkManager(), CyObjectManager.INSTANCE.getRootCyNetworkManager());
+			reader.run(null);
+			System.out.print("12");
+			styleJSONInputStream.close();
+			reader.getNetworks();
+			CyNetwork styleNetwork = reader.getNetworks()[0];
+			reader.buildCyNetworkView(styleNetwork);
+//			System.out.println("styleJSONInputStream.available():  "+styleJSONInputStream.available());
+//			String styleJSONStringTest = IOUtils.toString(styleJSONInputStream, "UTF-8");
+//			int count = 0;
+//			while(styleJSONStringTest.isEmpty()) {
+//				try {
+//					Thread.sleep(1000);
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				System.out.println("style JSON 2: ===========" + styleJSONStringTest);
+//				count ++;
+//				styleJSONStringTest = IOUtils.toString(styleJSONInputStream, "UTF-8");
+//				if (count==10) {
+//					return;
+//				}
+//			}
+//			System.out.println("style JSON 2: ===========" + styleJSONStringTest);
+//			ti.append(cytoscapeJsNetworkReaderFactory.createTaskIterator(styleJSONInputStream, collectionName));
+			
+//			ti.append(cytoscapeJsNetworkReaderFactory.createTaskIterator(styleJSONInputStream, null));
+//			System.out.println("12");
+//			CyObjectManager.INSTANCE.getTaskManager().execute(ti);
+//			System.out.println("13");
+//			Thread.sleep(10000);
+//			importStyleJson(styleJSONInputStream, null);
 //			tempFile = File.createTempFile("CyGraphSpaceStyleImport", ".json");
 //			try (FileOutputStream out = new FileOutputStream(tempFile)) {
 //	            IOUtils.copy(styleJSONInputStream, out);
@@ -1050,10 +1109,11 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		openBrowser.openURL(Server.INSTANCE.getHost()+"/graphs/"+id);
 	}
 	
-	private void getGraphActionPerformed(MouseEvent e, String id){
+	private void getGraphActionPerformed(MouseEvent e, String graphId){
 		System.out.println("get graph action performed");
 		try {
-			JSONObject graphJSON = Server.INSTANCE.client.getGraphById(id).getJSONObject("body").getJSONObject("object").getJSONObject("graph_json");
+			int id = Integer.valueOf(graphId);
+			JSONObject graphJSON = CyGraphSpaceClient.getGraphById(id).getJSONObject("body").getJSONObject("object").getJSONObject("graph_json");
 			String str = graphJSON.toString();
 			InputStream is = new ByteArrayInputStream(str.getBytes());
 			File tempFile = File.createTempFile("CyGraphSpaceImport", ".cyjs");
@@ -1284,6 +1344,38 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 				e1.printStackTrace();
 			}
 	    }
+	}
+	
+	public void importStyleJson(InputStream styleJSONInputStream, String collectionName) throws IOException {
+//		File tempFile = File.createTempFile("CyGraphSpaceStyleImport", ".json");
+//		try (FileOutputStream out = new FileOutputStream(tempFile)) {
+//            IOUtils.copy(styleJSONInputStream, out);
+//        }
+		System.out.println("11");
+		System.out.println("styleJSONInputStream.available():  "+styleJSONInputStream.available());
+		String styleJSONStringTest = IOUtils.toString(styleJSONInputStream, "UTF-8");
+		int count = 0;
+		while(styleJSONStringTest.isEmpty()) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("style JSON 2: ===========" + styleJSONStringTest);
+			count ++;
+			styleJSONStringTest = IOUtils.toString(styleJSONInputStream, "UTF-8");
+			if (count==10) {
+				return;
+			}
+		}
+		System.out.println("style JSON 2: ===========" + styleJSONStringTest);
+//		ti.append(cytoscapeJsNetworkReaderFactory.createTaskIterator(styleJSONInputStream, collectionName));
+		TaskIterator ti = cytoscapeJsNetworkReaderFactory.createTaskIterator(styleJSONInputStream, collectionName);
+		System.out.println("12");
+		CyObjectManager.INSTANCE.getTaskManager().execute(ti);
+		System.out.println("13");
+//		tempFile.delete();
 	}
 //	private static void setWidthAsPercentages(JTable table,
 //	        double... percentages) {

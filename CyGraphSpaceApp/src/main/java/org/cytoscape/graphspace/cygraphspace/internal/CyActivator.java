@@ -10,8 +10,13 @@ import org.cytoscape.application.CyApplicationConfiguration;
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.application.swing.CySwingApplication;
+import org.cytoscape.model.CyNetworkFactory;
+import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNetworkTableManager;
 import org.cytoscape.model.CyTableManager;
+import org.cytoscape.model.subnetwork.CyRootNetworkManager;
+import org.cytoscape.property.CyProperty;
+import org.cytoscape.property.CyProperty.SavePolicy;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.GetGraphsPanel;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.PostGraphToolBarComponent;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
@@ -21,22 +26,64 @@ import org.cytoscape.task.read.LoadVizmapFileTaskFactory;
 import org.cytoscape.task.write.ExportNetworkTaskFactory;
 import org.cytoscape.task.write.ExportVizmapTaskFactory;
 import org.cytoscape.util.swing.OpenBrowser;
+import org.cytoscape.view.model.CyNetworkViewManager;
+import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.osgi.framework.BundleContext;
 import org.cytoscape.graphspace.cygraphspace.internal.util.PersistentProperties;
+import org.cytoscape.graphspace.cygraphspace.internal.util.PropertyReader;
+import org.cytoscape.io.BasicCyFileFilter;
+import org.cytoscape.io.DataCategory;
+//import org.cytoscape.io.internal.read.json.CytoscapeJsNetworkReaderFactory;
+import org.cytoscape.property.SimpleCyProperty;
+import org.cytoscape.graphspace.cygraphspace.internal.io.read.json.CustomCytoscapeJsNetworkReaderFactory;
+import org.cytoscape.graphspace.cygraphspace.internal.io.read.json.CustomCytoscapejsFileFilter;
+import org.cytoscape.io.read.InputStreamTaskFactory;
+import org.cytoscape.graphspace.cygraphspace.internal.io.read.json.CustomCytoscapeJsNetworkReader;
+import org.cytoscape.io.util.StreamUtil;
+
 import static org.cytoscape.work.ServiceProperties.IN_TOOL_BAR;
 
 public class CyActivator extends AbstractCyActivator {
-	private JToolBar toolBar;
-    @Override
+	
+	public static String cyGraphSpaceHost;
+	public static String cyGraphSpaceUsername;
+	public static String cyGraphSpacePassword;
+	
+    @SuppressWarnings("rawtypes")
+	@Override
     public void start(BundleContext context) throws Exception {
+    	 
+//        PropertyReader propertyReader = new PropertyReader("cygraphspace", "properties");
+//        Properties propertyReaderProperties = new Properties();
+//        propertyReaderProperties.setProperty("cyPropertyName", "cygraphspace.properties");
+//        registerAllServices(context, propertyReader, propertyReaderProperties);
+//
+//        CyProperty<Properties> cyProperties = getService(context, CyProperty.class, "(cyPropertyName=cygraphspace.properties)");
+//        Properties loginProperties = cyProperties.getProperties();
+//        System.out.println(loginProperties.getProperty("cygraphspace.host"));
+//        System.out.println(loginProperties.getProperty("cygraphspace.username"));
+//        System.out.println(loginProperties.getProperty("cygraphspace.password"));
+//        if (loginProperties.getProperty("cygraphspace.username").isEmpty()) {
+//        	loginProperties.setProperty("cygraphspace.username", "rishu.sethi2525@gmail.com");
+//        }
+//        if (loginProperties.getProperty("cygraphspace.password").isEmpty()) {
+//        	loginProperties.setProperty("cygraphspace.password", "123456789");
+//        }
+    	Properties props = new Properties();
+        @SuppressWarnings("unchecked")
+		CyProperty<Properties> service = new SimpleCyProperty("cygraphspace", props, Properties.class,
+            SavePolicy.SESSION_FILE);
+        Properties serviceProps = new Properties();
+        serviceProps.setProperty("cyPropertyName", service.getName());
+        registerAllServices(context, service, serviceProps);
+        
         CyApplicationManager applicationManager = getService(context, CyApplicationManager.class);
         
         AbstractCyAction action = null;
         Properties properties = null;
         BundleContext bc = context;
-
 //        action = new AuthenticationMenuAction("Log in/Change host", applicationManager);
 //        properties = new Properties();
 //        registerAllServices(context, action, properties);
@@ -76,11 +123,6 @@ public class CyActivator extends AbstractCyActivator {
 //        ServiceTracker cytoscapeJsWriterFactory = null;
 //		ServiceTracker cytoscapeJsReaderFactory = null;
 //		//CyNetworkViewWriterFactory cxWriterFactory = null;
-//
-//		cytoscapeJsWriterFactory = new ServiceTracker(bc, bc.createFilter("(&(objectClass=org.cytoscape.io.write.CyNetworkViewWriterFactory)(id=cytoscapejsNetworkWriterFactory))"), null);
-//		cytoscapeJsWriterFactory.open();
-//		cytoscapeJsReaderFactory = new ServiceTracker(bc, bc.createFilter("(&(objectClass=org.cytoscape.io.read.InputStreamTaskFactory)(id=cytoscapejsNetworkReaderFactory))"), null);
-//		cytoscapeJsReaderFactory.open();
         
         //Register these with the CyObjectManager singleton.
         CyObjectManager manager = CyObjectManager.INSTANCE;
@@ -90,7 +132,7 @@ public class CyActivator extends AbstractCyActivator {
         manager.setCySwingAppAdapter(appAdapter);
         manager.setNetworkTableManager(networkTableManager);
         manager.setTableManager(tableManager);
-        
+//        manager.setCyProperties(cyProperties);
         CySwingApplication desktop = getService(bc,CySwingApplication.class);
         manager.setCySwingApplition(desktop);
 //        desktop.getJToolBar().add(new PostGraphToolBarComponent());
@@ -144,5 +186,26 @@ public class CyActivator extends AbstractCyActivator {
 		OpenBrowser openBrowser = getService(context, OpenBrowser.class);
 	    GetGraphsPanel getGraphsPanel = new GetGraphsPanel(taskManager, openBrowser);
 	    registerAllServices(context, getGraphsPanel, new Properties());
+	    
+	    final StreamUtil streamUtil = getService(bc, StreamUtil.class);
+        final CyNetworkFactory cyNetworkFactory = getService(bc, CyNetworkFactory.class);
+		final CyNetworkManager cyNetworkManager = getService(bc, CyNetworkManager.class);
+		final CyRootNetworkManager cyRootNetworkManager = getService(bc, CyRootNetworkManager.class);
+		manager.setCyNetworkFactory(cyNetworkFactory);
+		manager.setCyNetworkManager(cyNetworkManager);
+		manager.setCyRootNetworkManager(cyRootNetworkManager);
+//		final CyNetworkViewManager viewManager = getService(bc, CyNetworkViewManager.class);
+//		final VisualMappingManager vmm = getService(bc, VisualMappingManager.class);
+        // ///////////////// Readers ////////////////////////////
+//        
+// 		BasicCyFileFilter cytoscapejsReaderFilter = new BasicCyFileFilter(new String[] { "cyjs", "json" },
+// 				new String[] { "application/json" }, "Cytoscape.js JSON", DataCategory.NETWORK, streamUtil);
+// 		CustomCytoscapeJsNetworkReaderFactory jsReaderFactory = new CustomCytoscapeJsNetworkReaderFactory(
+// 				cytoscapejsReaderFilter, applicationManager, cyNetworkFactory, cyNetworkManager, cyRootNetworkManager);
+// 		final Properties cytoscapeJsNetworkReaderFactoryProps = new Properties();
+// 		registerService(bc, jsReaderFactory, InputStreamTaskFactory.class, cytoscapeJsNetworkReaderFactoryProps);
+// 		manager.setCytoscapeJsNetworkReaderFactory(jsReaderFactory);
+ 		
+ 		
     }
 }

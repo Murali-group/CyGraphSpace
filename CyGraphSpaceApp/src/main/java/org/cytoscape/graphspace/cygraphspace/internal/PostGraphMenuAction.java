@@ -11,6 +11,7 @@ import org.apache.commons.io.FileUtils;
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.work.TaskIterator;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -19,6 +20,7 @@ import org.cytoscape.graphspace.cygraphspace.internal.gui.PostGraphDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.UpdateGraphDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
+import org.cytoscape.graphspace.cygraphspace.internal.util.CyGraphSpaceClient;
 
 import javax.swing.*;
 
@@ -105,7 +107,7 @@ public class PostGraphMenuAction extends AbstractCyAction
 		boolean isGraphPublic = false;
 		if(Server.INSTANCE.updatePossible(graphName)){
 			loadingFrame.dispose();
-			JSONObject responseFromGraphSpace = Server.INSTANCE.client.getGraphByName(graphName);
+			JSONObject responseFromGraphSpace = CyGraphSpaceClient.getGraphByName(graphName);
 			int isPublic = responseFromGraphSpace.getInt("is_public");
 			if (isPublic==1){
 				isGraphPublic = true;
@@ -125,6 +127,7 @@ public class PostGraphMenuAction extends AbstractCyAction
     private JSONObject exportNetworkToJSON() throws IOException{
 		File tempFile = File.createTempFile("CyGraphSpaceExport", ".cyjs");
 		CyNetwork network = CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork();
+		CyNetworkView networkView = CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetworkView();
 		TaskIterator ti = CyObjectManager.INSTANCE.getExportNetworkTaskFactory().createTaskIterator(network, tempFile);
 		CyObjectManager.INSTANCE.getTaskManager().execute(ti);
 		String graphJSONString = FileUtils.readFileToString(tempFile, "UTF-8");

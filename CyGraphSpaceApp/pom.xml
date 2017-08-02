@@ -23,6 +23,7 @@
                 <includes>
                 	<include>graphspaceicon.png</include>
                 	<include>loading.gif</include>
+                	<include>properties</include>
                 </includes>
             </resource>
         </resources>
@@ -96,7 +97,7 @@
 			            <id>install-external</id>
 			            <phase>clean</phase>
 			            <configuration>
-			                <file>${basedir}/lib/javaclient-0.0.1.jar</file>
+			                <file>${basedir}/lib/GraphSpaceJavaClient-0.0.1.jar</file>
 			                <repositoryLayout>default</repositoryLayout>
 			                <groupId>org.graphspace</groupId>
 			                <artifactId>javaclient</artifactId>

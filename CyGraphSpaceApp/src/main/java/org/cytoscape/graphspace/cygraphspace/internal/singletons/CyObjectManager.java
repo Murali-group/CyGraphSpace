@@ -27,6 +27,7 @@
 package org.cytoscape.graphspace.cygraphspace.internal.singletons;
 
 import java.io.File;
+import java.util.Properties;
 
 import javax.swing.JFrame;
 
@@ -42,6 +43,7 @@ import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.CyNetworkTableManager;
 import org.cytoscape.model.CyTableManager;
 import org.cytoscape.model.subnetwork.CyRootNetworkManager;
+import org.cytoscape.property.CyProperty;
 import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
 import org.cytoscape.task.read.LoadVizmapFileTaskFactory;
 import org.cytoscape.task.write.ExportNetworkTaskFactory;
@@ -57,6 +59,7 @@ import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyleFactory;
 import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.swing.DialogTaskManager;
+import org.cytoscape.graphspace.cygraphspace.internal.io.read.json.CustomCytoscapeJsNetworkReaderFactory;
 
 public enum CyObjectManager {
     INSTANCE;
@@ -68,7 +71,7 @@ public enum CyObjectManager {
     private CyNetworkTableManager networkTableManager;
     
 //    private CyNetworkViewWriterFactory cytoscapeJsWriterFactory;
-//	private InputStreamTaskFactory cytoscapeJsReaderFactory;
+//	private CytoscapeJsReaderFactory cytoscapeJsReaderFactory;
 	private LoadNetworkFileTaskFactory loadNetworkFileTaskFactory;
 	private ExportNetworkTaskFactory exportNetworkTaskFactory;
 //	private CyNetworkReader cyNetworkReader;
@@ -77,6 +80,45 @@ public enum CyObjectManager {
 	private CySwingApplication desktop;
 	private LoadVizmapFileTaskFactory loadVizmapFileTaskFactory;
 	private ExportVizmapTaskFactory exportVizmapTaskFactory;
+	private CustomCytoscapeJsNetworkReaderFactory cytoscapeJsNetworkReaderFactory;
+    private CyNetworkFactory cyNetworkFactory;
+	private CyNetworkManager cyNetworkManager;
+	private CyRootNetworkManager cyRootNetworkManager;
+	private CyProperty<Properties> cyProperties;
+	
+	public void setCyProperties(CyProperty<Properties> cyProperties) {
+		this.cyProperties = cyProperties;
+	}
+	public CyProperty<Properties> getCyProperties(){
+		return this.cyProperties;
+	}
+	public void setCyNetworkFactory(CyNetworkFactory cyNetworkFactory) {
+		this.cyNetworkFactory = cyNetworkFactory;
+	}
+	public CyNetworkFactory getCyNetworkFactory() {
+		return this.cyNetworkFactory;
+	}
+	public void setCyNetworkManager(CyNetworkManager cyNetworkManager) {
+		this.cyNetworkManager = cyNetworkManager;
+	}
+	public CyNetworkManager getCyNetworkManager() {
+		return this.cyNetworkManager;
+	}
+	public void setCyRootNetworkManager(CyRootNetworkManager cyRootNetworkManager) {
+		this.cyRootNetworkManager = cyRootNetworkManager;
+	}
+	public CyRootNetworkManager getRootCyNetworkManager() {
+		return this.cyRootNetworkManager;
+	}
+	
+	public void setCytoscapeJsNetworkReaderFactory(CustomCytoscapeJsNetworkReaderFactory cytoscapeJsNetworkReaderFactory) {
+		this.cytoscapeJsNetworkReaderFactory = cytoscapeJsNetworkReaderFactory;
+	}
+	
+	public CustomCytoscapeJsNetworkReaderFactory getCytoscapeJsNetworkReaderFactory() {
+		return this.cytoscapeJsNetworkReaderFactory;
+	}
+	
     public File getConfigDir()
     {
         return configDir;

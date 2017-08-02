@@ -9,7 +9,6 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
-import org.graphspace.javaclient.CyGraphSpaceClient;
 
 import java.awt.Component;
 import java.awt.Frame;

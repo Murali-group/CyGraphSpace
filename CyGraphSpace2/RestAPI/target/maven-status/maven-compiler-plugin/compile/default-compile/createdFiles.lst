@@ -1,0 +1,7 @@
+org/graphspace/javaclient/model/GSGraphMetaData.class
+org/graphspace/javaclient/exceptions/RequestTypeNotDefinedException.class
+org/graphspace/javaclient/exceptions/GraphNotFoundException.class
+org/graphspace/javaclient/CyGraphSpaceClient.class
+org/graphspace/javaclient/Client.class
+org/graphspace/javaclient/exceptions/GraphNotPostedException.class
+org/graphspace/javaclient/model/GSGraph.class

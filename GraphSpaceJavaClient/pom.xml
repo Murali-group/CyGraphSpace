@@ -4,12 +4,22 @@
 
   <groupId>org.graphspace</groupId>
   <artifactId>GraphSpaceJavaClient</artifactId>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
 
   <name>GraphSpaceJavaClient</name>
   <url>http://maven.apache.org</url>
-  
+    <build>
+     <testResources>
+        <testResource>
+            <directory>src/test/resources/graph</directory>
+            <includes>
+            	<include>postGraph.cyjs</include>
+            	<include>postGraphStyle.json</include>
+            </includes>
+        </testResource>
+    </testResources>
+  </build>
   <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>

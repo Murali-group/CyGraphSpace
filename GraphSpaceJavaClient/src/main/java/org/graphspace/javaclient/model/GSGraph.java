@@ -7,7 +7,7 @@ import org.json.JSONObject;
 public class GSGraph{
 	
 	String name;
-	String id;
+	int id;
 	JSONObject graph;
 	int numberOfNodes;
 	int numberOfEdges;
@@ -19,14 +19,15 @@ public class GSGraph{
 	
 	public GSGraph(JSONObject graph){
 		this.graph = graph;
-		this.name = graph.getJSONObject("data").getString("name");
+		this.name = graph.getString("name");
+		this.id = graph.getInt("id");
 	}
 	
 	public String getName(){
 		return this.name;
 	}
 	
-	public void setId(String id){
+	public void setId(int id){
 		this.id = id;
 	}
 	
@@ -46,7 +47,7 @@ public class GSGraph{
 		return this.graph;
 	}
 	
-	public String getId(){
+	public int getId(){
 		return this.id;
 	}
 	

@@ -24,54 +24,59 @@ public class Requests{
 		return response;
     }
     
-    private static JSONObject postRequest(String path, Map<String, Object> data, Map<String, String> headers) throws UnirestException{
+    private static JSONObject postRequest(String path, Map<String, Object> data, Map<String, String> headers){
     	
-		String queryPath = User.host+path+"/";
+		String queryPath = User.host+path;
 		JSONObject dataJson = new JSONObject(data);
-		HttpResponse<JsonNode> getResponse = Unirest.post(queryPath)
-				.basicAuth(User.username, User.password)
-				.headers(headers)
+		try {
+			HttpResponse<JsonNode> postResponse = Unirest.post(queryPath)
+					.basicAuth(User.username, User.password)
+					.headers(headers)
 //					.fields(data)
-				.body(dataJson)
-				.asJson();
-		JSONObject response = new JSONObject(getResponse);
-		return response;
-    }
-    
+					.body(dataJson)
+					.asJson();
+			JSONObject response = new JSONObject(postResponse);
+			return response;
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		return new JSONObject();
+    }    
     private static JSONObject putRequest(String path, Map<String, Object> data, Map<String, String> headers) throws UnirestException{
 		String queryPath = User.host+path;
 		JSONObject dataJson = new JSONObject(data);
-		HttpResponse<JsonNode> getResponse = Unirest.put(queryPath)
+		HttpResponse<JsonNode> putResponse = Unirest.put(queryPath)
 				.basicAuth(User.username, User.password)
 				.headers(headers)
 //					.fields(data)
 				.body(dataJson)
 				.asJson();
-		JSONObject response = new JSONObject(getResponse);
+		JSONObject response = new JSONObject(putResponse);
 		return response;
     }
     
     private static JSONObject deleteRequest(String path, Map<String, Object> urlParams, Map<String, String> headers) throws UnirestException{
     	
 		String queryPath = User.host+path;
-		HttpResponse<JsonNode> getResponse = Unirest.delete(queryPath)
+		HttpResponse<JsonNode> deleteResponse = Unirest.delete(queryPath)
 				.basicAuth(User.username, User.password)
 				.headers(headers)
 				.queryString(urlParams)
 				.asJson();
-		JSONObject response = new JSONObject(getResponse);
+		JSONObject response = new JSONObject(deleteResponse);
 		return response;
 		
     }
     
-    public static JSONObject makeRequest(String method, String path, Map<String, Object> urlParams, Map<String, Object> data) throws UnirestException{
+    public static JSONObject makeRequest(String method, String path, Map<String, Object> urlParams, Map<String, Object> data) throws Exception{
     	Map<String, String> headers = new HashMap<String, String>();
     	headers.put("Accept", "application/json");
     	headers.put("Content-Type", "application/json");
     	return makeRequest(method, path, urlParams, data, headers);
     }
     
-    public static JSONObject makeRequest(String method, String path, Map<String, Object> urlParams, Map<String, Object> data, Map<String, String> headers) throws UnirestException{
+    public static JSONObject makeRequest(String method, String path, Map<String, Object> urlParams, Map<String, Object> data, Map<String, String> headers) throws Exception{
     	
     	if (method == "GET"){
     		return getRequest(path, urlParams, headers);
@@ -85,9 +90,11 @@ public class Requests{
     		return putRequest(path, data, headers);
     	}
     	
-    	else{
+    	else if (method == "DELETE"){
     		return deleteRequest(path, urlParams, headers);
     	}
-   
+    	else {
+    		throw new Exception("Request method should be among GET, POST, PUT and DELETE only.");
+    	}
     }
 }

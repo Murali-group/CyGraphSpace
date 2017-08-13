@@ -77,7 +77,6 @@ public class Graphs{
     	urlParams.put("owner_email", ownerEmail);
     	urlParams.put("names[]", graphName);
     	JSONObject response = Requests.makeRequest("GET", Config.GRAPHS_PATH, urlParams, null);
-    	System.out.println(response.toString());
 		JSONObject body = response.getJSONObject("body");
 		JSONArray array = body.getJSONArray("array");
 		int total = ((JSONObject) array.get(0)).getInt("total");
@@ -160,7 +159,6 @@ public class Graphs{
     		tags = tagsList.toArray(tags);
     		query.put("tags[]", tags.toString());
     	}
-    	System.out.println(query.toString());
     	return Requests.makeRequest("GET", Config.GRAPHS_PATH, query, null);
     }
     
@@ -231,8 +229,9 @@ public class Graphs{
         data.put("owner_email", User.username);
         data.put("graph_json", graph.computeGraphJSON());
         data.put("style_json", graph.getStyleJSON());
-        System.out.println("tags list: " + tagsList.toString());
-        data.put("tags[]", tagsList.get(0));
+        if (tagsList!=null && !tagsList.isEmpty()) {
+        	data.put("tags[]", tagsList);
+        }
     	return Requests.makeRequest("POST", Config.GRAPHS_PATH, null, data);
     }
     
@@ -255,7 +254,7 @@ public class Graphs{
     		isPublic = 0;
     	}
     	JSONObject graphResponse = getGraphResponse(graphName, ownerEmail);
-    	String id = String.valueOf(graphResponse.getJSONObject("body").getJSONObject("object").getJSONArray("graphs").getJSONObject(0).getInt("id"));
+    	int id = graphResponse.getJSONObject("body").getJSONObject("object").getJSONArray("graphs").getJSONObject(0).getInt("id");
     	if (styleJSON==null) {
     		styleJSON = graphResponse.getJSONObject("body").getJSONObject("object").getJSONArray("graphs").getJSONObject(0).getJSONObject("style_json");
     	}
@@ -288,7 +287,7 @@ public class Graphs{
      * @return message received from GraphSpace
      * @throws Exception (Graph Not Found)
      */
-    public static String deleteGraph(Integer id, String graphName) throws Exception{
+    public static JSONObject deleteGraph(Integer id, String graphName) throws Exception{
     	if (id!=null) {
     		JSONObject graphJSON = getGraphByName(graphName, null);
         	if (graphJSON == null){
@@ -297,7 +296,7 @@ public class Graphs{
         	}
         	else{
         		GSGraph graph = new GSGraph(graphJSON);
-        		return Requests.makeRequest("DELETE", Config.GRAPHS_PATH + graph.getId(), null, null).getString("message");
+        		return Requests.makeRequest("DELETE", Config.GRAPHS_PATH + graph.getId(), null, null);
         	}
     	}
     	if (graphName != null) {
@@ -308,7 +307,7 @@ public class Graphs{
         	}
         	else{
         		GSGraph graph = new GSGraph(graphJSON);
-        		return Requests.makeRequest("DELETE", Config.GRAPHS_PATH + graph.getId(), null, null).getString("message");
+        		return Requests.makeRequest("DELETE", Config.GRAPHS_PATH + graph.getId(), null, null);
         	}
     	}
     	throw new GraphException(ExceptionCode.BAD_REQUEST_FORMAT, ExceptionMessage.BAD_REQUEST_FORMAT_EXCEPTION,

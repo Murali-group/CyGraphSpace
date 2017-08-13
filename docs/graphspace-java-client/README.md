@@ -1,8 +1,13 @@
 # Overview
-GraphSpace Java Client is a Java client library for the GraphSpace REST API.
+GraphSpace Java Client is a Java Client library for the GraphSpace REST API. It simplifies the process of authentication, request construction, and response parsing for Java developers using the GraphSpace API.
 
-It simplifies the process of authentication, requesting and posting graphs to GraphSpace.
+# Why use GraphSpace Java Client?
+GraphSpace Java Client allows a user to import and upload the network from GraphSpace with a few lines of code. Moreover, the user need not know the details of the REST API to use this module. It is very easy to integrate this library into a user’s software pipeline.
 
+# Who uses  GraphSpace Java Client?
+The potential audience for graphspace_python includes biologists, computer scientists and data scientists.
+
+# Note
 This library currently does not allow you to create graphs from scratch. In case you need more functionlity, it is recommended to use [python client](https://graphspace-python.readthedocs.io) instead.
 
 # Installation
@@ -52,56 +57,6 @@ Get the GraphsSpace Java Client jar file from [here](https://github.com/Murali-g
 
 <br/>
 
-# Tutorial
+## [Tutorial](/graphspace-java-client/tutorial.md)
 
-### Import GraphSpace
-
-`import org.graphspace.javaclient.Client`
-
-### Connecting to GraphSpace
-
-You can connect to GraphSpace using your username and password. You can also set a different api host.
-
-`Client client = new Client();`<br/>
-`client.authenticate(host, username, password);`
-
-### Fetching a graph from GraphSpace
-
-You can retrieve your saved graph anytime from GraphSpace using the **getGraph(String graphName)** method.
-
-`JSONObject graph = client.getGraph("GraphName");`<br/>
-
-### Saving a graph on GraphSpace
-
-You can save your graph online using the **postGraph(JSONObject graphJSON, JSONObject styleJSON)** method.
-
-`client.postGraph(graphJSON, styleJSON);`
-
-### Updating a graph on GraphSpace
-
-You can also update your graph anytime using the
-**updateGraph(String graphName, String ownerEmail, JSONObject graphJSON, boolean isPublic)** method.
-
-`updateGraph(name, ownerEmail, graphJSON, isPublic);`
-
-### Making a graph public on GraphSpace
-
-You can also make a graph public using the makeGraphPublic(String graphName) method.
-
-`makeGraphPublic(graphName);`
-
-### Making a graph private on GraphSpace
-
-You can also make a graph private using the makeGraphPrivate(String graphName) method.
-
-`makeGraphPrivate(graphName);`
-
-### Deleting a graph on GraphSpace
-
-You can also delete your graph anytime using the updateGraph(String graphName) method.
-
-`deleteGraph(graphName);`
-
-<br/>
-
-# API Reference
+## [API Reference](https://rishabhsethi.com/cygraphspacejavadoc)

@@ -12,11 +12,7 @@
     <build>
      <testResources>
         <testResource>
-            <directory>src/test/resources/graph</directory>
-            <includes>
-            	<include>postGraph.cyjs</include>
-            	<include>postGraphStyle.json</include>
-            </includes>
+            <directory>src/test/resources</directory>
         </testResource>
     </testResources>
   </build>

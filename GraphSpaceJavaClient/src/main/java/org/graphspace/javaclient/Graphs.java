@@ -222,13 +222,12 @@ public class Graphs{
     		isPublic = 0;
     	}
     	Map<String, Object> data = new HashMap<String, Object>();
-    	GSGraph graph = new GSGraph(graphJSON);
-    	graph.setStyleJSON(styleJSON);
-    	data.put("name", graph.getName());
+    	String graphName = graphJSON.getJSONObject("data").getString("name");
+    	data.put("name", graphName);
     	data.put("is_public", isPublic);
         data.put("owner_email", User.username);
-        data.put("graph_json", graph.computeGraphJSON());
-        data.put("style_json", graph.getStyleJSON());
+        data.put("graph_json", graphJSON);
+        data.put("style_json", styleJSON);
         if (tagsList!=null && !tagsList.isEmpty()) {
         	data.put("tags[]", tagsList);
         }

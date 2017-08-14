@@ -4,66 +4,85 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.graphspace.javaclient.Client;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GraphsTest {
+	private static String host;
+	private static String username;
+	private static String password;
+	private static String graphFileName;
+	private static String styleFileName;
+	private static Client client;
+	private static String graphName;
+	private static JSONObject graphJson;
+	private static JSONObject styleJson;
 	
-	/**
-     * ============================================
-     * GET GRAPH TESTS
-     * ============================================
-     */
-	
+//	@BeforeClass
+//	public static void prepareTests() throws IOException {
+//		host = TestConfig.HOST;
+//		username = TestConfig.USERNAME;
+//		password = TestConfig.PASSWORD;
+//		graphFileName = TestConfig.POST_GRAPH_FILENAME;
+//		styleFileName = TestConfig.POST_GRAPH_STYLE_FILENAME;
+//		client = new Client(host, username, password);
+//		ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+//		File file = new File(classLoader.getResource(graphFileName).getFile());
+//		InputStream is = new FileInputStream(file);
+//		String graphJsonText = IOUtils.toString(is);
+//		graphJson = new JSONObject(graphJsonText);
+//		file = new File(classLoader.getResource(styleFileName).getFile());
+//		is = new FileInputStream(file);
+//		String styleJsonText = IOUtils.toString(is);
+//		JSONArray styleJSONArray = new JSONArray(styleJsonText);
+//		styleJson = styleJSONArray.getJSONObject(0);
+//		graphName = graphJson.getJSONObject("data").getString("name");
+//	}
+//	
 //	@Test
-//	public void getGraphByNameTest() throws Exception {
-//		String host = TestConfig.HOST;
-//		String username = TestConfig.USERNAME;
-//		String password = TestConfig.PASSWORD;
-//		String graphName = TestConfig.GET_GRAPH_NAME;
-//		Client client = new Client(host, username, password);
+//	public void a_postGraphTest() throws Exception{
+//		JSONObject response = client.postGraph(graphJson, styleJson, false, null);
+//		assertEquals(201, response.getInt("status"));
+//	}
+//	
+//	@Test
+//	public void b_getGraphByNameTest() throws Exception {
 //		String graphNameResponse = client.getGraphByName(graphName, username).getString("name");
 //		assertEquals(graphName, graphNameResponse);
 //	}
 //	
 //	@Test
-//	public void getGraphByIdTest() throws Exception {
-//		String host = TestConfig.HOST;
-//		String username = TestConfig.USERNAME;
-//		String password = TestConfig.PASSWORD;
-//		int graphId = TestConfig.GET_GRAPH_ID;
-//		Client client = new Client(host, username, password);
+//	public void c_getGraphByIdTest() throws Exception {
+//		int graphId = client.getGraphByName(graphName, username).getInt("id");
 //		int graphIdResponse = client.getGraphById(graphId).getJSONObject("body").getJSONArray("array").getJSONObject(0).getInt("id");
 //		assertEquals(graphId, graphIdResponse);
 //	}
 //	
 //	@Test
-//	public void getMyGraphsTest() throws Exception {
-//		String host = TestConfig.HOST;
-//		String username = TestConfig.USERNAME;
-//		String password = TestConfig.PASSWORD;
+//	public void d_getMyGraphsTest() throws Exception {
 //		int totalMyGraphs = TestConfig.GET_MY_GRAPHS_TOTAL;
-//		Client client = new Client(host, username, password);
 //		JSONObject graphObject;
 //		graphObject = client.getMyGraphs(null, null, totalMyGraphs+20, 0);
 //		JSONObject body = graphObject.getJSONObject("body");
 //		JSONArray array = body.getJSONArray("array");
 //		int totalMyGraphsResponse = ((JSONObject) array.get(0)).getInt("total");
-//		assertEquals(totalMyGraphs, totalMyGraphsResponse);
+//		assertEquals(totalMyGraphs+1, totalMyGraphsResponse);
 //	}
 //	
 //	@Test
-//	public void getSharedGraphsTest() throws Exception {
-//		String host = TestConfig.HOST;
-//		String username = TestConfig.USERNAME;
-//		String password = TestConfig.PASSWORD;
+//	public void e_getSharedGraphsTest() throws Exception {
 //		int totalSharedGraphs = TestConfig.GET_SHARED_GRAPHS_TOTAL;
-//		Client client = new Client(host, username, password);
 //		JSONObject graphObject;
 //		graphObject = client.getSharedGraphs(null, null, totalSharedGraphs+20, 0);
 //		JSONObject body = graphObject.getJSONObject("body");
@@ -73,12 +92,8 @@ public class GraphsTest {
 //	}
 //	
 //	@Test
-//	public void getPublicGraphsTest() throws Exception {
-//		String host = TestConfig.HOST;
-//		String username = TestConfig.USERNAME;
-//		String password = TestConfig.PASSWORD;
+//	public void f_getPublicGraphsTest() throws Exception {
 //		int totalPublicGraphs = TestConfig.GET_PUBLIC_GRAPHS_TOTAL;
-//		Client client = new Client(host, username, password);
 //		JSONObject graphObject;
 //		graphObject = client.getPublicGraphs(null, null, totalPublicGraphs+20, 0);
 //		JSONObject body = graphObject.getJSONObject("body");
@@ -87,48 +102,10 @@ public class GraphsTest {
 //		assertEquals(totalPublicGraphs, totalPublicGraphsResponse);
 //	}
 //	
-//	@Test
-//	public void postGraphTest() throws Exception{
-//		String host = TestConfig.HOST;
-//		String username = TestConfig.USERNAME;
-//		String password = TestConfig.PASSWORD;
-//		String fileName = TestConfig.POST_GRAPH_FILENAME;
-//		String styleFileName = TestConfig.POST_GRAPH_STYLE_FILENAME;
-//		Client client = new Client(host, username, password);
-//		ClassLoader classLoader = getClass().getClassLoader();
-//		File file = new File(classLoader.getResource(fileName).getFile());
-//		InputStream is = new FileInputStream(file);
-//		String graphJsonText = IOUtils.toString(is);
-//		JSONObject graphJson = new JSONObject(graphJsonText);
-//		file = new File(classLoader.getResource(styleFileName).getFile());
-//		is = new FileInputStream(file);
-//		String styleJsonText = IOUtils.toString(is);
-//		JSONArray styleJSONArray = new JSONArray(styleJsonText);
-//		JSONObject styleJson = styleJSONArray.getJSONObject(0);
-//		JSONObject response = client.postGraph(graphJson, styleJson, false, null);
-//		assertEquals(201, response.getInt("status"));
-//	}
 //	
-//	@Test
-//	public void deleteGraphTest() throws Exception{
-//		String host = TestConfig.HOST;
-//		String username = TestConfig.USERNAME;
-//		String password = TestConfig.PASSWORD;
-//		String fileName = TestConfig.POST_GRAPH_FILENAME;
-//		Client client = new Client(host, username, password);
-//		ClassLoader classLoader = getClass().getClassLoader();
-//		File file = new File(classLoader.getResource(fileName).getFile());
-//		InputStream is = new FileInputStream(file);
-//		String graphJsonText = IOUtils.toString(is);
-//		JSONObject graphJson = new JSONObject(graphJsonText);
-//		JSONObject data = graphJson.getJSONObject("data");
-//		String graphName = data.getString("name");
+//	@AfterClass
+//	public static void deleteGraphTest() throws Exception {
 //		JSONObject response = client.deleteGraph(null, graphName);
-//		if (response.has("message")) {
-//			System.out.println(response.getString("message"));
-//		}
-//		else {
-//			System.out.println(response.toString());
-//		}
+//		assertEquals(200, response.getInt("status"));
 //	}
 }

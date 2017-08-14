@@ -1,0 +1,77 @@
+{
+    "format_version": "1.0",
+    "generated_by": "graphspace-2.0.0",
+    "target_cytoscapejs_version": "~2.7",
+    "elements": {
+        "nodes": [
+            {
+                "data": {
+                    "name": "64",
+                    "SUID": 64,
+                    "selected": false,
+                    "label": "",
+                    "shared_name": "1",
+                    "id": "64"
+                },
+                "position": {
+                    "y": 467.8273153814769,
+                    "x": 777.4410444716442
+                }
+            },
+            {
+                "data": {
+                    "name": "66",
+                    "SUID": 66,
+                    "selected": false,
+                    "label": "",
+                    "shared_name": "2",
+                    "id": "66"
+                },
+                "position": {
+                    "y": 386.69002447980415,
+                    "x": 994.996328029376
+                }
+            }
+        ],
+        "edges": [
+            {
+                "data": {
+                    "interaction": "interacts with",
+                    "name": "64-66",
+                    "SUID": 68,
+                    "selected": false,
+                    "source": "64",
+                    "is_directed": false,
+                    "shared_interaction": "interacts with",
+                    "shared_name": "1 (interacts with) 2",
+                    "id": "68",
+                    "target": "66"
+                },
+                "style": {
+                    "curve-style": "bezier",
+                    "opacity": "1",
+                    "source-arrow-shape": "none",
+                    "font-size": "10px",
+                    "font-weight": "normal",
+                    "target-arrow-shape": "none",
+                    "text-opacity": "1",
+                    "color": "rgb(0,0,0)",
+                    "source-arrow-color": "rgb(0,0,0)",
+                    "line-color": "rgb(132,132,132)",
+                    "label": "",
+                    "width": "2px",
+                    "line-style": "solid",
+                    "target-arrow-color": "rgb(0,0,0)"
+                }
+            }
+        ]
+    },
+    "data": {
+        "name": "GraphSpaceJavaClientTestGraph",
+        "SUID": 52,
+        "__Annotations": [],
+        "selected": true,
+        "shared_name": "GraphSpaceJavaClientTestGraph",
+        "tags": []
+    }
+}

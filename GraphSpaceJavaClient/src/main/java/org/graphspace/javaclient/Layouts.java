@@ -38,14 +38,13 @@ public class Layouts{
     	
     	String path = String.format(Config.GRAPHS_PATH+"%s/layouts/%s", graphId, layoutId);
     	JSONObject response = Requests.makeRequest("GET", path, null, null);
-    	if (response.has("id")){
-    		return response.getJSONObject("style_json");
+    	if (response.getInt("status") == 200){
+    		return response;
     	}
     	else {
     		throw new LayoutException(ExceptionCode.LAYOUT_NOT_FOUND_EXCEPTION, ExceptionMessage.LAYOUT_NOT_FOUND_EXCEPTION,
-    				"Layout with layoutId:" + layoutId + "not found");
+    				"Layout with layoutId: " + layoutId + " not found. \nResponse Status: "+response.getInt("status"));
     	}
-    	
     	
     	//
 //    	if(layoutName!=null) {
@@ -142,7 +141,7 @@ public class Layouts{
     	else{
     		styleJSON = new JSONObject();
     		styleJSON.append("style", new JSONArray());
-    		data.put("positions_json", styleJSON);
+    		data.put("style_json", styleJSON);
     	}
     	String path = String.format(Config.GRAPHS_PATH+"%s/layouts/", graphId);
     	return Requests.makeRequest("POST", path, null, data);

@@ -22,6 +22,7 @@ public class GroupsTest{
 	private static String password;
 	private static Client client;
 	private static String groupName;
+	private static String groupName2;
 	private static String groupDescription;
 	
 	@BeforeClass
@@ -31,19 +32,19 @@ public class GroupsTest{
 		password = TestConfig.PASSWORD;
 		client = new Client(host, username, password);
 		groupName = "testgroup";
-//		groupName = "GraphSpaceJavaClientTestGroup";
+		groupName2 = "GraphSpaceJavaClientTestGroup";
 		groupDescription = "Test group to test GraphSpace java client library";
 	}
 	
-//	@Test
-//	public void a_postGroupTest() throws Exception {
-//		GSGroup group = new GSGroup();
-//		group.setName(groupName);
-//		group.setDescription(groupDescription);
-//		JSONObject response = client.postGroup(group);
-//		System.out.println(response.toString());
-//		assertEquals(200, response.getInt("status"));
-//	}
+	@Test
+	public void a_postGroupTest() throws Exception {
+		GSGroup group = new GSGroup();
+		group.setName(groupName2);
+		group.setDescription(groupDescription);
+		JSONObject response = client.postGroup(group);
+		System.out.println(response.toString());
+		assertEquals(200, response.getInt("status"));
+	}
 	
 	@Test
 	public void b_getGroupTest() throws Exception {
@@ -70,10 +71,9 @@ public class GroupsTest{
 		System.out.println(client.getGroupMembers(groupName, null, null));
 	}
 	
-//	@AfterClass
-//	public static void deleteGroupTest() throws Exception {
-//		int groupId = client.getGroup(groupName).getInt("id");
-//		JSONObject response = client.deleteGroup(groupName, groupId);
-//		assertEquals(200, response.getInt("status"));
-//	}
+	@AfterClass
+	public static void deleteGroupTest() throws Exception {
+		JSONObject response = client.deleteGroup(groupName2, null);
+		assertEquals(200, response.getInt("status"));
+	}
 }

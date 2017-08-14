@@ -10,6 +10,12 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+/**
+ * Implements the get, post, put and delete methods used by all the methods. Uses Unirest to handle requests.
+ *  
+ * @author rishabh
+ *
+ */
 public class Requests{
 	
     private static JSONObject getRequest(String path, Map<String, Object> urlParams, Map<String, String> headers) throws UnirestException{

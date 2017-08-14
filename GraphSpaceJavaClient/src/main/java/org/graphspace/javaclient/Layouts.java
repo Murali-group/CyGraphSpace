@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
+ * Provides methods for layout related operations such as saving, fetching, updating and deleting layouts on GraphSpace.
  * 
  * @author rishabh
  *

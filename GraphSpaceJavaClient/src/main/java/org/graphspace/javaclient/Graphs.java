@@ -14,6 +14,12 @@ import org.json.JSONObject;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+/**
+ * Provides methods for graph related operations such as saving, fetching, updating and deleting graphs on GraphSpace.
+ * 
+ * @author rishabh
+ *
+ */
 public class Graphs{
     
     

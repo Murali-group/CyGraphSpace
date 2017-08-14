@@ -72,7 +72,7 @@ public class Requests{
     public static JSONObject makeRequest(String method, String path, Map<String, Object> urlParams, Map<String, Object> data) throws Exception{
     	Map<String, String> headers = new HashMap<String, String>();
     	headers.put("Accept", "application/json");
-    	headers.put("Content-Type", "application/json");
+    	headers.put("Content-Type", "application/x-www-form-urlencoded");
     	return makeRequest(method, path, urlParams, data, headers);
     }
     

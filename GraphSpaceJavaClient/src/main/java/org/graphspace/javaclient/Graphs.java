@@ -243,7 +243,8 @@ public class Graphs{
      * @return Saved graph on GraphSpace
      * @throws Exception
      */
-    public static JSONObject updateGraph(String graphName, String ownerEmail, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
+    public static JSONObject updateGraph(String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
+    	String ownerEmail = User.username;
     	Map<String, Object> data = new HashMap<String, Object>();
     	int isPublic;
     	if (isGraphPublic){
@@ -266,12 +267,52 @@ public class Graphs{
     		data.put("owner_email", User.username);
     		data.put("graph_json", graph.computeGraphJSON());
     		data.put("style_json", graph.getStyleJSON());
-    		data.put("tags[]", tagsList.get(0));
+    		if (tagsList!=null && !tagsList.isEmpty()) {
+    			data.put("tags[]", tagsList.get(0));
+    		}
     		return Requests.makeRequest("PUT", Config.GRAPHS_PATH + graph.getId(), null, data);
     	}
     	else{
     		return null;
     	}
+    }
+    
+    /**
+     * Make an existing graph Public
+     * @param graphName(String) graph's name
+     * @return the response on updating the graph after making it public
+     * @throws Exception
+     */
+    public static JSONObject makeGraphPublic(String graphName) throws Exception {
+    	String ownerEmail = User.username;
+    	JSONObject response = getGraphResponse(graphName, ownerEmail);
+    	JSONObject graphJSON = response.getJSONObject("body").getJSONObject("object").getJSONArray("graphs").getJSONObject(0).getJSONObject("graph_json");
+    	JSONObject styleJSON = response.getJSONObject("body").getJSONObject("object").getJSONArray("graphs").getJSONObject(0).getJSONObject("style_json");
+    	JSONArray tagsArray = response.getJSONObject("body").getJSONObject("object").getJSONArray("graphs").getJSONObject(0).getJSONArray("tags[]");
+    	ArrayList<String> tagsList = new ArrayList<String>();
+    	for (Object tag: tagsArray) {
+    		tagsList.add((String)tag);
+    	}
+    	return updateGraph(graphName, graphJSON, styleJSON, true, tagsList);
+    }
+    
+    /**
+     * Make an existing graph Private
+     * @param graphName(String) graph's name
+     * @return the response on updating the graph after making it private
+     * @throws Exception
+     */
+    public static JSONObject makeGraphPrivate(String graphName) throws Exception {
+    	String ownerEmail = User.username;
+    	JSONObject response = getGraphResponse(graphName, ownerEmail);
+    	JSONObject graphJSON = response.getJSONObject("body").getJSONObject("object").getJSONArray("graphs").getJSONObject(0).getJSONObject("graph_json");
+    	JSONObject styleJSON = response.getJSONObject("body").getJSONObject("object").getJSONArray("graphs").getJSONObject(0).getJSONObject("style_json");
+    	JSONArray tagsArray = response.getJSONObject("body").getJSONObject("object").getJSONArray("graphs").getJSONObject(0).getJSONArray("tags[]");
+    	ArrayList<String> tagsList = new ArrayList<String>();
+    	for (Object tag: tagsArray) {
+    		tagsList.add((String)tag);
+    	}
+    	return updateGraph(graphName, graphJSON, styleJSON, false, tagsList);
     }
     
 	/**

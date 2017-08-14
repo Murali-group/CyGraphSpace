@@ -94,7 +94,7 @@ public class Layouts{
      * @return List of layouts owned by the user for graph with graphId
      * @throws Exception
      */
-    public static JSONObject getSharedGraphLayouts(String graphId, int limit, int offset) throws Exception{
+    public static JSONObject getSharedGraphLayouts(int graphId, int limit, int offset) throws Exception{
     	Map<String, Object> query = new HashMap<String, Object>();
     	query.put("limit", limit);
     	query.put("offset", offset);
@@ -194,8 +194,8 @@ public class Layouts{
      * @return Success/Error Message from GraphSpace
      * @throws Exception
      */
-    public static String deleteGraphLayout(int graphId, String layoutId) throws Exception{
+    public static JSONObject deleteGraphLayout(int graphId, int layoutId) throws Exception{
     	String path = String.format(Config.GRAPHS_PATH+"%s/layouts/%s", graphId, layoutId);
-    	return Requests.makeRequest("DELETE", path, null, null).getString("message");
+    	return Requests.makeRequest("DELETE", path, null, null);
     }
 }

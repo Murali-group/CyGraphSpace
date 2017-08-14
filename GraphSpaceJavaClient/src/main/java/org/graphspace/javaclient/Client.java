@@ -11,8 +11,11 @@ import org.graphspace.javaclient.Config;
 import org.graphspace.javaclient.exceptions.ExceptionCode;
 import org.graphspace.javaclient.exceptions.ExceptionMessage;
 import org.graphspace.javaclient.exceptions.GraphException;
+import org.graphspace.javaclient.exceptions.GroupException;
 import org.graphspace.javaclient.exceptions.LayoutException;
 import org.graphspace.javaclient.model.GSGraph;
+import org.graphspace.javaclient.model.GSGroup;
+import org.graphspace.javaclient.model.GSMember;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -24,10 +27,6 @@ import org.json.JSONObject;
  *
  */
 public class Client {
-	
-	private String host;
-	private String username;
-	private String password;
 	
 	/**
 	 * Create client object with host, username and password
@@ -115,7 +114,21 @@ public class Client {
      * Reference: {@link org.graphspace.javaclient.Graphs#updateGraph(String graphName, String ownerEmail, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList tagsList)}
      */
     public JSONObject updateGraph(String graphName, String ownerEmail, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
-    	return Graphs.updateGraph(graphName, ownerEmail, graphJSON, styleJSON, isGraphPublic, tagsList);
+    	return Graphs.updateGraph(graphName, graphJSON, styleJSON, isGraphPublic, tagsList);
+    }
+    
+    /**
+     * Reference: {@link org.graphspace.javaclient.Graphs#makeGraphPublic(String graphName)}
+     */
+    public JSONObject makeGraphPublic(String graphName) throws Exception {
+    	return Graphs.makeGraphPublic(graphName);
+    }
+    
+    /**
+     * Reference: {@link org.graphspace.javaclient.Graphs#makeGraphPrivate(String graphName)}
+     */
+    public JSONObject makeGraphPrivate(String graphName) throws Exception {
+    	return Graphs.makeGraphPrivate(graphName);
     }
     
     /**
@@ -148,7 +161,7 @@ public class Client {
     /**
      * Reference: {@link org.graphspace.javaclient.Layouts#getSharedGraphLayouts(String graphId, int limit, int offset)}
      */
-    public JSONObject getSharedGraphLayouts(String graphId, int limit, int offset) throws Exception{
+    public JSONObject getSharedGraphLayouts(int graphId, int limit, int offset) throws Exception{
     	return Layouts.getSharedGraphLayouts(graphId, limit, offset);
     }
     
@@ -169,7 +182,90 @@ public class Client {
     /**
      * Reference: {@link org.graphspace.javaclient.Layouts#deleteGraphLayout(int graphId, String layoutId)}
      */
-    public String deleteGraphLayout(int graphId, String layoutId) throws Exception{
+    public JSONObject deleteGraphLayout(int graphId, int layoutId) throws Exception{
     	return Layouts.deleteGraphLayout(graphId, layoutId);
+    }
+    
+    /**
+     * ============================================
+     * GROUP METHODS
+     * ============================================
+     */
+    
+    /**
+     * Reference: {@link org.graphspace.javaclient.Groups#getGroup(String groupName)}
+     */
+    public JSONObject getGroup(String groupName) throws Exception {
+    	return Groups.getGroup(groupName);
+    }
+    
+    /**
+     * Reference: {@link org.graphspace.javaclient.Groups#getMyGroups(int limit, int offset)}
+     */
+    public JSONArray getMyGroups(int limit, int offset) throws Exception {
+    	return Groups.getMyGroups(limit, offset);
+    }
+    
+    /**
+     * Reference: {@link org.graphspace.javaclient.Groups#getAllGroups(int limit, int offset)}
+     */
+    public JSONArray getAllGroups(int limit, int offset) throws Exception {
+    	return Groups.getAllGroups(limit, offset);
+    }
+    
+    /**
+     * Reference: {@link org.graphspace.javaclient.Groups#postGroup(GSGroup group)}
+     */
+    public JSONObject postGroup(GSGroup group) throws Exception {
+    	return Groups.postGroup(group);
+    }
+    
+    /**
+     * Reference: {@link org.graphspace.javaclient.Groups#deleteGroup(String groupName, Integer groupId)}
+     */
+    public JSONObject deleteGroup(String groupName, Integer groupId) throws Exception {
+    	return Groups.deleteGroup(groupName, groupId);
+    }
+    
+    /**
+     * Reference: {@link org.graphspace.javaclient.Groups#getGroupMembers(String groupName, Integer groupId, GSGroup group)}
+     */
+    public JSONArray getGroupMembers(String groupName, Integer groupId, GSGroup group) throws Exception {
+    	return Groups.getGroupMembers(groupName, groupId, group);
+    }
+    
+    /**
+     * Reference: {@link org.graphspace.javaclient.Groups#addGroupMember(String memberEmail, String groupName, Integer groupId, GSGroup group)}
+     */    
+    public JSONObject addGroupMember(String memberEmail, String groupName, Integer groupId, GSGroup group) throws Exception {
+    	return Groups.addGroupMember(memberEmail, groupName, groupId, group);
+    }
+    
+    /**
+     * Reference: {@link org.graphspace.javaclient.Groups#deleteGroupMember(Integer memberId, GSMember member, String groupName, Integer groupId, GSGroup group)}
+     */
+    public static JSONObject deleteGroupMember(Integer memberId, GSMember member, String groupName, Integer groupId, GSGroup group) throws Exception {
+    	return Groups.deleteGroupMember(memberId, member, groupName, groupId, group);
+    }
+    
+    /**
+     * Reference: {@link org.graphspace.javaclient.Groups#getGroupGraphs(String groupName, Integer groupId, GSGroup group)}
+     */
+    public static JSONArray getGroupGraphs(String groupName, Integer groupId, GSGroup group) throws Exception {
+    	return Groups.getGroupGraphs(groupName, groupId, group);
+    }
+    
+    /**
+     * Reference: {@link org.graphspace.javaclient.Groups#shareGraph(String graphName, Integer graphId, GSGraph graph, String groupName, Integer groupId, GSGroup group)}
+     */
+    public static JSONObject shareGraph(String graphName, Integer graphId, GSGraph graph, String groupName, Integer groupId, GSGroup group) throws Exception{
+    	return Groups.shareGraph(graphName, graphId, graph, groupName, groupId, group);
+    }
+
+    /**
+     * Reference: {@link org.graphspace.javaclient.Groups#unshareGraph(String graphName, Integer graphId, GSGraph graph, String groupName, Integer groupId, GSGroup group)}
+     */
+    public static JSONObject unshareGraph(String graphName, Integer graphId, GSGraph graph, String groupName, Integer groupId, GSGroup group) throws Exception{
+    	return Groups.unshareGraph(graphName, graphId, graph, groupName, groupId, group);
     }
 }

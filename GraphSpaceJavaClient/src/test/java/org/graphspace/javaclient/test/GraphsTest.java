@@ -52,18 +52,21 @@ public class GraphsTest {
 //	
 //	@Test
 //	public void a_postGraphTest() throws Exception{
+//		System.out.println("Running Test: postGraph");
 //		JSONObject response = client.postGraph(graphJson, styleJson, false, null);
 //		assertEquals(201, response.getInt("status"));
 //	}
 //	
 //	@Test
 //	public void b_getGraphByNameTest() throws Exception {
+//		System.out.println("Running Test: getGraphByName");
 //		String graphNameResponse = client.getGraphByName(graphName, username).getString("name");
 //		assertEquals(graphName, graphNameResponse);
 //	}
 //	
 //	@Test
 //	public void c_getGraphByIdTest() throws Exception {
+//		System.out.println("Running Test: getGraphById");
 //		int graphId = client.getGraphByName(graphName, username).getInt("id");
 //		int graphIdResponse = client.getGraphById(graphId).getJSONObject("body").getJSONArray("array").getJSONObject(0).getInt("id");
 //		assertEquals(graphId, graphIdResponse);
@@ -71,6 +74,7 @@ public class GraphsTest {
 //	
 //	@Test
 //	public void d_getMyGraphsTest() throws Exception {
+//		System.out.println("Running Test: getMyGraphs");
 //		int totalMyGraphs = TestConfig.GET_MY_GRAPHS_TOTAL;
 //		JSONObject graphObject;
 //		graphObject = client.getMyGraphs(null, null, totalMyGraphs+20, 0);
@@ -82,6 +86,7 @@ public class GraphsTest {
 //	
 //	@Test
 //	public void e_getSharedGraphsTest() throws Exception {
+//		System.out.println("Running Test: getSharedGraphs");
 //		int totalSharedGraphs = TestConfig.GET_SHARED_GRAPHS_TOTAL;
 //		JSONObject graphObject;
 //		graphObject = client.getSharedGraphs(null, null, totalSharedGraphs+20, 0);
@@ -93,6 +98,7 @@ public class GraphsTest {
 //	
 //	@Test
 //	public void f_getPublicGraphsTest() throws Exception {
+//		System.out.println("Running Test: getPublicGraphs");
 //		int totalPublicGraphs = TestConfig.GET_PUBLIC_GRAPHS_TOTAL;
 //		JSONObject graphObject;
 //		graphObject = client.getPublicGraphs(null, null, totalPublicGraphs+20, 0);
@@ -105,6 +111,7 @@ public class GraphsTest {
 //	
 //	@AfterClass
 //	public static void deleteGraphTest() throws Exception {
+//		System.out.println("Running Test: deleteGraph");
 //		JSONObject response = client.deleteGraph(null, graphName);
 //		assertEquals(200, response.getInt("status"));
 //	}

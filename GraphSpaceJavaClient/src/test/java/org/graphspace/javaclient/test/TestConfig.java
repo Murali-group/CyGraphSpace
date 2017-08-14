@@ -25,4 +25,10 @@ public class TestConfig {
 	public static String POST_LAYOUT_NAME = "GraphSpaceJavaClientTestGraphLayout";
 	public static String POST_LAYOUT_STYLE_FILENAME = "GraphSpaceJavaClientTestGraphStyle.json";
 	public static String POST_LAYOUT_POSITION_FILENAME = "GraphSpaceJavaClientTestGraphPosition.json";
+	
+	/**
+	 * GROUP Config Variables
+	 */
+	public static int GET_MY_GROUPS_TOTAL = 2;
+	public static int GET_ALL_GROUPS_TOTAL = 2;
 }

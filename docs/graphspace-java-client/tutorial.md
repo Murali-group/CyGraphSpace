@@ -8,7 +8,7 @@
 
 You can connect to GraphSpace using your username and password. You can also set a different api host.
 
-`Client client = new Client();`<br/>
+`Client client = new Client();`
 `client.authenticate(host, username, password);`
 
 ### Fetching a graph from GraphSpace

@@ -45,8 +45,9 @@ public class GraphsTest {
 		file = new File(classLoader.getResource(styleFileName).getFile());
 		is = new FileInputStream(file);
 		String styleJsonText = IOUtils.toString(is);
-		JSONArray styleJSONArray = new JSONArray(styleJsonText);
-		styleJson = styleJSONArray.getJSONObject(0);
+		styleJson = new JSONObject(styleJsonText);
+//		JSONArray styleJSONArray = new JSONArray(styleJsonText);
+//		styleJson = styleJSONArray.getJSONObject(0);
 		graphName = graphJson.getJSONObject("data").getString("name");
 	}
 	

@@ -96,7 +96,6 @@ public class LayoutsTest{
 		int graphId = client.getGraphByName(graphName, username).getInt("id");
 		JSONObject response = client.getSharedGraphLayouts(graphId, 100, 0);
 		assertEquals(200, response.getInt("status"));
-		layoutId = response.getJSONObject("body").getJSONObject("object").getJSONArray("layouts").getJSONObject(0).getInt("id");
 	}
 	
 	@Test

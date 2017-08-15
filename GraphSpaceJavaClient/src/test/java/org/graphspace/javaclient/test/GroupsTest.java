@@ -21,8 +21,8 @@ public class GroupsTest{
 	private static String username;
 	private static String password;
 	private static Client client;
-	private static String groupName;
-	private static String groupName2;
+	private static String getGroupName;
+	private static String postGroupName;
 	private static String groupDescription;
 	
 	@BeforeClass
@@ -31,29 +31,31 @@ public class GroupsTest{
 		username = TestConfig.USERNAME;
 		password = TestConfig.PASSWORD;
 		client = new Client(host, username, password);
-		groupName = "testgroup";
-		groupName2 = "GraphSpaceJavaClientTestGroup";
+		getGroupName = TestConfig.GET_GROUP_NAME;
+		postGroupName = TestConfig.POST_GROUP_NAME;
 		groupDescription = "Test group to test GraphSpace java client library";
 	}
 	
-	@Test
-	public void a_postGroupTest() throws Exception {
-		GSGroup group = new GSGroup();
-		group.setName(groupName2);
-		group.setDescription(groupDescription);
-		JSONObject response = client.postGroup(group);
-		System.out.println(response.toString());
-		assertEquals(200, response.getInt("status"));
-	}
+//	@Test
+//	public void a_postGroupTest() throws Exception {
+//		GSGroup group = new GSGroup();
+//		group.setName(groupName2);
+//		group.setDescription(groupDescription);
+//		JSONObject response = client.postGroup(group);
+//		System.out.println(response.toString());
+//		assertEquals(200, response.getInt("status"));
+//	}
 	
 	@Test
 	public void b_getGroupTest() throws Exception {
-		String groupNameResponse = client.getGroup(groupName).getString("name");
-		assertEquals(groupName, groupNameResponse);
+		System.out.println("Running Test: getGroup");
+		String groupNameResponse = client.getGroup(getGroupName).getString("name");
+		assertEquals(getGroupName, groupNameResponse);
 	}
 	
 	@Test
 	public void c_getMyGroupsTest() throws Exception {
+		System.out.println("Running Test: getMyGroups");
 		int myGroupsCount = TestConfig.GET_MY_GROUPS_TOTAL;
 		JSONArray myGroups = client.getMyGroups(myGroupsCount+20, 0);
 		assertEquals(myGroupsCount, myGroups.length());
@@ -61,6 +63,7 @@ public class GroupsTest{
 	
 	@Test
 	public void d_getAllGroupsTest() throws Exception {
+		System.out.println("Running Test: getAllGroups");
 		int allGroupsCount = TestConfig.GET_ALL_GROUPS_TOTAL;
 		JSONArray allGroups = client.getAllGroups(allGroupsCount+20, 0);
 		assertEquals(allGroupsCount, allGroups.length());
@@ -68,12 +71,13 @@ public class GroupsTest{
 	
 	@Test
 	public void e_getGroupMembersTest() throws Exception {
-		System.out.println(client.getGroupMembers(groupName, null, null));
+		System.out.println("Running Test: postGroupMembers");
+		System.out.println(client.getGroupMembers(getGroupName, null, null));
 	}
 	
-	@AfterClass
-	public static void deleteGroupTest() throws Exception {
-		JSONObject response = client.deleteGroup(groupName2, null);
-		assertEquals(200, response.getInt("status"));
-	}
+//	@AfterClass
+//	public static void deleteGroupTest() throws Exception {
+//		JSONObject response = client.deleteGroup(groupName2, null);
+//		assertEquals(200, response.getInt("status"));
+//	}
 }

@@ -27,7 +27,7 @@ import org.json.JSONObject;
  *
  */
 public class Client {
-	
+
 	/**
 	 * Create client object with host, username and password
 	 * @param host
@@ -52,7 +52,17 @@ public class Client {
 		User.password = password;
 	}
 	
-    
+    public void setConfig(String property, String value) {
+    	if (property=="PROXY_HOST") {
+    		UserConfig.PROXY_HOST = value;
+    		return;
+    	}
+    	if (property=="PROXY_PORT") {
+    		UserConfig.PROXY_HOST = value;
+    		return;
+    	}
+		System.out.println("Invalid Property Variable");
+    }
     /**
      * ============================================
      * GRAPH METHODS
@@ -268,4 +278,5 @@ public class Client {
     public static JSONObject unshareGraph(String graphName, Integer graphId, GSGraph graph, String groupName, Integer groupId, GSGroup group) throws Exception{
     	return Groups.unshareGraph(graphName, graphId, graph, groupName, groupId, group);
     }
+    
 }

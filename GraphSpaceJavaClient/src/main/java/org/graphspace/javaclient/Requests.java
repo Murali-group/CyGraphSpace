@@ -20,7 +20,10 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 public class Requests{
 	
     private static JSONObject getRequest(String path, Map<String, Object> urlParams, Map<String, String> headers) throws UnirestException{
-    	Unirest.setProxy(new HttpHost("proxy61.iitd.ernet.in", 3128));
+    	if (UserConfig.PROXY_HOST != null && UserConfig.PROXY_PORT != null) {
+    		Unirest.setProxy(new HttpHost(UserConfig.PROXY_HOST, UserConfig.PROXY_PORT));
+    	}
+    	
 		String queryPath = User.host+path;
 		HttpResponse<JsonNode> getResponse = Unirest.get(queryPath)
 				.basicAuth(User.username, User.password)
@@ -32,7 +35,9 @@ public class Requests{
     }
     
     private static JSONObject postRequest(String path, Map<String, Object> data, Map<String, String> headers){
-    	Unirest.setProxy(new HttpHost("proxy61.iitd.ernet.in", 3128));
+    	if (UserConfig.PROXY_HOST != null && UserConfig.PROXY_PORT != null) {
+    		Unirest.setProxy(new HttpHost(UserConfig.PROXY_HOST, UserConfig.PROXY_PORT));
+    	}
 		String queryPath = User.host+path;
 		JSONObject dataJson = new JSONObject(data);
 		try {
@@ -51,7 +56,9 @@ public class Requests{
 		return new JSONObject();
     }    
     private static JSONObject putRequest(String path, Map<String, Object> data, Map<String, String> headers) throws UnirestException{
-    	Unirest.setProxy(new HttpHost("proxy61.iitd.ernet.in", 3128));
+    	if (UserConfig.PROXY_HOST != null && UserConfig.PROXY_PORT != null) {
+    		Unirest.setProxy(new HttpHost(UserConfig.PROXY_HOST, UserConfig.PROXY_PORT));
+    	}
 		String queryPath = User.host+path;
 		JSONObject dataJson = new JSONObject(data);
 		HttpResponse<JsonNode> putResponse = Unirest.put(queryPath)
@@ -65,7 +72,9 @@ public class Requests{
     }
     
     private static JSONObject deleteRequest(String path, Map<String, Object> urlParams, Map<String, String> headers) throws UnirestException{
-    	Unirest.setProxy(new HttpHost("proxy61.iitd.ernet.in", 3128));
+    	if (UserConfig.PROXY_HOST != null && UserConfig.PROXY_PORT != null) {
+    		Unirest.setProxy(new HttpHost(UserConfig.PROXY_HOST, UserConfig.PROXY_PORT));
+    	}
 		String queryPath = User.host+path;
 		HttpResponse<JsonNode> deleteResponse = Unirest.delete(queryPath)
 				.basicAuth(User.username, User.password)

@@ -1,8 +1,0 @@
-/home/rishabh/Coding/Projects/GSOC/CyGraphSpace2/RestAPI/src/main/java/org/graphspace/javaclient/CyGraphSpaceClient.java
-/home/rishabh/Coding/Projects/GSOC/CyGraphSpace2/RestAPI/src/main/java/org/graphspace/javaclient/model/GSGraphMetaData.java
-/home/rishabh/Coding/Projects/GSOC/CyGraphSpace2/RestAPI/src/main/java/org/graphspace/javaclient/model/GSGraph.java
-/home/rishabh/Coding/Projects/GSOC/CyGraphSpace2/RestAPI/src/main/java/org/graphspace/javaclient/model/GSGroupMetaData.java
-/home/rishabh/Coding/Projects/GSOC/CyGraphSpace2/RestAPI/src/main/java/org/graphspace/javaclient/Client.java
-/home/rishabh/Coding/Projects/GSOC/CyGraphSpace2/RestAPI/src/main/java/org/graphspace/javaclient/exceptions/GraphNotPostedException.java
-/home/rishabh/Coding/Projects/GSOC/CyGraphSpace2/RestAPI/src/main/java/org/graphspace/javaclient/exceptions/RequestTypeNotDefinedException.java
-/home/rishabh/Coding/Projects/GSOC/CyGraphSpace2/RestAPI/src/main/java/org/graphspace/javaclient/exceptions/GraphNotFoundException.java

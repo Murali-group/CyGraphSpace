@@ -42,7 +42,7 @@ public class Groups{
     	Map<String, Object> urlParams = new HashMap<String, Object>();
     	urlParams.put("member_email", User.username);
     	urlParams.put("name", name);
-    	JSONObject response = Requests.makeRequest("GET", Config.GROUPS_PATH, urlParams, null);
+    	JSONObject response = RestClient.makeRequest("GET", Config.GROUPS_PATH, urlParams, null);
     	int total = response.getJSONObject("body").getJSONObject("object").getInt("total");
     	if(total>0){
     		return response.getJSONObject("body").getJSONObject("object").getJSONArray("groups").getJSONObject(0);
@@ -62,7 +62,7 @@ public class Groups{
     	query.put("limit", limit);
     	query.put("offset", offset);
     	query.put("owner_email", User.username);
-    	JSONObject response = Requests.makeRequest("GET", Config.GROUPS_PATH, query, null);
+    	JSONObject response = RestClient.makeRequest("GET", Config.GROUPS_PATH, query, null);
     	return response.getJSONObject("body").getJSONObject("object").getJSONArray("groups");
     }
     
@@ -78,7 +78,7 @@ public class Groups{
     	query.put("limit", limit);
     	query.put("offset", offset);
     	query.put("member_email", User.username);
-    	JSONObject response = Requests.makeRequest("GET", Config.GROUPS_PATH, query, null);
+    	JSONObject response = RestClient.makeRequest("GET", Config.GROUPS_PATH, query, null);
     	return response.getJSONObject("body").getJSONObject("object").getJSONArray("groups");
     }
     
@@ -94,7 +94,7 @@ public class Groups{
     	data.put("name", group.getName());
     	data.put("description", group.getDescription());
     	System.out.println(data.toString());
-    	return Requests.makeRequest("POST", Config.GROUPS_PATH, null, data);
+    	return RestClient.makeRequest("POST", Config.GROUPS_PATH, null, data);
     }
     
     /**
@@ -107,7 +107,7 @@ public class Groups{
      */
     public static JSONObject updateGroup(GSGroup group, Integer groupId, String groupName) throws Exception {
     	if (groupId != null) {
-    		return Requests.makeRequest("PUT", Config.GROUPS_PATH+String.valueOf(groupId), null, group.toMap());
+    		return RestClient.makeRequest("PUT", Config.GROUPS_PATH+String.valueOf(groupId), null, group.toMap());
     	}
     	if (groupName != null || group.getName()!=null) {
     		if (groupName==null) {
@@ -121,7 +121,7 @@ public class Groups{
     		}
     		else {
     			groupId = existingGroup.getInt("id");
-    			return Requests.makeRequest("PUT", Config.GROUPS_PATH+String.valueOf(groupId), null, group.toMap());
+    			return RestClient.makeRequest("PUT", Config.GROUPS_PATH+String.valueOf(groupId), null, group.toMap());
     		}
     	}
     	throw new GroupException(ExceptionCode.BAD_REQUEST_FORMAT, ExceptionMessage.BAD_REQUEST_FORMAT_EXCEPTION,
@@ -137,12 +137,12 @@ public class Groups{
      */
     public static JSONObject deleteGroup(String groupName, Integer groupId) throws Exception {
     	if (groupId != null) {
-    		return Requests.makeRequest("DELETE", Config.GROUPS_PATH+groupId, null, null);
+    		return RestClient.makeRequest("DELETE", Config.GROUPS_PATH+groupId, null, null);
     	}
     	if (groupName != null) {
     		JSONObject group = getGroup(groupName);
     		groupId = group.getInt("id");
-    		return Requests.makeRequest("DELETE", Config.GROUPS_PATH+groupId, null, null);
+    		return RestClient.makeRequest("DELETE", Config.GROUPS_PATH+groupId, null, null);
     	}
     	else {
     		throw new GroupException(ExceptionCode.GROUP_NOT_FOUND_EXCEPTION, ExceptionMessage.GROUP_NOT_FOUND_EXCEPTION,
@@ -163,13 +163,13 @@ public class Groups{
     		groupName = group.getName();
     	}
     	if (groupId != null) {
-    		JSONArray members = Requests.makeRequest("GET", Config.GROUPS_PATH+groupId+"/members", null, null).
+    		JSONArray members = RestClient.makeRequest("GET", Config.GROUPS_PATH+groupId+"/members", null, null).
     				getJSONObject("body").getJSONObject("object").getJSONArray("members"); 
     		return members;
     	}
     	if (groupName != null) {
     		groupId = getGroup(groupName).getInt("id");
-    		JSONArray members = Requests.makeRequest("GET", Config.GROUPS_PATH+groupId+"/members", null, null).
+    		JSONArray members = RestClient.makeRequest("GET", Config.GROUPS_PATH+groupId+"/members", null, null).
     				getJSONObject("body").getJSONObject("object").getJSONArray("members"); 
     		return members;
     	}
@@ -198,13 +198,13 @@ public class Groups{
     	if (groupId != null) {
     		Map<String, Object> data = new HashMap<String, Object>();
     		data.put("member_email", memberEmail);
-    		return Requests.makeRequest("POST", Config.GROUPS_PATH+groupId+"/members", null, data);
+    		return RestClient.makeRequest("POST", Config.GROUPS_PATH+groupId+"/members", null, data);
     	}
     	if (groupName != null) {
     		groupId = getGroup(groupName).getInt("id");
     		Map<String, Object> data = new HashMap<String, Object>();
     		data.put("member_email", memberEmail);
-    		return Requests.makeRequest("POST", Config.GROUPS_PATH+groupId+"/members", null, data);
+    		return RestClient.makeRequest("POST", Config.GROUPS_PATH+groupId+"/members", null, data);
     	}
     	throw new GroupException(ExceptionCode.BAD_REQUEST_FORMAT, ExceptionMessage.BAD_REQUEST_FORMAT_EXCEPTION,
     			"group name, group id and group can't all be null.");
@@ -233,12 +233,12 @@ public class Groups{
     				"Both member id and member object can't be null");
     	}
     	if (groupId != null) {
-    		return Requests.makeRequest("DELETE", Config.GROUPS_PATH+groupId+"/members/"+memberId, null, null);
+    		return RestClient.makeRequest("DELETE", Config.GROUPS_PATH+groupId+"/members/"+memberId, null, null);
     	}
     	if (groupName != null) {
     		groupId = getGroup(groupName).getInt("id");
     		if (groupId != null) {
-    			return Requests.makeRequest("DELETE", Config.GROUPS_PATH+groupId+"/members/"+memberId, null, null);
+    			return RestClient.makeRequest("DELETE", Config.GROUPS_PATH+groupId+"/members/"+memberId, null, null);
     		}
     		
     	}
@@ -260,13 +260,13 @@ public class Groups{
     		groupName = group.getName();
     	}
     	if (groupId != null) {
-    		JSONArray graphs = Requests.makeRequest("GET", Config.GROUPS_PATH+groupId+"/graphs", null, null).
+    		JSONArray graphs = RestClient.makeRequest("GET", Config.GROUPS_PATH+groupId+"/graphs", null, null).
     				getJSONObject("body").getJSONObject("object").getJSONArray("graphs"); 
     		return graphs;
     	}
     	if (groupName != null) {
     		groupId = getGroup(groupName).getInt("id");
-    		JSONArray graphs = Requests.makeRequest("GET", Config.GROUPS_PATH+groupId+"/graphs", null, null).
+    		JSONArray graphs = RestClient.makeRequest("GET", Config.GROUPS_PATH+groupId+"/graphs", null, null).
     				getJSONObject("body").getJSONObject("object").getJSONArray("graphs"); 
     		return graphs;
     	}
@@ -310,7 +310,7 @@ public class Groups{
     	if(groupId != null) {
     		Map<String, Object> data = new HashMap<String, Object>();
     		data.put("graph_id", graphId);
-    		return Requests.makeRequest("POST", Config.GROUPS_PATH+groupId+"/graphs", null, data);
+    		return RestClient.makeRequest("POST", Config.GROUPS_PATH+groupId+"/graphs", null, data);
     	}
     	if(groupName != null) {
     		JSONObject groupResponse = getGroup(groupName);
@@ -318,7 +318,7 @@ public class Groups{
     			groupId = groupResponse.getInt("id");
     			Map<String, Object> data = new HashMap<String, Object>();
     			data.put("graph_id", graphId);
-        		return Requests.makeRequest("POST", Config.GROUPS_PATH+groupId+"/graphs", null, data);
+        		return RestClient.makeRequest("POST", Config.GROUPS_PATH+groupId+"/graphs", null, data);
     		}
     	}
     	
@@ -362,14 +362,14 @@ public class Groups{
     		}
     	}
     	if(groupId != null) {
-    		return Requests.makeRequest("DELETE", Config.GROUPS_PATH+groupId+"/graphs/"+groupId, null, null);
+    		return RestClient.makeRequest("DELETE", Config.GROUPS_PATH+groupId+"/graphs/"+groupId, null, null);
     	}
     	
     	if(groupName != null) {
     		JSONObject groupResponse = getGroup(groupName);
     		if (groupResponse!=null) {
     			groupId = groupResponse.getInt("id");
-    			return Requests.makeRequest("DELETE", Config.GROUPS_PATH+groupId+"/graphs/"+groupId, null, null);
+    			return RestClient.makeRequest("DELETE", Config.GROUPS_PATH+groupId+"/graphs/"+groupId, null, null);
     		}
     	}
     	

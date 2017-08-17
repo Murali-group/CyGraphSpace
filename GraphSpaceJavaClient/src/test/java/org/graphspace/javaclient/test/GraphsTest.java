@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.graphspace.javaclient.Client;
+import org.graphspace.javaclient.GraphSpaceClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.AfterClass;
@@ -24,7 +24,7 @@ public class GraphsTest {
 	private static String password;
 	private static String graphFileName;
 	private static String styleFileName;
-	private static Client client;
+	private static GraphSpaceClient client;
 	private static String graphName;
 	private static JSONObject graphJson;
 	private static JSONObject styleJson;
@@ -36,7 +36,7 @@ public class GraphsTest {
 		password = TestConfig.PASSWORD;
 		graphFileName = TestConfig.POST_GRAPH_FILENAME;
 		styleFileName = TestConfig.POST_GRAPH_STYLE_FILENAME;
-		client = new Client(host, username, password);
+		client = new GraphSpaceClient(host, username, password);
 		ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 		File file = new File(classLoader.getResource(graphFileName).getFile());
 		InputStream is = new FileInputStream(file);

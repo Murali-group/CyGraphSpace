@@ -26,7 +26,7 @@ import org.json.JSONObject;
  * @author rishabh
  *
  */
-public class Client {
+public class GraphSpaceClient {
 
 	/**
 	 * Create client object with host, username and password
@@ -34,7 +34,7 @@ public class Client {
 	 * @param username
 	 * @param password
 	 */
-	public Client(String host, String username, String password) {
+	public GraphSpaceClient(String host, String username, String password) {
 		User.host = host;
 		User.username = username;
 		User.password = password;
@@ -46,7 +46,7 @@ public class Client {
 	 * @param username
 	 * @param password
 	 */
-	public Client(String username, String password) {
+	public GraphSpaceClient(String username, String password) {
 		User.host = Config.HOST;
 		User.username = username;
 		User.password = password;

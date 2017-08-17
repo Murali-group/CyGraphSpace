@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 
-import org.graphspace.javaclient.Client;
+import org.graphspace.javaclient.GraphSpaceClient;
 import org.graphspace.javaclient.model.GSGroup;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,7 +20,7 @@ public class GroupsTest{
 	private static String host;
 	private static String username;
 	private static String password;
-	private static Client client;
+	private static GraphSpaceClient client;
 	private static String getGroupName;
 	private static String postGroupName;
 	private static String groupDescription;
@@ -30,7 +30,7 @@ public class GroupsTest{
 		host = TestConfig.HOST;
 		username = TestConfig.USERNAME;
 		password = TestConfig.PASSWORD;
-		client = new Client(host, username, password);
+		client = new GraphSpaceClient(host, username, password);
 		getGroupName = TestConfig.GET_GROUP_NAME;
 		postGroupName = TestConfig.POST_GROUP_NAME;
 		groupDescription = "Test group to test GraphSpace java client library";

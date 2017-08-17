@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.graphspace.javaclient.Requests;
+import org.graphspace.javaclient.RestClient;
 import org.graphspace.javaclient.exceptions.ExceptionCode;
 import org.graphspace.javaclient.exceptions.ExceptionMessage;
 import org.graphspace.javaclient.exceptions.GraphException;
@@ -38,7 +38,7 @@ public class Graphs{
      */
     public static JSONObject getGraphById(int graphId) throws Exception{
     	String path = Config.GRAPHS_PATH+graphId;
-    	return Requests.makeRequest("GET", path, null, null);
+    	return RestClient.makeRequest("GET", path, null, null);
     }
     
 	/**
@@ -56,12 +56,12 @@ public class Graphs{
     	Map<String, Object> urlParams = new HashMap<String, Object>();
     	urlParams.put("owner_email", ownerEmail);
     	urlParams.put("names[]", graphName);
-    	JSONObject response = Requests.makeRequest("GET", Config.GRAPHS_PATH, urlParams, null);
+    	JSONObject response = RestClient.makeRequest("GET", Config.GRAPHS_PATH, urlParams, null);
 		JSONObject body = response.getJSONObject("body");
 		JSONArray array = body.getJSONArray("array");
-		int total = ((JSONObject) array.get(0)).getInt("total");
+		int total = array.getJSONObject(0).getInt("total");
     	if (total > 0){
-    		return ((JSONArray) ((JSONObject)((JSONArray)((JSONObject)response.getJSONObject("body")).getJSONArray("array")).get(0)).getJSONArray("graphs")).getJSONObject(0);
+    		return response.getJSONObject("body").getJSONArray("array").getJSONObject(0).getJSONArray("graphs").getJSONObject(0);
     	}
     	else{
     		throw new GraphException(ExceptionCode.GRAPH_NOT_FOUND_EXCEPTION, ExceptionMessage.GRAPH_NOT_FOUND_EXCEPTION,
@@ -82,10 +82,10 @@ public class Graphs{
     	Map<String, Object> urlParams = new HashMap<String, Object>();
     	urlParams.put("owner_email", ownerEmail);
     	urlParams.put("names[]", graphName);
-    	JSONObject response = Requests.makeRequest("GET", Config.GRAPHS_PATH, urlParams, null);
+    	JSONObject response = RestClient.makeRequest("GET", Config.GRAPHS_PATH, urlParams, null);
 		JSONObject body = response.getJSONObject("body");
 		JSONArray array = body.getJSONArray("array");
-		int total = ((JSONObject) array.get(0)).getInt("total");
+		int total = array.getJSONObject(0).getInt("total");
     	if (total > 0){
     		return response;
     	}
@@ -128,7 +128,7 @@ public class Graphs{
     		names = graphNames.toArray(names);
     		query.put("names[]", names.toString());
     	}
-    	return Requests.makeRequest("GET", Config.GRAPHS_PATH, query, null);
+    	return RestClient.makeRequest("GET", Config.GRAPHS_PATH, query, null);
     }
     
     
@@ -165,7 +165,7 @@ public class Graphs{
     		tags = tagsList.toArray(tags);
     		query.put("tags[]", tags.toString());
     	}
-    	return Requests.makeRequest("GET", Config.GRAPHS_PATH, query, null);
+    	return RestClient.makeRequest("GET", Config.GRAPHS_PATH, query, null);
     }
     
     /**
@@ -201,7 +201,7 @@ public class Graphs{
     		tags = tagsList.toArray(tags);
     		query.put("tags[]", tags.toString());
     	}
-		return Requests.makeRequest("GET", Config.GRAPHS_PATH, query, null);
+		return RestClient.makeRequest("GET", Config.GRAPHS_PATH, query, null);
     }
     
 	/**
@@ -237,7 +237,7 @@ public class Graphs{
         if (tagsList!=null && !tagsList.isEmpty()) {
         	data.put("tags[]", tagsList);
         }
-    	return Requests.makeRequest("POST", Config.GRAPHS_PATH, null, data);
+    	return RestClient.makeRequest("POST", Config.GRAPHS_PATH, null, data);
     }
     
     /**
@@ -276,7 +276,7 @@ public class Graphs{
     		if (tagsList!=null && !tagsList.isEmpty()) {
     			data.put("tags[]", tagsList.get(0));
     		}
-    		return Requests.makeRequest("PUT", Config.GRAPHS_PATH + graph.getId(), null, data);
+    		return RestClient.makeRequest("PUT", Config.GRAPHS_PATH + graph.getId(), null, data);
     	}
     	else{
     		return null;
@@ -342,7 +342,7 @@ public class Graphs{
         	}
         	else{
         		GSGraph graph = new GSGraph(graphJSON);
-        		return Requests.makeRequest("DELETE", Config.GRAPHS_PATH + graph.getId(), null, null);
+        		return RestClient.makeRequest("DELETE", Config.GRAPHS_PATH + graph.getId(), null, null);
         	}
     	}
     	if (graphName != null) {
@@ -353,7 +353,7 @@ public class Graphs{
         	}
         	else{
         		GSGraph graph = new GSGraph(graphJSON);
-        		return Requests.makeRequest("DELETE", Config.GRAPHS_PATH + graph.getId(), null, null);
+        		return RestClient.makeRequest("DELETE", Config.GRAPHS_PATH + graph.getId(), null, null);
         	}
     	}
     	throw new GraphException(ExceptionCode.BAD_REQUEST_FORMAT, ExceptionMessage.BAD_REQUEST_FORMAT_EXCEPTION,

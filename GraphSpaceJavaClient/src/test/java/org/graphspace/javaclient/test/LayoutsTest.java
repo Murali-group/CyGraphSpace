@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.graphspace.javaclient.Client;
+import org.graphspace.javaclient.GraphSpaceClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.AfterClass;
@@ -25,7 +25,7 @@ public class LayoutsTest{
 	private static String graphFileName;
 	private static String styleFileName;
 	private static String positionFileName;
-	private static Client client;
+	private static GraphSpaceClient client;
 	private static String graphName;
 	private static String layoutName;
 	private static JSONObject graphJson;
@@ -44,7 +44,7 @@ public class LayoutsTest{
 		
 		layoutName = TestConfig.POST_LAYOUT_NAME;
 		
-		client = new Client(host, username, password);
+		client = new GraphSpaceClient(host, username, password);
 		
 		ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 		

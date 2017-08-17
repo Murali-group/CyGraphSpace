@@ -38,7 +38,7 @@ public class Layouts{
     	}
     	
     	String path = String.format(Config.GRAPHS_PATH+"%s/layouts/%s", graphId, layoutId);
-    	JSONObject response = Requests.makeRequest("GET", path, null, null);
+    	JSONObject response = RestClient.makeRequest("GET", path, null, null);
     	if (response.getInt("status") == 200){
     		return response;
     	}
@@ -83,7 +83,7 @@ public class Layouts{
     	query.put("offset", offset);
     	query.put("owner_email", User.username);
     	String path = String.format(Config.GRAPHS_PATH+"%s/layouts/", graphId);
-    	return Requests.makeRequest("GET", path, query, null);
+    	return RestClient.makeRequest("GET", path, query, null);
     }
 
     /**
@@ -101,7 +101,7 @@ public class Layouts{
     	query.put("offset", offset);
     	query.put("is_shared", 1);
     	String path = String.format(Config.GRAPHS_PATH+"%s/layouts/", graphId);
-    	return Requests.makeRequest("GET", path, query, null);
+    	return RestClient.makeRequest("GET", path, query, null);
     }
     
     /**
@@ -145,7 +145,7 @@ public class Layouts{
     		data.put("style_json", styleJSON);
     	}
     	String path = String.format(Config.GRAPHS_PATH+"%s/layouts/", graphId);
-    	return Requests.makeRequest("POST", path, null, data);
+    	return RestClient.makeRequest("POST", path, null, data);
     }
 	
 	/**
@@ -177,7 +177,7 @@ public class Layouts{
 		}
 		
 		String path = String.format(Config.GRAPHS_PATH+"%s/layouts/%s", graphId, layoutId);
-		return Requests.makeRequest("PUT", path, null, data);
+		return RestClient.makeRequest("PUT", path, null, data);
     }
 
 
@@ -197,6 +197,6 @@ public class Layouts{
      */
     public static JSONObject deleteGraphLayout(int graphId, int layoutId) throws Exception{
     	String path = String.format(Config.GRAPHS_PATH+"%s/layouts/%s", graphId, layoutId);
-    	return Requests.makeRequest("DELETE", path, null, null);
+    	return RestClient.makeRequest("DELETE", path, null, null);
     }
 }

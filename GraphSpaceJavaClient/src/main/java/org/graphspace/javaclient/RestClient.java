@@ -26,7 +26,19 @@ public class RestClient{
 	
 	private Map<String, String> headers;
 	
-	public RestClient(String username, String password, String host) {
+	public String getUser() {
+		return this.username;
+	}
+	
+	public String getPassword() {
+		return this.password;
+	}
+	
+	public String getHost() {
+		return this.host;
+	}
+	
+	public RestClient(String host, String username, String password) {
 		this.host = host;
 		this.username = username;
 		this.password = password;
@@ -52,12 +64,14 @@ public class RestClient{
 	
     public JSONObject get(String path, Map<String, Object> urlParams) throws UnirestException{
 		String queryPath = this.host+path;
+		System.out.println(queryPath);
 		HttpResponse<JsonNode> getResponse = Unirest.get(queryPath)
-				.basicAuth(User.username, User.password)
+				.basicAuth(this.username, this.password)
 				.headers(this.headers)
 				.queryString(urlParams)
 				.asJson();
 		JSONObject response = new JSONObject(getResponse);
+		System.out.println("GET: "+response.toString());
 		return response;
     }
     
@@ -65,7 +79,7 @@ public class RestClient{
 		String queryPath = this.host+path;
 		JSONObject dataJson = new JSONObject(data);
 			HttpResponse<JsonNode> postResponse = Unirest.post(queryPath)
-					.basicAuth(User.username, User.password)
+					.basicAuth(this.username, this.password)
 					.headers(this.headers)
 					.body(dataJson)
 					.asJson();
@@ -75,6 +89,7 @@ public class RestClient{
     
     public JSONObject put(String path, Map<String, Object> data) throws UnirestException{
 		String queryPath = this.host+path;
+		System.out.println(queryPath);
 		JSONObject dataJson = new JSONObject(data);
 		HttpResponse<JsonNode> putResponse = Unirest.put(queryPath)
 				.basicAuth(this.username, this.password)
@@ -82,11 +97,13 @@ public class RestClient{
 				.body(dataJson)
 				.asJson();
 		JSONObject response = new JSONObject(putResponse);
+		System.out.println("PUT: "+response.toString());
 		return response;
     }
     
     public JSONObject delete(String path) throws UnirestException{
 		String queryPath = this.host+path;
+		System.out.println(queryPath);
 		HttpResponse<JsonNode> deleteResponse = Unirest.delete(queryPath)
 				.basicAuth(this.username, this.password)
 				.headers(this.headers)

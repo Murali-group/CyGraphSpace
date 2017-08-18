@@ -3,7 +3,7 @@ package org.graphspace.javaclient;
 import org.json.JSONObject;
 
 public abstract class Resource {
-	protected int id;
+	protected Integer id;
 	protected String name;
 	protected String ownerEmail;
 	protected JSONObject json;
@@ -11,14 +11,17 @@ public abstract class Resource {
 	
 	public Resource (RestClient restClient) {
 		this.restClient = restClient;
+		if (this.json!=null) {
+			setAttrs();
+		}
 	}
 	
 	public Resource(RestClient restClient, JSONObject json) {
 		this.restClient = restClient;
 		this.json = json;
-		this.id = json.getInt("id");
-		this.name = json.getString("name");
-		this.ownerEmail = json.getString("owner_email");
+		if (this.json!=null) {
+			setAttrs();
+		}
 	}
 	
 	public void setId(int id) {
@@ -41,7 +44,7 @@ public abstract class Resource {
 		this.restClient = restClient;
 	}
 	
-	public int getId() {
+	public Integer getId() {
 		return this.id;
 	}
 	
@@ -59,5 +62,20 @@ public abstract class Resource {
 	
 	public RestClient getRestClient() {
 		return this.restClient;
+	}
+	
+	private void setAttrs() {
+		if (this.json.has("id")) {
+			this.id = json.getInt("id");
+		}
+		if (this.json.has("name")) {
+			this.name = json.getString("name");
+		}
+		if (this.json.has("data")) {
+			this.name = json.getJSONObject("data").getString("name");
+		}
+		if (this.json.has("owner_email")) {
+			this.ownerEmail = json.getString("owner_email");
+		}
 	}
 }

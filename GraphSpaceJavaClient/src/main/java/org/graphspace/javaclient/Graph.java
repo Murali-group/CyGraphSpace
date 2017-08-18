@@ -7,8 +7,6 @@ import java.util.Map;
 import org.graphspace.javaclient.exceptions.ExceptionCode;
 import org.graphspace.javaclient.exceptions.ExceptionMessage;
 import org.graphspace.javaclient.exceptions.GraphException;
-import org.graphspace.javaclient.model.GSGraph;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import util.Config;
@@ -16,24 +14,41 @@ import util.ParseResponse;
 
 public class Graph extends Resource {
 
-	private RestClient restClient;
 	private JSONObject styleJson;
 	private boolean isGraphPublic;
 	private ArrayList<String> tags;
+	private JSONObject graphJson;
 	
-	public Graph(RestClient restClient, JSONObject graphJson) {
-		super(restClient, graphJson);
+	public Graph(RestClient restClient) {
+		super(restClient);
 		this.isGraphPublic = false;
 	}
 	
-	public Graph(RestClient restClient, JSONObject graphJson, JSONObject styleJson) {
-		super(restClient, graphJson);
-		this.styleJson = styleJson;
+	public Graph(RestClient restClient, JSONObject json) {
+		super(restClient, json);
 		this.isGraphPublic = false;
+		this.graphJson = json.getJSONObject("graph_json");
+	}
+	
+	public Graph(RestClient restClient, boolean isGraphPublic) {
+		super(restClient);
+		this.isGraphPublic = isGraphPublic;
 	}
 	
 	public JSONObject getStyleJson() {
 		return this.styleJson;
+	}
+	
+	public JSONObject getGraphJson() {
+		return this.graphJson;
+	}
+	
+	public void setGraphJson(JSONObject graphJson) {
+		this.graphJson = graphJson;
+	}
+	
+	public void setStyleJson(JSONObject graphJson) {
+		this.graphJson = graphJson;
 	}
 	
 	public void addTag(String tag) {
@@ -70,17 +85,41 @@ public class Graph extends Resource {
 	 * @return graph JSONObject, if graph with the given name exists
 	 * @throws Exception
 	 */
-    public static Graph getGraph(RestClient restClient, String graphName, String ownerEmail) throws Exception{
+    public static Graph getGraph(RestClient restClient, String graphName) throws Exception {
     	String path = Config.GRAPHS_PATH;
-    	if(ownerEmail==null) {
-    		ownerEmail = User.username;
-    	}
+    	String ownerEmail = restClient.getUser();
     	Map<String, Object> urlParams = new HashMap<String, Object>();
     	urlParams.put("owner_email", ownerEmail);
     	urlParams.put("names[]", graphName);
     	JSONObject response = restClient.get(path, urlParams);
     	ParseResponse parseResponse = new ParseResponse(restClient, response);
-    	return parseResponse.getGraphs().get(0);
+    	ArrayList<Graph> graphs = parseResponse.getGraphs();
+    	if (graphs.isEmpty()) {
+    		return null;
+    	}
+    	return graphs.get(0);
+    }
+    
+    /**
+	 * Get a graph with the graph name
+	 * 
+	 * @param graphName(String) Name of the graph to be fetched
+	 * @param ownerEmail(String) Email of the owner of the graph
+	 * @return graph JSONObject, if graph with the given name exists
+	 * @throws Exception
+	 */
+    public static Graph getGraph(RestClient restClient, String graphName, String ownerEmail) throws Exception {
+    	String path = Config.GRAPHS_PATH;
+    	Map<String, Object> urlParams = new HashMap<String, Object>();
+    	urlParams.put("owner_email", ownerEmail);
+    	urlParams.put("names[]", graphName);
+    	JSONObject response = restClient.get(path, urlParams);
+    	ParseResponse parseResponse = new ParseResponse(restClient, response);
+    	ArrayList<Graph> graphs = parseResponse.getGraphs();
+    	if (graphs.isEmpty()) {
+    		return null;
+    	}
+    	return graphs.get(0);
     }
     
     /**
@@ -170,7 +209,7 @@ public class Graph extends Resource {
     public static ArrayList<Graph> getSharedGraphs(RestClient restClient, ArrayList<String> graphNames, ArrayList<String> tagsList, int limit, int offset) throws Exception{
     	String path = Config.GRAPHS_PATH;
     	Map<String, Object> query = new HashMap<String, Object>();
-		query.put("member_email", User.username);
+		query.put("member_email", restClient.getUser());
 		query.put("limit", limit);
     	query.put("offset", offset);
     	if (graphNames != null && !graphNames.isEmpty()){
@@ -209,7 +248,7 @@ public class Graph extends Resource {
     public static ArrayList<Graph> getMyGraphs(RestClient restClient, ArrayList<String> graphNames, ArrayList<String> tagsList, int limit, int offset) throws Exception{
     	String path = Config.GRAPHS_PATH;
     	Map<String, Object> query = new HashMap<String, Object>();
-		query.put("owner_email", User.username);
+		query.put("owner_email", restClient.getUser());
 		query.put("limit", limit);
     	query.put("offset", offset);
     	if (graphNames != null && !graphNames.isEmpty()){
@@ -243,18 +282,24 @@ public class Graph extends Resource {
      * @throws Exception
      */
     public Response postGraph() throws Exception{
+    	if(this.graphJson == null) {
+    		throw new GraphException(ExceptionCode.BAD_REQUEST_FORMAT, ExceptionMessage.BAD_REQUEST_FORMAT_EXCEPTION,
+    				"Graph JSON is not set.");
+    	}
     	String path = Config.GRAPHS_PATH;
     	int isPublic = this.isGraphPublic ? 1 : 0;
     	Map<String, Object> data = new HashMap<String, Object>();
     	data.put("name", name);
     	data.put("is_public", isPublic);
-        data.put("owner_email", User.username);
-        data.put("graph_json", this.json);
-        data.put("style_json", this.styleJson);
+        data.put("owner_email", restClient.getUser());
+        data.put("graph_json", this.graphJson);
+        if (styleJson!=null) {
+        	data.put("style_json", this.styleJson);
+        }
         if (tags!=null && !tags.isEmpty()) {
         	data.put("tags[]", tags);
         }
-    	JSONObject response = restClient.put(path, data);
+    	JSONObject response = restClient.post(path, data);
     	ParseResponse parseResponse = new ParseResponse(restClient, response);
     	return parseResponse.getResponse();
     }
@@ -269,13 +314,17 @@ public class Graph extends Resource {
      * @throws Exception
      */
     public Response updateGraph() throws Exception{
+    	if(this.graphJson == null) {
+    		throw new GraphException(ExceptionCode.BAD_REQUEST_FORMAT, ExceptionMessage.BAD_REQUEST_FORMAT_EXCEPTION,
+    				"Graph JSON is not set.");
+    	}
     	Map<String, Object> data = new HashMap<String, Object>();
     	int isPublic = this.isGraphPublic ? 1 : 0;
-    	if (getGraph(restClient, this.name, User.username) != null) {
+    	if (getGraph(restClient, this.name, restClient.getUser()) != null) {
     		data.put("name", this.name);
     		data.put("is_public", isPublic);
     		data.put("owner_email", this.ownerEmail);
-    		data.put("graph_json", this.json);
+    		data.put("graph_json", this.graphJson);
     		data.put("style_json", this.styleJson);
     		if (tags!=null && !tags.isEmpty()) {
     			data.put("tags[]", tags);
@@ -323,8 +372,23 @@ public class Graph extends Resource {
      * @return message received from GraphSpace
      * @throws Exception (Graph Not Found)
      */
-    public Response delete() throws Exception{
-    	String path = Config.GRAPHS_PATH + this.id;
+    public static Response deleteGraph(RestClient restClient, int graphId) throws Exception{
+    	String path = Config.GRAPHS_PATH + graphId;
+    	JSONObject response = restClient.delete(path);
+    	ParseResponse parseResponse = new ParseResponse(restClient, response);
+    	return parseResponse.getResponse();
+    }
+    
+    /**
+     * Delete an existing graph on GraphSpace 
+     * @param graphName(String) name of the graph to be deleted
+     * @return message received from GraphSpace
+     * @throws Exception (Graph Not Found)
+     */
+    public static Response deleteGraph(RestClient restClient, String graphName) throws Exception{
+    	String ownerEmail = restClient.getUser();
+    	Graph graph = Graph.getGraph(restClient, graphName, ownerEmail);
+    	String path = Config.GRAPHS_PATH + graph.getId();
     	JSONObject response = restClient.delete(path);
     	ParseResponse parseResponse = new ParseResponse(restClient, response);
     	return parseResponse.getResponse();

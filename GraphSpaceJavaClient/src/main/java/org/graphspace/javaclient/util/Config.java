@@ -1,4 +1,4 @@
-package util;
+package org.graphspace.javaclient.util;
 
 public class Config {
 	public static String VERSION = "v1";
@@ -19,7 +19,7 @@ public class Config {
 	}
 	
 	public static String getMembersPath(int groupId) {
-		return Config.GROUPS_PATH+groupId+"/members";
+		return String.format(Config.GROUPS_PATH + "%s/members/", groupId);
 	}
 	
 	public static String getMemberPath(int groupId, int memberId) {
@@ -31,6 +31,6 @@ public class Config {
 	}
 	
 	public static String getGroupGraphPath(int groupId, int graphId) {
-		return String.format(Config.GROUPS_PATH+"%s/graphs%", groupId, graphId);
+		return String.format(Config.GROUPS_PATH+"%s/graphs%s", groupId, graphId);
 	}
 }

@@ -31,7 +31,8 @@ public class TestConfig {
 	 */
 	public static int GET_MY_GROUPS_TOTAL = 2;
 	public static int GET_ALL_GROUPS_TOTAL = 2;
-	public static String GET_GROUP_NAME = "testgroup";
-	public static String POST_GROUP_NAME = "GraphSpaceJavaClientTestGroup";
+//	public static String GET_GROUP_NAME = "testgroup";
+	public static String GROUP_NAME = "GraphSpaceJavaClientTestGroup";
+	public static String MEMBER_EMAIL = "testuser@test.com";
 	
 }

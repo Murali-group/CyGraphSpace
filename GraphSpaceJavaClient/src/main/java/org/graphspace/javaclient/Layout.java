@@ -7,34 +7,53 @@ import java.util.Map;
 import org.graphspace.javaclient.exceptions.ExceptionCode;
 import org.graphspace.javaclient.exceptions.ExceptionMessage;
 import org.graphspace.javaclient.exceptions.LayoutException;
+import org.graphspace.javaclient.util.Config;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import util.Config;
-import util.ParseResponse;
-
 public class Layout extends Resource {
 	
+	private JSONObject styleJson;
 	private JSONObject positionsJson;
 	private boolean isGraphShared;
 	
 	public Layout(RestClient restClient) {
 		super(restClient);
+		this.isGraphShared = false;
 	}
 	
-	public Layout(RestClient restClient, JSONObject layoutJson) {
-		super(restClient);
+	public Layout(RestClient restClient, JSONObject json) {
+		super(restClient, json);
+		this.isGraphShared = false;
+		if (this.json.has("style_json")) {
+			String styleJsonString = json.getString("style_json");
+			this.styleJson = new JSONObject(styleJsonString);
+//			this.styleJson = json.getJSONObject("style_json");
+		}
+		if (this.json.has("positions_json")) {
+			String positionsJsonString = json.getString("positions_json");
+			this.positionsJson = new JSONObject(positionsJsonString);
+//			this.positionsJson = json.getJSONObject("positions_json");
+		}
 	}
 	
-	public Layout(RestClient restClient, JSONObject layoutJson, String layoutName, JSONObject positionsJson) {
+	public Layout(RestClient restClient, String layoutName, JSONObject styleJson, JSONObject positionsJson) {
 		super(restClient);
-		this.json = layoutJson;
 		this.name = layoutName;
 		this.positionsJson = positionsJson;
+		this.styleJson = styleJson;
 	}
 	
 	public void setPositionsJson(JSONObject positionsJson) {
 		this.positionsJson = positionsJson;
+	}
+	
+	public JSONObject getPositionsJson() {
+		return this.positionsJson;
+	}
+	
+	public JSONObject getStyleJson() {
+		return this.styleJson;
 	}
 	
 	/**
@@ -53,11 +72,10 @@ public class Layout extends Resource {
 	 * @throws Exception
 	 */
     public static Layout getGraphLayout(RestClient restClient, int graphId, int layoutId) throws Exception{
-		String ownerEmail = restClient.getUser();
     	String path = Config.getLayoutPath(graphId, layoutId);
-    	JSONObject response = restClient.get(path, null);
-    	ParseResponse parseResponse = new ParseResponse(restClient, response);
-    	return parseResponse.getLayouts().get(0);
+    	JSONObject jsonResponse = restClient.get(path, null);
+    	Response response = new Response(jsonResponse);
+    	return response.getLayout();
     }
     
     /**
@@ -69,12 +87,12 @@ public class Layout extends Resource {
 	 * @return layout JSON object, if layout with the given 'name' or 'layoutId' exists; otherwise null
 	 * @throws Exception
 	 */
-    public static Layout getGraphLayout(RestClient restClient, int graphId, int layoutId, String ownerEmail) throws Exception{
-    	String path = Config.getLayoutPath(graphId, layoutId);
-    	JSONObject response = restClient.get(path, null);
-    	ParseResponse parseResponse = new ParseResponse(restClient, response);
-    	return parseResponse.getLayouts().get(0);
-    }
+//    public static Layout getGraphLayout(RestClient restClient, int graphId, int layoutId, String ownerEmail) throws Exception{
+//    	String path = Config.getLayoutPath(graphId, layoutId);
+//    	JSONObject jsonResponse = restClient.get(path, null);
+//    	Response response = new Response(jsonResponse);
+//    	return response.getLayout();
+//    }
     
     /**
      * Get layouts created by the requesting user for the graph with given graphId.
@@ -91,9 +109,9 @@ public class Layout extends Resource {
     	query.put("offset", offset);
     	query.put("owner_email", restClient.getUser());
     	String path = Config.getLayoutsPath(graphId);
-    	JSONObject response = restClient.get(path, query);
-    	ParseResponse parseResponse = new ParseResponse(restClient, response);
-    	return parseResponse.getLayouts();
+    	JSONObject jsonResponse = restClient.get(path, query);
+    	Response response = new Response(jsonResponse);
+    	return response.getLayouts();
     }
 
     /**
@@ -112,9 +130,9 @@ public class Layout extends Resource {
     	query.put("is_shared", 1);
     	query.put("member_email", restClient.getUser());
     	String path = Config.getLayoutsPath(graphId);
-    	JSONObject response = restClient.get(path, query);
-    	ParseResponse parseResponse = new ParseResponse(restClient, response);
-    	return parseResponse.getLayouts();
+    	JSONObject jsonResponse = restClient.get(path, query);
+    	Response response = new Response(jsonResponse);
+    	return response.getLayouts();
     }
     
     /**
@@ -134,33 +152,32 @@ public class Layout extends Resource {
      * @return Saved layout on GraphSpace
      * @throws Exception
      */
-	public Response postGraphLayout(int graphId, boolean isGraphShared) throws Exception{
+	public String postGraphLayout(int graphId, boolean isGraphShared) throws Exception{
 
     	int isShared = (isGraphShared) ? 1 : 0;
     	Map<String, Object> data = new HashMap<String, Object>();
     	data.put("name", this.name);
     	data.put("graph_id", graphId);
     	data.put("is_shared", isShared);
-    	data.put("owner_email", this.restClient);
-    	if (positionsJson != null){
+    	data.put("owner_email", this.restClient.getUser());
+    	if (this.positionsJson != null){
     		data.put("positions_json", positionsJson);
     	}
     	else{
     		positionsJson = new JSONObject();
     		data.put("positions_json", positionsJson);
     	}
-    	if (this.json != null){
-    		data.put("style_json", this.json);
+    	if (this.styleJson != null){
+    		data.put("style_json", styleJson);
     	}
-    	else{
-    		this.json = new JSONObject();
-    		this.json.append("style", new JSONArray());
-    		data.put("style_json", this.json);
+    	else {
+    		throw new LayoutException(ExceptionCode.BAD_REQUEST_FORMAT, ExceptionMessage.BAD_REQUEST_FORMAT_EXCEPTION,
+    				"style.json can't be null");
     	}
     	String path = Config.getLayoutsPath(graphId);
-    	JSONObject response = restClient.post(path, data);
-    	ParseResponse parseResponse = new ParseResponse(restClient, response);
-    	return parseResponse.getResponse();
+    	JSONObject jsonResponse = restClient.post(path, data);
+    	Response response = new Response(jsonResponse);
+    	return response.getResponseStatus();
     }
 	
 	/**
@@ -175,7 +192,7 @@ public class Layout extends Resource {
 	 * @return Updated layout on GraphSpace
 	 * @throws Exception
 	 */
-    public Response updateGraphLayout(int graphId, int layoutId, boolean isGraphShared) throws Exception{
+    public String updateGraphLayout(int graphId, int layoutId, boolean isGraphShared) throws Exception{
     	
     	int isShared = (isGraphShared) ? 1 : 0;
     	Map<String, Object> data = new HashMap<String, Object>();
@@ -190,19 +207,18 @@ public class Layout extends Resource {
     		positionsJson = new JSONObject();
     		data.put("positions_json", positionsJson);
     	}
-    	if (this.json != null){
+    	if (this.styleJson != null){
     		data.put("style_json", this.json);
     	}
-    	else{
-    		this.json = new JSONObject();
-    		this.json.append("style", new JSONArray());
-    		data.put("style_json", this.json);
+    	else {
+    		throw new LayoutException(ExceptionCode.BAD_REQUEST_FORMAT, ExceptionMessage.BAD_REQUEST_FORMAT_EXCEPTION,
+    				"style.json can't be null");
     	}
 		
-		String path = Config.getLayoutPath(graphId, layoutId);
-		JSONObject response = restClient.put(path, data);
-    	ParseResponse parseResponse = new ParseResponse(restClient, response);
-    	return parseResponse.getResponse();
+    	String path = Config.getLayoutPath(graphId, layoutId);
+    	JSONObject jsonResponse = restClient.put(path, data);
+    	Response response = new Response(jsonResponse);
+    	return response.getResponseStatus();
     }
 
 
@@ -220,11 +236,11 @@ public class Layout extends Resource {
      * @return Success/Error Message from GraphSpace
      * @throws Exception
      */
-    public static Response deleteGraphLayout(RestClient restClient, int graphId, int layoutId) throws Exception{
+    public static String deleteGraphLayout(RestClient restClient, int graphId, int layoutId) throws Exception{
     	String path = Config.getLayoutPath(graphId, layoutId);
-    	JSONObject response = restClient.delete(path);
-    	ParseResponse parseResponse = new ParseResponse(restClient, response);
-    	return parseResponse.getResponse();
+    	JSONObject jsonResponse = restClient.delete(path);
+    	Response response = new Response(jsonResponse);
+    	return response.getResponseStatus();
     }
 
 }

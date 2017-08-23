@@ -7,13 +7,11 @@ public abstract class Resource {
 	protected String name;
 	protected String ownerEmail;
 	protected JSONObject json;
+	protected JSONObject responseBody;
 	protected RestClient restClient;
 	
 	public Resource (RestClient restClient) {
 		this.restClient = restClient;
-		if (this.json!=null) {
-			setAttrs();
-		}
 	}
 	
 	public Resource(RestClient restClient, JSONObject json) {

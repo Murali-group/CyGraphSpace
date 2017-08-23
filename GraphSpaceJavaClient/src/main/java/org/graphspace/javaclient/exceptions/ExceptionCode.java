@@ -5,4 +5,5 @@ public final class ExceptionCode{
 	public static final int BAD_REQUEST_FORMAT = 300;
 	public static final int LAYOUT_NOT_FOUND_EXCEPTION = 500;
 	public static final int GROUP_NOT_FOUND_EXCEPTION = 600;
+	public static final int MEMBER_NOT_FOUND_EXCEPTION = 700;
 }

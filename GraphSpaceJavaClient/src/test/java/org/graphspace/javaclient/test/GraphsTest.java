@@ -6,8 +6,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import org.apache.commons.io.IOUtils;
+import org.graphspace.javaclient.Graph;
 import org.graphspace.javaclient.GraphSpaceClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,6 +30,9 @@ public class GraphsTest {
 	private static String graphName;
 	private static JSONObject graphJson;
 	private static JSONObject styleJson;
+	private static int numberOfPublicGraphs;
+	private static int numberOfMyGraphs;
+	private static int numberOfSharedGraphs;
 	
 	@BeforeClass
 	public static void prepareTests() throws IOException {
@@ -37,7 +42,6 @@ public class GraphsTest {
 		graphFileName = TestConfig.POST_GRAPH_FILENAME;
 		styleFileName = TestConfig.POST_GRAPH_STYLE_FILENAME;
 		client = new GraphSpaceClient(host, username, password);
-		client.setProxy("proxy61.iitd.ernet.in", 3128);
 		ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 		File file = new File(classLoader.getResource(graphFileName).getFile());
 		InputStream is = new FileInputStream(file);
@@ -47,77 +51,64 @@ public class GraphsTest {
 		is = new FileInputStream(file);
 		String styleJsonText = IOUtils.toString(is);
 		styleJson = new JSONObject(styleJsonText);
-//		JSONArray styleJSONArray = new JSONArray(styleJsonText);
-//		styleJson = styleJSONArray.getJSONObject(0);
 		graphName = graphJson.getJSONObject("data").getString("name");
 	}
 	
 	@Test
-	public void a_postGraphTest() throws Exception{
+	public void a_getMyGraphsTest() throws Exception {
+		System.out.println("Running Test: getMyGraphs");
+		ArrayList<Graph> graphs = client.getMyGraphs(Integer.MAX_VALUE, 0);
+		numberOfMyGraphs = graphs.size();
+		System.out.println("Total Number of personal graphs initially: " + numberOfMyGraphs);
+	}
+	
+	@Test
+	public void b_getSharedGraphsTest() throws Exception {
+		System.out.println("Running Test: getSharedGraphs");
+		ArrayList<Graph> graphs = client.getSharedGraphs(Integer.MAX_VALUE, 0);
+		numberOfSharedGraphs = graphs.size();
+		System.out.println("Total Number of shared graphs initially: " + numberOfSharedGraphs);
+	}
+	
+	@Test
+	public void c_getPublicGraphsTest() throws Exception {
+		System.out.println("Running Test: getPublicGraphs");
+		ArrayList<Graph> graphs = client.getPublicGraphs(Integer.MAX_VALUE, 0);
+		numberOfPublicGraphs = graphs.size();
+		System.out.println("Total Number of public graphs initially: " + numberOfPublicGraphs);
+	}
+	
+	@Test
+	public void d_postGraphTest() throws Exception{
 		System.out.println("Running Test: postGraph");
-		System.out.println(client.postGraph(graphJson, styleJson, false, null).toString());
-//		JSONObject response = client.postGraph(graphJson, styleJson, false, null);
-//		assertEquals(201, response.getInt("status"));
+		System.out.println(client.postGraph(graphJson, styleJson, false, null));
 	}
 	
 	@Test
-	public void b_getGraphByNameTest() throws Exception {
+	public void e_getMyGraphsTest() throws Exception {
+		System.out.println("Running Test: getMyGraphs");
+		ArrayList<Graph> graphs = client.getMyGraphs(Integer.MAX_VALUE, 0);
+		int numberOfMyGraphsFinal = graphs.size();
+		System.out.println("Number of graphs after posting one graph: " + numberOfMyGraphsFinal);
+		assertEquals(numberOfMyGraphs+1, numberOfMyGraphsFinal);
+	}
+	
+	@Test
+	public void f_getGraphByNameTest() throws Exception {
 		System.out.println("Running Test: getGraphByName");
-		System.out.println(client.getGraph(graphName, username));
-//		String graphNameResponse = client.getGraphByName(graphName, username).getString("name");
-//		assertEquals(graphName, graphNameResponse);
+		System.out.println(client.getGraph(graphName, username).getGraphJson());
 	}
 	
 	@Test
-	public void c_getGraphByIdTest() throws Exception {
+	public void g_getGraphByIdTest() throws Exception {
 		System.out.println("Running Test: getGraphById");
 		int graphId = client.getGraph(graphName, username).getId();
-		System.out.println(client.getGraph(graphId));
-//		assertEquals(graphId, graphIdResponse);
+		System.out.println(client.getGraph(graphId).getGraphJson());
 	}
-	
-//	@Test
-//	public void d_getMyGraphsTest() throws Exception {
-//		System.out.println("Running Test: getMyGraphs");
-//		int totalMyGraphs = TestConfig.GET_MY_GRAPHS_TOTAL;
-//		JSONObject graphObject;
-//		graphObject = client.getMyGraphs(null, null, totalMyGraphs+20, 0);
-//		JSONObject body = graphObject.getJSONObject("body");
-//		JSONArray array = body.getJSONArray("array");
-//		int totalMyGraphsResponse = ((JSONObject) array.get(0)).getInt("total");
-//		assertEquals(totalMyGraphs+1, totalMyGraphsResponse);
-//	}
-//	
-//	@Test
-//	public void e_getSharedGraphsTest() throws Exception {
-//		System.out.println("Running Test: getSharedGraphs");
-//		int totalSharedGraphs = TestConfig.GET_SHARED_GRAPHS_TOTAL;
-//		JSONObject graphObject;
-//		graphObject = client.getSharedGraphs(null, null, totalSharedGraphs+20, 0);
-//		JSONObject body = graphObject.getJSONObject("body");
-//		JSONArray array = body.getJSONArray("array");
-//		int totalSharedGraphsResponse = ((JSONObject) array.get(0)).getInt("total");
-//		assertEquals(totalSharedGraphs, totalSharedGraphsResponse);
-//	}
-//	
-//	@Test
-//	public void f_getPublicGraphsTest() throws Exception {
-//		System.out.println("Running Test: getPublicGraphs");
-//		int totalPublicGraphs = TestConfig.GET_PUBLIC_GRAPHS_TOTAL;
-//		JSONObject graphObject;
-//		graphObject = client.getPublicGraphs(null, null, totalPublicGraphs+20, 0);
-//		JSONObject body = graphObject.getJSONObject("body");
-//		JSONArray array = body.getJSONArray("array");
-//		int totalPublicGraphsResponse = ((JSONObject) array.get(0)).getInt("total");
-//		assertEquals(totalPublicGraphs, totalPublicGraphsResponse);
-//	}
-	
-	
+		
 	@AfterClass
 	public static void deleteGraphTest() throws Exception {
 		System.out.println("Running Test: deleteGraph");
 		System.out.println(client.deleteGraph(graphName));
-//		JSONObject response = client.deleteGraph(null, graphName);
-//		assertEquals(200, response.getInt("status"));
 	}
 }

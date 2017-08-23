@@ -5,7 +5,10 @@ package org.graphspace.javaclient;
 
 import java.util.ArrayList;
 import org.graphspace.javaclient.util.Config;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 /**
  * This is the main class that exposes all the graph, layout and group methods to the user.
@@ -44,6 +47,17 @@ public class GraphSpaceClient {
     
     public RestClient getRestClient() {
     	return this.restClient;
+    }
+    
+    public boolean isAuthenticated() throws JSONException, UnirestException {
+    	int id = 21752;
+    	String path = Config.GRAPHS_PATH+id;
+    	if (restClient.get(path, null).getInt("status")!=401) {
+    		return true;
+    	}
+    	else {
+    		return false;
+    	}
     }
     
     /**

@@ -1,6 +1,7 @@
 package org.cytoscape.graphspace.cygraphspace.internal.gui;
 
 import java.awt.Component;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -31,9 +32,6 @@ import javax.swing.table.TableRowSorter;
 import org.apache.commons.io.IOUtils;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
-import org.cytoscape.graphspace.cygraphspace.internal.util.CyGraphSpaceClient;
-import org.cytoscape.graphspace.cygraphspace.internal.io.read.json.CustomCytoscapeJsNetworkReader;
-import org.cytoscape.graphspace.cygraphspace.internal.io.read.json.CustomCytoscapeJsNetworkReaderFactory;
 import org.cytoscape.io.webservice.NetworkImportWebServiceClient;
 import org.cytoscape.io.webservice.swing.AbstractWebServiceGUIClient;
 import org.cytoscape.model.CyNetwork;
@@ -43,7 +41,7 @@ import org.cytoscape.util.swing.OpenBrowser;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.TaskMonitor;
-import org.graphspace.javaclient.model.GSGraphMetaData;
+import org.graphspace.javaclient.Graph;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import javax.swing.GroupLayout;
@@ -60,11 +58,9 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			+ "<a href=\"http://www.grapshace.org\">GraphSpace</a> website. ";
 
 //	final TaskManager taskManager;
-	CyGraphSpaceClient client;
 	OpenBrowser openBrowser;
 	LoadNetworkFileTaskFactory loadNetworkFileTaskFactory;
 	LoadVizmapFileTaskFactory loadVizmapFileTaskFactory;
-	CustomCytoscapeJsNetworkReaderFactory cytoscapeJsNetworkReaderFactory;
 	TaskManager taskManager;
 	
 //	final JButton searchButton = new JButton(new ImageIcon(getClass().getResource("/search-icon.png")));
@@ -133,7 +129,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		this.openBrowser = openBrowser;
 		this.loadNetworkFileTaskFactory = CyObjectManager.INSTANCE.getLoadNetworkFileTaskFactory();
 		this.loadVizmapFileTaskFactory = CyObjectManager.INSTANCE.getLoadVizmapFileTaskFactory();
-		this.cytoscapeJsNetworkReaderFactory = CyObjectManager.INSTANCE.getCytoscapeJsNetworkReaderFactory();
 		parentPanel = new JPanel();
 		super.gui = parentPanel;
 		
@@ -623,7 +618,12 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		loginButton.setToolTipText("Log in to the server");
 		loginButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				loginActionPerformed(e);
+				try {
+					loginActionPerformed(e);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		GroupLayout gl_loginPanel = new GroupLayout(loginPanel);
@@ -715,7 +715,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		clearSearchButton.setEnabled(false);
 	}
 	
-	private void loginActionPerformed(ActionEvent evt){
+	private void loginActionPerformed(ActionEvent evt) throws Exception{
 		if (!this.loggedIn){
 			System.out.println("login performed");
 //			loginButton.setEnabled(false);
@@ -825,18 +825,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		return new TaskIterator();
 	}
 	
-//	public void populateTables() throws Exception{
-//		System.out.println("populate table action performed");
-//		myGraphsTableModel.setRowCount(0);
-//		sharedGraphsTableModel.setRowCount(0);
-//		publicGraphsTableModel.setRowCount(0);
-////		searchResultsTableModel.setRowCount(0);
-//		if (Server.INSTANCE.isAuthenticated()){
-//			populateMyGraphs(this.limit, this.myGraphsOffSet);
-//			populatePublicGraphs(this.limit, this.publicGraphsOffSet);			
-//		}
-//	}
-	
 	private void searchPerformed(){
 		clearSearchButton.setEnabled(true);
 		this.searchTerm = searchField.getText();
@@ -859,40 +847,40 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	            @Override
 	            protected Integer doInBackground() throws Exception{
 	            	{
-	            		ArrayList<GSGraphMetaData> myGraphsSearchResults = Server.INSTANCE.searchGraphs(searchTerm, true, false, false, limit, myGraphsOffSet);
-	        			ArrayList<GSGraphMetaData> sharedGraphsSearchResults = Server.INSTANCE.searchGraphs(searchTerm, false, true, false, limit, sharedGraphsOffSet);
-	        			ArrayList<GSGraphMetaData> publicGraphsSearchResults = Server.INSTANCE.searchGraphs(searchTerm, false, false, true, limit, publicGraphsOffSet);
-	        			for (GSGraphMetaData gsGraphMetaData : myGraphsSearchResults){
+	            		ArrayList<Graph> myGraphsSearchResults = Server.INSTANCE.searchMyGraphs(searchTerm, limit, myGraphsOffSet);
+	        			ArrayList<Graph> sharedGraphsSearchResults = Server.INSTANCE.searchSharedGraphs(searchTerm, limit, sharedGraphsOffSet);
+	        			ArrayList<Graph> publicGraphsSearchResults = Server.INSTANCE.searchPublicGraphs(searchTerm, limit, publicGraphsOffSet);
+	        			for (Graph graph : myGraphsSearchResults){
 	        				String tags = "";
-	        				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
-	        					tags += gsGraphMetaData.getTags().get(i)+", ";
+	        				for (int i=0; i<graph.getTags().size(); i++){
+	        					tags += graph.getTags().get(i)+", ";
 	        				}
 	        				if(tags.length()>0){
 	        					tags = tags.substring(0, tags.length()-2);
 	        				}
-	        				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
+	        				Object[] row = {String.valueOf(graph.getId()), graph.getName(), graph.getOwner(), tags};
 	        				myGraphsTableModel.addRow(row);
 	        			}
-	        			for (GSGraphMetaData gsGraphMetaData : sharedGraphsSearchResults){
+	        			for (Graph graph : sharedGraphsSearchResults){
 	        				String tags = "";
-	        				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
-	        					tags += gsGraphMetaData.getTags().get(i)+", ";
+	        				for (int i=0; i<graph.getTags().size(); i++){
+	        					tags += graph.getTags().get(i)+", ";
 	        				}
 	        				if(tags.length()>0){
 	        					tags = tags.substring(0, tags.length()-2);
 	        				}
-	        				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
+	        				Object[] row = {String.valueOf(graph.getId()), graph.getName(), graph.getOwner(), tags};
 	        				sharedGraphsTableModel.addRow(row);
 	        			}
-	        			for (GSGraphMetaData gsGraphMetaData : publicGraphsSearchResults){
+	        			for (Graph graph : publicGraphsSearchResults){
 	        				String tags = "";
-	        				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
-	        					tags += gsGraphMetaData.getTags().get(i)+", ";
+	        				for (int i=0; i<graph.getTags().size(); i++){
+	        					tags += graph.getTags().get(i)+", ";
 	        				}
 	        				if(tags.length()>0){
 	        					tags = tags.substring(0, tags.length()-2);
 	        				}
-	        				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
+	        				Object[] row = {String.valueOf(graph.getId()), graph.getName(), graph.getOwner(), tags};
 	        				publicGraphsTableModel.addRow(row);
 	        			}
 	        			myGraphsScrollPane.setViewportView(myGraphsTable);
@@ -912,34 +900,35 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			e.printStackTrace();
 		}
 	}
+	
 	private void populateMyGraphs(String searchTerm, int limit, int offset) throws Exception{
 		if (searchTerm == null){
 			myGraphsTableModel.setRowCount(0);
-			ArrayList<GSGraphMetaData> myGraphsMetaDataList = CyGraphSpaceClient.getGraphMetaDataList(true, false, false, limit, offset);
-			for (GSGraphMetaData gsGraphMetaData : myGraphsMetaDataList){
+			ArrayList<Graph> myGraphs = Server.INSTANCE.getMyGraphs(limit, offset);
+			for (Graph graph : myGraphs){
 				String tags = "";
-				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
-					tags += gsGraphMetaData.getTags().get(i)+", ";
+				for (int i=0; i<graph.getTags().size(); i++){
+					tags += graph.getTags().get(i)+", ";
 				}
 				if(tags.length()>0){
 					tags = tags.substring(0, tags.length()-2);
 				}
-				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
+				Object[] row = {String.valueOf(graph.getId()), graph.getName(), graph.getOwner(), tags};
 				myGraphsTableModel.addRow(row);
 			}
 		}
 		else{
 			myGraphsTableModel.setRowCount(0);
-			ArrayList<GSGraphMetaData> myGraphsSearchResults = Server.INSTANCE.searchGraphs(searchTerm, true, false, false, limit, offset);
-			for (GSGraphMetaData gsGraphMetaData : myGraphsSearchResults){
+			ArrayList<Graph> myGraphsSearchResults = Server.INSTANCE.searchMyGraphs(searchTerm, limit, offset);
+			for (Graph graph : myGraphsSearchResults){
 				String tags = "";
-				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
-					tags += gsGraphMetaData.getTags().get(i)+", ";
+				for (int i=0; i<graph.getTags().size(); i++){
+					tags += graph.getTags().get(i)+", ";
 				}
 				if(tags.length()>0){
 					tags = tags.substring(0, tags.length()-2);
 				}
-				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
+				Object[] row = {String.valueOf(graph.getId()), graph.getName(), graph.getOwner(), tags};
 				myGraphsTableModel.addRow(row);
 			}
 		}
@@ -949,32 +938,32 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		if(searchTerm==null){
 			System.out.println("populate public graphs table action performed");
 			publicGraphsTableModel.setRowCount(0);
-			ArrayList<GSGraphMetaData> publicGraphsMetaDataList = CyGraphSpaceClient.getGraphMetaDataList(false, false, true, limit, offset);
-			for (GSGraphMetaData gsGraphMetaData : publicGraphsMetaDataList){
+			ArrayList<Graph> publicGraphs = Server.INSTANCE.getPublicGraphs(limit, offset);
+			for (Graph graph : publicGraphs){
 				String tags = "";
-				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
-					tags += gsGraphMetaData.getTags().get(i)+", ";
+				for (int i=0; i<graph.getTags().size(); i++){
+					tags += graph.getTags().get(i)+", ";
 				}
 				if(tags.length()>0){
 					tags = tags.substring(0, tags.length()-2);
 				}
-				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
+				Object[] row = {String.valueOf(graph.getId()), graph.getName(), graph.getOwner(), tags};
 				publicGraphsTableModel.addRow(row);
 			}
 		}
 		else{
 			System.out.println("populate public graphs table action performed");
 			publicGraphsTableModel.setRowCount(0);
-			ArrayList<GSGraphMetaData> publicGraphsSearchResults = CyGraphSpaceClient.searchGraphs(searchTerm, false, false, true, limit, offset);
-			for (GSGraphMetaData gsGraphMetaData : publicGraphsSearchResults){
+			ArrayList<Graph> publicGraphsSearchResults = Server.INSTANCE.searchPublicGraphs(searchTerm, limit, offset);
+			for (Graph graph : publicGraphsSearchResults){
 				String tags = "";
-				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
-					tags += gsGraphMetaData.getTags().get(i)+", ";
+				for (int i=0; i<graph.getTags().size(); i++){
+					tags += graph.getTags().get(i)+", ";
 				}
 				if(tags.length()>0){
 					tags = tags.substring(0, tags.length()-2);
 				}
-				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
+				Object[] row = {String.valueOf(graph.getId()), graph.getName(), graph.getOwner(), tags};
 				publicGraphsTableModel.addRow(row);
 			}
 		}
@@ -984,32 +973,32 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		if(searchTerm==null){
 			System.out.println("populate shared graphs table action performed");
 			sharedGraphsTableModel.setRowCount(0);
-			ArrayList<GSGraphMetaData> sharedGraphsMetaDataList = CyGraphSpaceClient.getGraphMetaDataList(false, true, false, limit, offset);
-			for (GSGraphMetaData gsGraphMetaData : sharedGraphsMetaDataList){
+			ArrayList<Graph> sharedGraphs = Server.INSTANCE.getSharedGraphs(limit, offset);
+			for (Graph graph : sharedGraphs){
 				String tags = "";
-				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
-					tags += gsGraphMetaData.getTags().get(i)+", ";
+				for (int i=0; i<graph.getTags().size(); i++){
+					tags += graph.getTags().get(i)+", ";
 				}
 				if(tags.length()>0){
 					tags = tags.substring(0, tags.length()-2);
 				}
-				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
+				Object[] row = {String.valueOf(graph.getId()), graph.getName(), graph.getOwner(), tags};
 				sharedGraphsTableModel.addRow(row);
 			}
 		}
 		else{
 			System.out.println("populate shared graphs table action performed");
 			sharedGraphsTableModel.setRowCount(0);
-			ArrayList<GSGraphMetaData> sharedGraphsSearchResults = Server.INSTANCE.searchGraphs(searchTerm, false, true, false, limit, offset);
-			for (GSGraphMetaData gsGraphMetaData : sharedGraphsSearchResults){
+			ArrayList<Graph> sharedGraphsSearchResults = Server.INSTANCE.searchSharedGraphs(searchTerm, limit, offset);
+			for (Graph graph : sharedGraphsSearchResults){
 				String tags = "";
-				for (int i=0; i<gsGraphMetaData.getTags().size(); i++){
-					tags += gsGraphMetaData.getTags().get(i)+", ";
+				for (int i=0; i<graph.getTags().size(); i++){
+					tags += graph.getTags().get(i)+", ";
 				}
 				if(tags.length()>0){
 					tags = tags.substring(0, tags.length()-2);
 				}
-				Object[] row = {String.valueOf(gsGraphMetaData.getId()), gsGraphMetaData.getName(), gsGraphMetaData.getOwner(), tags};
+				Object[] row = {String.valueOf(graph.getId()), graph.getName(), graph.getOwner(), tags};
 				sharedGraphsTableModel.addRow(row);
 			}
 		}
@@ -1019,8 +1008,8 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		System.out.println("get graph action performed");
 		try {
 			int id = Integer.valueOf(graphId);
-			JSONObject graphJSON = CyGraphSpaceClient.getGraphById(id).getJSONObject("body").getJSONObject("object").getJSONObject("graph_json");
-			JSONArray styleJSON = CyGraphSpaceClient.getGraphById(id).getJSONObject("body").getJSONObject("object").getJSONObject("style_json").getJSONArray("style");
+			JSONObject graphJSON = Server.INSTANCE.getGraphById(id).getGraphJson();
+			JSONObject styleJSON = Server.INSTANCE.getGraphById(id).getStyleJson();
 			String graphJSONString = graphJSON.toString();
 			String styleJSONString = styleJSON.toString();
 			InputStream graphJSONInputStream = new ByteArrayInputStream(graphJSONString.getBytes());
@@ -1029,71 +1018,11 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			try (FileOutputStream out = new FileOutputStream(tempFile)) {
 	            IOUtils.copy(graphJSONInputStream, out);
 	        }
-//			String styleJSONStringTest = IOUtils.toString(styleJSONInputStream, "UTF-8");
-//			System.out.println("style JSON: ===========" + styleJSONStringTest);
-//			String graphJSONStringTest = FileUtils.readFileToString(tempFile, "UTF-8");
-//			int count = 0;
-//			while(graphJSONString.isEmpty()){
-//				try {
-//					Thread.sleep(1000);
-//				} catch (InterruptedException ex) {
-//					// TODO Auto-generated catch block
-//					ex.printStackTrace();
-//				}
-//				graphJSONStringTest = FileUtils.readFileToString(tempFile, "UTF-8");
-//				count++;
-//				if (count>=10){
-//					return;
-//				}
-//			}
+
 			TaskIterator ti = loadNetworkFileTaskFactory.createTaskIterator(tempFile);
 			CyObjectManager.INSTANCE.getTaskManager().execute(ti);
 			tempFile.delete();
 			
-			System.out.println("11");
-			CustomCytoscapeJsNetworkReader reader = new CustomCytoscapeJsNetworkReader(null, styleJSONInputStream,
-					CyObjectManager.INSTANCE.getApplicationManager(), CyObjectManager.INSTANCE.getCyNetworkFactory(),
-					CyObjectManager.INSTANCE.getCyNetworkManager(), CyObjectManager.INSTANCE.getRootCyNetworkManager());
-			reader.run(null);
-			System.out.print("12");
-			styleJSONInputStream.close();
-			reader.getNetworks();
-			CyNetwork styleNetwork = reader.getNetworks()[0];
-			reader.buildCyNetworkView(styleNetwork);
-//			System.out.println("styleJSONInputStream.available():  "+styleJSONInputStream.available());
-//			String styleJSONStringTest = IOUtils.toString(styleJSONInputStream, "UTF-8");
-//			int count = 0;
-//			while(styleJSONStringTest.isEmpty()) {
-//				try {
-//					Thread.sleep(1000);
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				System.out.println("style JSON 2: ===========" + styleJSONStringTest);
-//				count ++;
-//				styleJSONStringTest = IOUtils.toString(styleJSONInputStream, "UTF-8");
-//				if (count==10) {
-//					return;
-//				}
-//			}
-//			System.out.println("style JSON 2: ===========" + styleJSONStringTest);
-//			ti.append(cytoscapeJsNetworkReaderFactory.createTaskIterator(styleJSONInputStream, collectionName));
-			
-//			ti.append(cytoscapeJsNetworkReaderFactory.createTaskIterator(styleJSONInputStream, null));
-//			System.out.println("12");
-//			CyObjectManager.INSTANCE.getTaskManager().execute(ti);
-//			System.out.println("13");
-//			Thread.sleep(10000);
-//			importStyleJson(styleJSONInputStream, null);
-//			tempFile = File.createTempFile("CyGraphSpaceStyleImport", ".json");
-//			try (FileOutputStream out = new FileOutputStream(tempFile)) {
-//	            IOUtils.copy(styleJSONInputStream, out);
-//	        }
-//			ti = loadVizmapFileTaskFactory.createTaskIterator(tempFile);
-//			CyObjectManager.INSTANCE.getTaskManager().execute(ti);
-////			System.out.println(str);
-//			tempFile.delete();
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog((Component)e.getSource(), "Could not get graph", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1113,7 +1042,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		System.out.println("get graph action performed");
 		try {
 			int id = Integer.valueOf(graphId);
-			JSONObject graphJSON = CyGraphSpaceClient.getGraphById(id).getJSONObject("body").getJSONObject("object").getJSONObject("graph_json");
+			JSONObject graphJSON = Server.INSTANCE.getGraphById(id).getGraphJson();
 			String str = graphJSON.toString();
 			InputStream is = new ByteArrayInputStream(str.getBytes());
 			File tempFile = File.createTempFile("CyGraphSpaceImport", ".cyjs");
@@ -1346,37 +1275,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	    }
 	}
 	
-	public void importStyleJson(InputStream styleJSONInputStream, String collectionName) throws IOException {
-//		File tempFile = File.createTempFile("CyGraphSpaceStyleImport", ".json");
-//		try (FileOutputStream out = new FileOutputStream(tempFile)) {
-//            IOUtils.copy(styleJSONInputStream, out);
-//        }
-		System.out.println("11");
-		System.out.println("styleJSONInputStream.available():  "+styleJSONInputStream.available());
-		String styleJSONStringTest = IOUtils.toString(styleJSONInputStream, "UTF-8");
-		int count = 0;
-		while(styleJSONStringTest.isEmpty()) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			System.out.println("style JSON 2: ===========" + styleJSONStringTest);
-			count ++;
-			styleJSONStringTest = IOUtils.toString(styleJSONInputStream, "UTF-8");
-			if (count==10) {
-				return;
-			}
-		}
-		System.out.println("style JSON 2: ===========" + styleJSONStringTest);
-//		ti.append(cytoscapeJsNetworkReaderFactory.createTaskIterator(styleJSONInputStream, collectionName));
-		TaskIterator ti = cytoscapeJsNetworkReaderFactory.createTaskIterator(styleJSONInputStream, collectionName);
-		System.out.println("12");
-		CyObjectManager.INSTANCE.getTaskManager().execute(ti);
-		System.out.println("13");
-//		tempFile.delete();
-	}
 //	private static void setWidthAsPercentages(JTable table,
 //	        double... percentages) {
 //	    final double factor = 10000;

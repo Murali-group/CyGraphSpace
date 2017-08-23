@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.cytoscape.graphspace</groupId>
     <artifactId>CyGraphSpace</artifactId>
-    <version>0.0.1</version>
+    <version>1.0.0</version>
 
     <name>CyGraphSpace</name>
 
@@ -97,7 +97,7 @@
 			            <id>install-external</id>
 			            <phase>clean</phase>
 			            <configuration>
-			                <file>${basedir}/lib/GraphSpaceJavaClient-0.0.1.jar</file>
+			                <file>${basedir}/lib/GraphSpaceJavaClient-1.0.0.jar</file>
 			                <repositoryLayout>default</repositoryLayout>
 			                <groupId>org.graphspace</groupId>
 			                <artifactId>javaclient</artifactId>
@@ -252,8 +252,8 @@
 		</dependency>
 		<dependency>
 		    <groupId>org.graphspace</groupId>
-		    <artifactId>javaclient</artifactId>
-		    <version>0.0.1</version>
+		    <artifactId>GraphSpaceJavaClient</artifactId>
+		    <version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.mashape.unirest</groupId>

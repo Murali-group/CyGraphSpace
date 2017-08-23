@@ -13,6 +13,7 @@ import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.work.TaskIterator;
+import org.graphspace.javaclient.Graph;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.AuthenticationDialog;
@@ -20,35 +21,22 @@ import org.cytoscape.graphspace.cygraphspace.internal.gui.PostGraphDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.UpdateGraphDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
-import org.cytoscape.graphspace.cygraphspace.internal.util.CyGraphSpaceClient;
 
 import javax.swing.*;
 
-/**
- *
- * @author David Welker
- * Creates a new menu item in the Apps|NDex menu to upload an Cytoscape network to the current NDEx server.
- */
-public class PostGraphMenuAction extends AbstractCyAction
-{
+public class PostGraphMenuAction extends AbstractCyAction {
     /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private JFrame loadingFrame;
-	public PostGraphMenuAction(String menuTitle, CyApplicationManager applicationManager)
-    {
+	public PostGraphMenuAction(String menuTitle, CyApplicationManager applicationManager) {
         super(menuTitle, applicationManager, null, null);
-        // We want this menu item to appear under the App|NDEx menu. The actual name of the menu item is set in
-        // org.cytoscape.ndex.internal.CyActivator as "Upload Network"
+        // We want this menu item to appear under the File|Export menu.
         setPreferredMenu("File.Export");
     }
 
     @Override
-    /**
-     * This method displays the upload network dialog.
-     * It is called when the menu item is selected.  
-     */
     public void actionPerformed(ActionEvent e)
     {
         JFrame parent = CyObjectManager.INSTANCE.getApplicationFrame();
@@ -58,8 +46,6 @@ public class PostGraphMenuAction extends AbstractCyAction
         JFrame loadingFrame = new JFrame("Checking if update Possible");
 		ImageIcon loading = new ImageIcon(this.getClass().getClassLoader().getResource("loading.gif"));
 		JLabel loadingLabel = new JLabel("", loading, JLabel.CENTER);
-//		loadingLabel.setHorizontalTextPosition(JLabel.CENTER);
-//		loadingLabel.setVerticalTextPosition(JLabel.BOTTOM);
 		loadingFrame.add(loadingLabel);
 	    loadingFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		loadingFrame.setSize(400, 300);
@@ -107,11 +93,12 @@ public class PostGraphMenuAction extends AbstractCyAction
 		boolean isGraphPublic = false;
 		if(Server.INSTANCE.updatePossible(graphName)){
 			loadingFrame.dispose();
-			JSONObject responseFromGraphSpace = CyGraphSpaceClient.getGraphByName(graphName);
-			int isPublic = responseFromGraphSpace.getInt("is_public");
-			if (isPublic==1){
-				isGraphPublic = true;
-			}
+			Graph graph = Server.INSTANCE.getGraphByName(graphName);
+			isGraphPublic = graph.isPublic();
+//			int isPublic = responseFromGraphSpace.getInt("is_public");
+//			if (isPublic==1){
+//				isGraphPublic = true;
+//			}
 			UpdateGraphDialog updateDialog = new UpdateGraphDialog(parent, graphName, graphJSON, styleJSON, isGraphPublic, null);
 			updateDialog.setLocationRelativeTo(parent);
 			updateDialog.setVisible(true);

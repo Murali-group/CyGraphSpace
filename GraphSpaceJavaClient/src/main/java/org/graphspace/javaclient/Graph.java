@@ -62,6 +62,14 @@ public class Graph extends Resource {
 			System.out.println(tag + "not found");
 		}
 	}
+	
+	public ArrayList<String> getTags(){
+		return this.tags;
+	}
+	
+	public boolean isPublic() {
+		return this.isGraphPublic;
+	}
 	/**
      * Get a graph with the graphId
      * 

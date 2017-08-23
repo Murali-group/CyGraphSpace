@@ -16,7 +16,6 @@ import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.work.TaskIterator;
-import org.graphspace.javaclient.model.GSGroupMetaData;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -214,7 +213,7 @@ public class PostGraphDialog extends JDialog {
 //	}
 	
 	private void postGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
-		System.out.println(Server.INSTANCE.postGraph(graphJSON, styleJSON, isGraphPublic, tagsList).toString());
+		Server.INSTANCE.postGraph(graphJSON, styleJSON, isGraphPublic, tagsList);
 	}
 	
 	

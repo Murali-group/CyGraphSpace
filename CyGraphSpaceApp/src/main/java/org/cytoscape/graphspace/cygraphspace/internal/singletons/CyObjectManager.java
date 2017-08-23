@@ -59,7 +59,6 @@ import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyleFactory;
 import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.swing.DialogTaskManager;
-import org.cytoscape.graphspace.cygraphspace.internal.io.read.json.CustomCytoscapeJsNetworkReaderFactory;
 
 public enum CyObjectManager {
     INSTANCE;
@@ -80,7 +79,6 @@ public enum CyObjectManager {
 	private CySwingApplication desktop;
 	private LoadVizmapFileTaskFactory loadVizmapFileTaskFactory;
 	private ExportVizmapTaskFactory exportVizmapTaskFactory;
-	private CustomCytoscapeJsNetworkReaderFactory cytoscapeJsNetworkReaderFactory;
     private CyNetworkFactory cyNetworkFactory;
 	private CyNetworkManager cyNetworkManager;
 	private CyRootNetworkManager cyRootNetworkManager;
@@ -109,14 +107,6 @@ public enum CyObjectManager {
 	}
 	public CyRootNetworkManager getRootCyNetworkManager() {
 		return this.cyRootNetworkManager;
-	}
-	
-	public void setCytoscapeJsNetworkReaderFactory(CustomCytoscapeJsNetworkReaderFactory cytoscapeJsNetworkReaderFactory) {
-		this.cytoscapeJsNetworkReaderFactory = cytoscapeJsNetworkReaderFactory;
-	}
-	
-	public CustomCytoscapeJsNetworkReaderFactory getCytoscapeJsNetworkReaderFactory() {
-		return this.cytoscapeJsNetworkReaderFactory;
 	}
 	
     public File getConfigDir()

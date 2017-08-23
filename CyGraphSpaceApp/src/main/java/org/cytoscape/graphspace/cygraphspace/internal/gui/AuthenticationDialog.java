@@ -149,12 +149,7 @@ public class AuthenticationDialog extends JDialog {
     }
 	
 	private void populateFields(){
-		if (Server.INSTANCE.getHost()==null){
-			hostField.setText("www.graphspace.org");
-		}
-		else{
-			hostField.setText(Server.INSTANCE.getHost());
-		}
+		hostField.setText(Server.INSTANCE.getHost());
 		if (Server.INSTANCE.getUsername()!=null){
 			usernameField.setText(Server.INSTANCE.getUsername());
 		}

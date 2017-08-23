@@ -1,4 +1,4 @@
-package org.cytoscape.graphspace.cygraphspace.internal.io.write.json.serializer;
+package org.cytoscape.graphspace.cygraphspace.internal.util.Json2VisConvertor;
 
 
 /**
@@ -65,6 +65,7 @@ public enum CytoscapeJsToken {
 	////////////////// Visual Style Tags////////////////////
 	COLOR("color"), // The color of the element's label.
 	CONTENT("content"), //The text to display for an element's label.
+	LABEL("label"),
 	CURSOR("cursor"), // The CSS cursor shown when the cursor is over top the element.
 	FONT_FAMILY("font-family"), // A comma-separated list of font names to use on the label text.
 	FONT_SIZE("font-size"), // The size of the label text.
@@ -91,7 +92,6 @@ public enum CytoscapeJsToken {
 	SHAPE("shape"), // The shape of the node's body; may be rectangle, roundrectangle, ellipse, or triangle.
 	TEXT_HALIGN("text-halign"), // The vertical alignment of a label; may have value left, center, or right.
 	TEXT_VALIGN("text-valign"), // The vertical alignment of a label; may have value top, center, or bottom.
-
 
 	/////////////////// For edges ///////////////////////
 	LINE_COLOR("line-color"), // The color of the edge's line.

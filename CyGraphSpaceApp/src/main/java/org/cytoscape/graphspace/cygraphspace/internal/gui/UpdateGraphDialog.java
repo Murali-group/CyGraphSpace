@@ -16,7 +16,6 @@ import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.work.TaskIterator;
-import org.graphspace.javaclient.model.GSGroupMetaData;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

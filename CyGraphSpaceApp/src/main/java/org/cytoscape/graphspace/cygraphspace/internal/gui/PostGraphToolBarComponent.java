@@ -27,9 +27,9 @@ import org.cytoscape.application.swing.CyAction;
 import org.cytoscape.application.swing.ToolBarComponent;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
-import org.cytoscape.graphspace.cygraphspace.internal.util.CyGraphSpaceClient;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.work.TaskIterator;
+import org.graphspace.javaclient.Graph;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.apache.commons.io.FileUtils;
@@ -115,11 +115,12 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 		boolean isGraphPublic = false;
 		if(Server.INSTANCE.updatePossible(graphName)){
 			loadingFrame.dispose();
-			JSONObject responseFromGraphSpace = CyGraphSpaceClient.getGraphByName(graphName);
-			int isPublic = responseFromGraphSpace.getInt("is_public");
-			if (isPublic==1){
-				isGraphPublic = true;
-			}
+			Graph graph = Server.INSTANCE.getGraphByName(graphName);
+			isGraphPublic = graph.isPublic();
+//			int isPublic = responseFromGraphSpace.getInt("is_public");
+//			if (isPublic==1){
+//				isGraphPublic = true;
+//			}
 			UpdateGraphDialog updateDialog = new UpdateGraphDialog(parent, graphName, graphJSON, styleJSON, isGraphPublic, null);
 			updateDialog.setLocationRelativeTo(parent);
 			updateDialog.setVisible(true);

@@ -13,7 +13,7 @@ import org.graphspace.javaclient.util.Config;
 import org.json.JSONObject;
 
 /**
- * This class defines Graph Object and corresponding methods (extends {@link org.graphspace.javaclient#Resource})
+ * This class defines Graph Object and corresponding methods (extends {@link org.graphspace.javaclient.Resource})
  * @author rishabh
  *
  */

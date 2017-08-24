@@ -4,39 +4,58 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+//internal imports
 import org.graphspace.javaclient.exceptions.ExceptionCode;
 import org.graphspace.javaclient.exceptions.ExceptionMessage;
 import org.graphspace.javaclient.exceptions.LayoutException;
 import org.graphspace.javaclient.util.Config;
-import org.json.JSONArray;
+
 import org.json.JSONObject;
 
+/**
+ * This class defines Layout Object and corresponding methods (extends {@link org.graphspace.javaclient#Resource})
+ * @author rishabh
+ *
+ */
 public class Layout extends Resource {
 	
 	private JSONObject styleJson;
 	private JSONObject positionsJson;
 	private boolean isGraphShared;
 	
+	/**
+	 * Constructor for Layout object
+	 * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+	 */
 	public Layout(RestClient restClient) {
 		super(restClient);
 		this.isGraphShared = false;
 	}
 	
+	/**
+	 * Constructor for Layout object
+	 * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+	 * @param json(JSONObject) response body retrieved from GraphSpace
+	 */
 	public Layout(RestClient restClient, JSONObject json) {
 		super(restClient, json);
 		this.isGraphShared = false;
 		if (this.json.has("style_json")) {
 			String styleJsonString = json.getString("style_json");
 			this.styleJson = new JSONObject(styleJsonString);
-//			this.styleJson = json.getJSONObject("style_json");
 		}
 		if (this.json.has("positions_json")) {
 			String positionsJsonString = json.getString("positions_json");
 			this.positionsJson = new JSONObject(positionsJsonString);
-//			this.positionsJson = json.getJSONObject("positions_json");
 		}
 	}
-	
+	/**
+	 * Constructor for Layout Object
+	 * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+	 * @param layoutName(String) name of the layout to be exported to graphspace
+	 * @param styleJson(JSONObject) style json to be exported
+	 * @param positionsJson(JSONObject) positions json to be exported
+	 */
 	public Layout(RestClient restClient, String layoutName, JSONObject styleJson, JSONObject positionsJson) {
 		super(restClient);
 		this.name = layoutName;
@@ -44,14 +63,34 @@ public class Layout extends Resource {
 		this.styleJson = styleJson;
 	}
 	
+	/**
+	 * set style json for Layout object
+	 * @param styleJson(JSONObject) style json defining style for various elements of a graph
+	 */
+	public void setStyleJson(JSONObject styleJson) {
+		this.styleJson = styleJson;
+	}
+	
+	/**
+	 * set positions json for Layout object
+	 * @param positionsJson(JSONObject) positions json defining positions of nodes
+	 */
 	public void setPositionsJson(JSONObject positionsJson) {
 		this.positionsJson = positionsJson;
 	}
 	
+	/**
+	 * get positions json for layout
+	 * @return the positions json for the Layout object
+	 */
 	public JSONObject getPositionsJson() {
 		return this.positionsJson;
 	}
 	
+	/**
+	 * get style json for layout
+	 * @return the style json for the Layout object
+	 */
 	public JSONObject getStyleJson() {
 		return this.styleJson;
 	}
@@ -63,12 +102,11 @@ public class Layout extends Resource {
      */
 	
 	/**
-	 * Get a layout with given layoutId or name for the graph with given graphId.
-	 * 
-	 * @param graphId(int) ID of the graph
-	 * @param layoutId(int) ID of the layout
-	 * @param ownerEmail(String) Email of owner of layout
-	 * @return layout JSON object, if layout with the given 'name' or 'layoutId' exists; otherwise null
+	 * Retrieve layout with layoutId for a graph with graphId
+	 * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+	 * @param graphId(int) id of the graph on GraphSpace
+	 * @param layoutId(int) id of the layouts on GraphSpace
+	 * @return Layout object returned from GraphSpace
 	 * @throws Exception
 	 */
     public static Layout getGraphLayout(RestClient restClient, int graphId, int layoutId) throws Exception{
@@ -79,28 +117,12 @@ public class Layout extends Resource {
     }
     
     /**
-	 * Get a layout with given layoutId or name for the graph with given graphId.
-	 * 
-	 * @param graphId(int) ID of the graph
-	 * @param layoutId(int) ID of the layout
-	 * @param ownerEmail(String) Email of owner of layout
-	 * @return layout JSON object, if layout with the given 'name' or 'layoutId' exists; otherwise null
-	 * @throws Exception
-	 */
-//    public static Layout getGraphLayout(RestClient restClient, int graphId, int layoutId, String ownerEmail) throws Exception{
-//    	String path = Config.getLayoutPath(graphId, layoutId);
-//    	JSONObject jsonResponse = restClient.get(path, null);
-//    	Response response = new Response(jsonResponse);
-//    	return response.getLayout();
-//    }
-    
-    /**
-     * Get layouts created by the requesting user for the graph with given graphId.
-     * 
-     * @param graphId(int) ID of the graph
-     * @param limit(int) Number of entities to return.
-     * @param offset(int) Offset the list of returned entities by this number.
-     * @return List of layouts owned by the user for graph with graphId
+     * Retrieve list of all private layouts for a graph with graphId
+     * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+     * @param graphId(int) id of the graph on GraphSpace
+     * @param limit(int) number of entities to return
+     * @param offset(int) Offset the list of returned entities by this number
+     * @return ArrayList of layouts for a graph
      * @throws Exception
      */
     public static ArrayList<Layout> getMyGraphLayouts(RestClient restClient, int graphId, int limit, int offset) throws Exception{
@@ -115,12 +137,12 @@ public class Layout extends Resource {
     }
 
     /**
-     * Get layouts shared with the requesting user for the graph with given graphId
-     * 
-     * @param graphId(int) ID of the graph
-     * @param limit(int) Number of entities to return.
-     * @param offset(int) Offset the list of returned entities by this number.
-     * @return List of layouts owned by the user for graph with graphId
+     * Retrieve list of all shared layouts for a graph with graphId
+     * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+     * @param graphId(int) id of the graph on GraphSpace
+     * @param limit(int) number of entities to return
+     * @param offset(int) Offset the list of returned entities by this number
+     * @return ArrayList of layouts for a graph
      * @throws Exception
      */
     public static ArrayList<Layout> getSharedGraphLayouts(RestClient restClient, int graphId, int limit, int offset) throws Exception{
@@ -143,13 +165,9 @@ public class Layout extends Resource {
     
     /**
      * Export a layout for the graph with given graphId
-     * 
      * @param graphId(int) id of the graph
-     * @param layoutName(String) name of layout
-     * @param positionsJSON(JSONObject) positions JSON Object
-     * @param styleJSON(JSONObject) JSONObject containing style
      * @param isGraphShared(boolean) true if graph is shared, false if graph is private
-     * @return Saved layout on GraphSpace
+     * @return response status on post request to GraphSpace
      * @throws Exception
      */
 	public String postGraphLayout(int graphId, boolean isGraphShared) throws Exception{
@@ -182,14 +200,10 @@ public class Layout extends Resource {
 	
 	/**
 	 * Update a layout with given layoutId or name for the graph with given graphId
-	 * 
 	 * @param graphId(int) id of graph
 	 * @param layoutId(int) id of layout
-	 * @param layoutName(String) name of layout
-	 * @param positionsJSON(JSONObject) positions JSONObject
-	 * @param styleJSON(JSONObject)JSONObject containing style
 	 * @param isGraphShared(boolean) true if graph is shared, false if graph is private
-	 * @return Updated layout on GraphSpace
+	 * @return response status on update request to GraphSpace
 	 * @throws Exception
 	 */
     public String updateGraphLayout(int graphId, int layoutId, boolean isGraphShared) throws Exception{
@@ -231,9 +245,10 @@ public class Layout extends Resource {
     /**
      * Delete a layout with the given layoutId or name for the graph with given graphId
      * 
+     * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
      * @param graphId(int) id of the graph
      * @param layoutId(int) id of the layout
-     * @return Success/Error Message from GraphSpace
+     * @return response status on delete request to GraphSpace
      * @throws Exception
      */
     public static String deleteGraphLayout(RestClient restClient, int graphId, int layoutId) throws Exception{

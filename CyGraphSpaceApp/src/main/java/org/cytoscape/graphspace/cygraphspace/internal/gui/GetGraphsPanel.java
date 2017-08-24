@@ -42,6 +42,7 @@ import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.TaskMonitor;
 import org.graphspace.javaclient.Graph;
+import org.graphspace.javaclient.GraphSpaceClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import javax.swing.GroupLayout;
@@ -57,15 +58,10 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	static final String APP_DESCRIPTION = "<html>" + "CyGraphSpace App is used to import and export graphs from "
 			+ "<a href=\"http://www.grapshace.org\">GraphSpace</a> website. ";
 
-//	final TaskManager taskManager;
 	OpenBrowser openBrowser;
 	LoadNetworkFileTaskFactory loadNetworkFileTaskFactory;
 	LoadVizmapFileTaskFactory loadVizmapFileTaskFactory;
 	TaskManager taskManager;
-	
-//	final JButton searchButton = new JButton(new ImageIcon(getClass().getResource("/search-icon.png")));
-//	final JTable resultsTable = new JTable();
-//	final JLabel noResultsLabel = new JLabel();
 	private JTextField usernameTextField;
 	private JTextField hostTextField;
 	private JPasswordField passwordField;
@@ -81,8 +77,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	TableRowSorter<TableModel> sharedGraphsTableSorter;
 	DefaultTableModel publicGraphsTableModel;
 	TableRowSorter<TableModel> publicGraphsTableSorter;
-//	DefaultTableModel searchResultsTableModel;
-//	TableRowSorter<TableModel> searchResultsTableSorter;
 	private JButton importButton;
 	private JButton openInBrowserButton;
 	private JPanel parentPanel;
@@ -90,24 +84,19 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private JPanel myGraphsPanel = new JPanel();
 	private JTabbedPane tabbedPane = new JTabbedPane();
 	private JPanel publicGraphsPanel = new JPanel();
-//	private JPanel searchResultsPanel = new JPanel();
 	private JTable myGraphsTable;
 	private JTable sharedGraphsTable;
 	private JTable publicGraphsTable;
-//	private JTable searchResultsTable;
 	private JPanel myGraphsPaginationPanel = new JPanel();
 	private JPanel sharedGraphsPaginationPanel = new JPanel();
 	private JPanel publicGraphsPaginationPanel = new JPanel();
-//	private JPanel searchResultsPaginationPanel = new JPanel();
 	JScrollPane myGraphsScrollPane = new JScrollPane();
 	JScrollPane sharedGraphsScrollPane = new JScrollPane();
 	JScrollPane publicGraphsScrollPane = new JScrollPane();
-//	JScrollPane searchResultsScrollPane = new JScrollPane();
 	private int limit = 20;
 	private int myGraphsOffSet = 0;
 	private int sharedGraphsOffSet = 0;
 	private int publicGraphsOffSet = 0;
-//	private int searchResultsOffSet = 0;
 	private boolean loggedIn = false;
 	private JButton myGraphsNextButton;
 	private JButton myGraphsPreviousButton;
@@ -120,12 +109,13 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private JPanel sharedGraphsLoadingFrame;
 	private JPanel publicGraphsLoadingFrame;
 	private JButton clearSearchButton;
+	private GraphSpaceClient client;
+	
 	@SuppressWarnings({ "serial", "static-access" })
 	public GetGraphsPanel(TaskManager taskManager, OpenBrowser openBrowser) {
 		super("http://www.graphspace.org", "GraphSpace", APP_DESCRIPTION);
 		this.taskManager = taskManager;
-//		this.taskManager = CyObjectManager.INSTANCE.getTaskManager();
-//		this.client = Server.INSTANCE.client;
+		this.client = Server.INSTANCE.client;
 		this.openBrowser = openBrowser;
 		this.loadNetworkFileTaskFactory = CyObjectManager.INSTANCE.getLoadNetworkFileTaskFactory();
 		this.loadVizmapFileTaskFactory = CyObjectManager.INSTANCE.getLoadVizmapFileTaskFactory();
@@ -162,8 +152,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		tabbedPane.addTab("My Graphs", myGraphsPanel);
 		tabbedPane.addTab("Shared Graphs", sharedGraphsPanel);
 		tabbedPane.addTab("Public Graphs", publicGraphsPanel);
-//		tabbedPane.addTab("Search Results", searchResultsPanel);
-		
+
 		GroupLayout gl_myGraphsPanel = new GroupLayout(myGraphsPanel);
 		gl_myGraphsPanel.setHorizontalGroup(
 			gl_myGraphsPanel.createParallelGroup(Alignment.LEADING)
@@ -227,7 +216,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
         myGraphsTable.getColumn("Owner").setPreferredWidth(Math.round((myGraphsTable.getPreferredSize().width)* 0.25f));
         myGraphsTable.getColumn("Tags").setPreferredWidth(Math.round((myGraphsTable.getPreferredSize().width)* 0.35f));
         myGraphsScrollPane.setViewportView(myGraphsTable);
-//        myGraphsScrollPane.setViewportView((Component)loadingFrame);
         
 		GroupLayout gl_sharedGraphsPanel = new GroupLayout(sharedGraphsPanel);
 		gl_sharedGraphsPanel.setHorizontalGroup(
@@ -370,15 +358,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		);
 		resultsPanel.setLayout(gl_resultsPanel);
 		
-		
-//		searchResultsTable.addMouseListener(new MouseAdapter() {
-//			public void mouseClicked(MouseEvent e) {
-//				if (e.getClickCount() == 2){
-//					String id = searchResultsTable.getValueAt(searchResultsTable.getSelectedRow(), 0).toString();
-//					getGraphActionPerformed(e, id);
-//				}
-//			}
-//		});
 		importButton = new JButton("Import to Cytoscape");
 		importButton.setEnabled(false);
 		importButton.addActionListener(new ActionListener() {
@@ -410,14 +389,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 						id = publicGraphsTable.getValueAt(publicGraphsTable.getSelectedRow(), 0).toString();
 					}
 				}
-//				else if (selectedTable==3){
-//					if (searchResultsTable.getSelectedRow()<=0){
-//						id = null;
-//					}
-//					else{
-//						id = searchResultsTable.getValueAt(searchResultsTable.getSelectedRow(), 0).toString();
-//					}
-//				}
 				getGraphActionPerformed(e, id);
 			}
 		});
@@ -692,7 +663,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private void populate(){
 		if (Server.INSTANCE.isAuthenticated()){
 			try {
-				this.loggedIn = false;
+				this.loggedIn = true;
 				loginButton.setText("Log Out");
 				hostTextField.setText(Server.INSTANCE.getHost());
 				usernameTextField.setText(Server.INSTANCE.getUsername());
@@ -718,7 +689,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private void loginActionPerformed(ActionEvent evt) throws Exception{
 		if (!this.loggedIn){
 			System.out.println("login performed");
-//			loginButton.setEnabled(false);
+			loginButton.setEnabled(false);
 	    	String hostText = hostTextField.getText();
 	    	String usernameText = usernameTextField.getText();
 	    	String passwordText = new String(passwordField.getPassword());
@@ -737,13 +708,11 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	    		try {
 	    			this.loggedIn = true;
 	    			loginButton.setText("Log Out");
-		    		loginButton.setEnabled(true);
 		    		hostTextField.setEnabled(false);
 		    		usernameTextField.setEnabled(false);
 		    		passwordField.setEnabled(false);
 		    		importGraphListActionPerformed();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 	    	}
@@ -760,7 +729,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			publicGraphsTableModel.setRowCount(0);
 			importButton.setEnabled(false);
 			openInBrowserButton.setEnabled(false);
-			hostTextField.setText("http://www.graphspace.org");
+			hostTextField.setText(Server.INSTANCE.getHost());
 			usernameTextField.setText("");
 			passwordField.setText("");
 			loginButton.setText("Log In");
@@ -776,13 +745,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private void importGraphListActionPerformed(){
 		try {
 			this.searchTerm = null;
-//			JDialog waitDialog = new JDialog();
-//			JLabel waitLabel = new JLabel("Graphs are currently being imported from GraphSpace. Please Wait...");
-//			waitDialog.setLocationRelativeTo(null);
-//			waitDialog.setTitle("Please Wait...");
-//			waitDialog.getContentPane().add(waitLabel);
-//			waitDialog.pack();
-//			waitDialog.setVisible(true);
 			myGraphsLoadingFrame.setVisible(true);
 			sharedGraphsLoadingFrame.setVisible(true);
 			publicGraphsLoadingFrame.setVisible(true);
@@ -902,95 +864,62 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	}
 	
 	private void populateMyGraphs(String searchTerm, int limit, int offset) throws Exception{
-		if (searchTerm == null){
-			myGraphsTableModel.setRowCount(0);
+		System.out.println("populate my graphs table action performed");
+		if (searchTerm == null) {
 			ArrayList<Graph> myGraphs = Server.INSTANCE.getMyGraphs(limit, offset);
-			for (Graph graph : myGraphs){
-				String tags = "";
-				for (int i=0; i<graph.getTags().size(); i++){
-					tags += graph.getTags().get(i)+", ";
-				}
-				if(tags.length()>0){
-					tags = tags.substring(0, tags.length()-2);
-				}
-				Object[] row = {String.valueOf(graph.getId()), graph.getName(), graph.getOwner(), tags};
-				myGraphsTableModel.addRow(row);
-			}
+			populateTable(myGraphsTableModel, myGraphs, searchTerm, limit, offset);
 		}
-		else{
-			myGraphsTableModel.setRowCount(0);
-			ArrayList<Graph> myGraphsSearchResults = Server.INSTANCE.searchMyGraphs(searchTerm, limit, offset);
-			for (Graph graph : myGraphsSearchResults){
-				String tags = "";
-				for (int i=0; i<graph.getTags().size(); i++){
-					tags += graph.getTags().get(i)+", ";
-				}
-				if(tags.length()>0){
-					tags = tags.substring(0, tags.length()-2);
-				}
-				Object[] row = {String.valueOf(graph.getId()), graph.getName(), graph.getOwner(), tags};
-				myGraphsTableModel.addRow(row);
-			}
+		else {
+			ArrayList<Graph> myGraphs = Server.INSTANCE.searchMyGraphs(searchTerm, limit, offset);
+			populateTable(myGraphsTableModel, myGraphs, searchTerm, limit, offset);			
 		}
 	}
-	
+
 	private void populatePublicGraphs(String searchTerm, int limit, int offset) throws Exception{
-		if(searchTerm==null){
-			System.out.println("populate public graphs table action performed");
-			publicGraphsTableModel.setRowCount(0);
+		System.out.println("populate public graphs table action performed");
+		if (searchTerm == null) {
 			ArrayList<Graph> publicGraphs = Server.INSTANCE.getPublicGraphs(limit, offset);
-			for (Graph graph : publicGraphs){
-				String tags = "";
-				for (int i=0; i<graph.getTags().size(); i++){
-					tags += graph.getTags().get(i)+", ";
-				}
-				if(tags.length()>0){
-					tags = tags.substring(0, tags.length()-2);
-				}
-				Object[] row = {String.valueOf(graph.getId()), graph.getName(), graph.getOwner(), tags};
-				publicGraphsTableModel.addRow(row);
-			}
+			populateTable(publicGraphsTableModel, publicGraphs, searchTerm, limit, offset);
 		}
-		else{
-			System.out.println("populate public graphs table action performed");
-			publicGraphsTableModel.setRowCount(0);
-			ArrayList<Graph> publicGraphsSearchResults = Server.INSTANCE.searchPublicGraphs(searchTerm, limit, offset);
-			for (Graph graph : publicGraphsSearchResults){
-				String tags = "";
-				for (int i=0; i<graph.getTags().size(); i++){
-					tags += graph.getTags().get(i)+", ";
-				}
-				if(tags.length()>0){
-					tags = tags.substring(0, tags.length()-2);
-				}
-				Object[] row = {String.valueOf(graph.getId()), graph.getName(), graph.getOwner(), tags};
-				publicGraphsTableModel.addRow(row);
-			}
+		else {
+			ArrayList<Graph> publicGraphs = Server.INSTANCE.searchPublicGraphs(searchTerm, limit, offset);
+			populateTable(publicGraphsTableModel, publicGraphs, searchTerm, limit, offset);			
 		}
 	}
 	
 	private void populateSharedGraphs(String searchTerm, int limit, int offset) throws Exception{
-		if(searchTerm==null){
-			System.out.println("populate shared graphs table action performed");
-			sharedGraphsTableModel.setRowCount(0);
+		System.out.println("populate shared graphs table action performed");
+		if (searchTerm == null) {
 			ArrayList<Graph> sharedGraphs = Server.INSTANCE.getSharedGraphs(limit, offset);
-			for (Graph graph : sharedGraphs){
+			populateTable(sharedGraphsTableModel, sharedGraphs, searchTerm, limit, offset);
+		}
+		else {
+			ArrayList<Graph> sharedGraphs = Server.INSTANCE.searchSharedGraphs(searchTerm, limit, offset);
+			populateTable(sharedGraphsTableModel, sharedGraphs, searchTerm, limit, offset);			
+		}
+	}
+
+	private void populateTable(DefaultTableModel tableModel, ArrayList<Graph> graphs, String searchTerm, int limit, int offset) throws Exception {
+		if (searchTerm == null){
+			tableModel.setRowCount(0);
+			for (Graph graph : graphs){
 				String tags = "";
-				for (int i=0; i<graph.getTags().size(); i++){
-					tags += graph.getTags().get(i)+", ";
-				}
-				if(tags.length()>0){
-					tags = tags.substring(0, tags.length()-2);
+				if(graph.getTags()!=null) {
+					for (int i=0; i<graph.getTags().size(); i++){
+						tags += graph.getTags().get(i)+", ";
+					}
+					if(tags.length()>0){
+						tags = tags.substring(0, tags.length()-2);
+					}
 				}
 				Object[] row = {String.valueOf(graph.getId()), graph.getName(), graph.getOwner(), tags};
-				sharedGraphsTableModel.addRow(row);
+				tableModel.addRow(row);
 			}
 		}
 		else{
-			System.out.println("populate shared graphs table action performed");
-			sharedGraphsTableModel.setRowCount(0);
-			ArrayList<Graph> sharedGraphsSearchResults = Server.INSTANCE.searchSharedGraphs(searchTerm, limit, offset);
-			for (Graph graph : sharedGraphsSearchResults){
+			tableModel.setRowCount(0);
+			
+			for (Graph graph : graphs){
 				String tags = "";
 				for (int i=0; i<graph.getTags().size(); i++){
 					tags += graph.getTags().get(i)+", ";
@@ -999,7 +928,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 					tags = tags.substring(0, tags.length()-2);
 				}
 				Object[] row = {String.valueOf(graph.getId()), graph.getName(), graph.getOwner(), tags};
-				sharedGraphsTableModel.addRow(row);
+				tableModel.addRow(row);
 			}
 		}
 	}
@@ -1007,21 +936,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private void getGraphActionPerformed(ActionEvent e, String graphId){
 		System.out.println("get graph action performed");
 		try {
-			int id = Integer.valueOf(graphId);
-			JSONObject graphJSON = Server.INSTANCE.getGraphById(id).getGraphJson();
-			JSONObject styleJSON = Server.INSTANCE.getGraphById(id).getStyleJson();
-			String graphJSONString = graphJSON.toString();
-			String styleJSONString = styleJSON.toString();
-			InputStream graphJSONInputStream = new ByteArrayInputStream(graphJSONString.getBytes());
-			InputStream styleJSONInputStream = new ByteArrayInputStream(styleJSONString.getBytes());
-			File tempFile = File.createTempFile("CyGraphSpaceImport", ".cyjs");
-			try (FileOutputStream out = new FileOutputStream(tempFile)) {
-	            IOUtils.copy(graphJSONInputStream, out);
-	        }
-
-			TaskIterator ti = loadNetworkFileTaskFactory.createTaskIterator(tempFile);
-			CyObjectManager.INSTANCE.getTaskManager().execute(ti);
-			tempFile.delete();
 			
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
@@ -1030,34 +944,42 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		}
 	}
 	
+	private void getGraphActionPerformed(MouseEvent e, String graphId){
+		System.out.println("get graph action performed");
+		try {
+			getGraph(graphId);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog((Component)e.getSource(), "Could not get graph", "Error", JOptionPane.ERROR_MESSAGE);
+			e1.printStackTrace();
+		}
+	}
+	
+	private void getGraph(String graphId) throws Exception {
+		int id = Integer.valueOf(graphId);
+		JSONObject graphJson = Server.INSTANCE.getGraphById(id).getGraphJson();
+		System.out.println(graphJson.toString());
+		JSONObject styleJson = Server.INSTANCE.getGraphById(id).getStyleJson();
+		System.out.println(styleJson.toString());
+		String graphJsonString = graphJson.toString();
+		String styleJsonString = styleJson.toString();
+		InputStream graphJSONInputStream = new ByteArrayInputStream(graphJsonString.getBytes());
+		InputStream styleJSONInputStream = new ByteArrayInputStream(styleJsonString.getBytes());
+		File tempFile = File.createTempFile("CyGraphSpaceImport", ".cyjs");
+		try (FileOutputStream out = new FileOutputStream(tempFile)) {
+            IOUtils.copy(graphJSONInputStream, out);
+        }
+		TaskIterator ti = loadNetworkFileTaskFactory.createTaskIterator(tempFile);
+		CyObjectManager.INSTANCE.getTaskManager().execute(ti);
+		tempFile.delete();
+	}
+	
 	public void openInBrowser(String id){
 		if (id==null){
 			JOptionPane.showMessageDialog(new JDialog(), "Please select a graph", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		openBrowser.openURL(Server.INSTANCE.getHost()+"/graphs/"+id);
-	}
-	
-	private void getGraphActionPerformed(MouseEvent e, String graphId){
-		System.out.println("get graph action performed");
-		try {
-			int id = Integer.valueOf(graphId);
-			JSONObject graphJSON = Server.INSTANCE.getGraphById(id).getGraphJson();
-			String str = graphJSON.toString();
-			InputStream is = new ByteArrayInputStream(str.getBytes());
-			File tempFile = File.createTempFile("CyGraphSpaceImport", ".cyjs");
-			try (FileOutputStream out = new FileOutputStream(tempFile)) {
-	            IOUtils.copy(is, out);
-	        }
-			TaskIterator ti = loadNetworkFileTaskFactory.createTaskIterator(tempFile);
-			CyObjectManager.INSTANCE.getTaskManager().execute(ti);
-			System.out.println(str);
-			tempFile.delete();
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			JOptionPane.showMessageDialog((Component)e.getSource(), "Could not get graph", "Error", JOptionPane.ERROR_MESSAGE);
-			e1.printStackTrace();
-		}
 	}
 	
 	public void setMyGraphsOffSet(int offset){
@@ -1099,9 +1021,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 				};
 				
 				worker.execute();
-//				populateMyGraphs(searchTerm, limit, offset);
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 	    }
@@ -1127,7 +1047,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		            		populateMyGraphs(searchTerm, limit, offset);
 		            		myGraphsScrollPane.setViewportView(myGraphsTable);
 		        			myGraphsLoadingFrame.setVisible(false);
-		        			
 		        		}
 		                return 1;
 		            }
@@ -1135,7 +1054,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 				worker.execute();
 				
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 	    }
@@ -1202,7 +1120,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 				};
 				worker.execute();
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 	    }
@@ -1235,7 +1152,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 				};
 				worker.execute();
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 	    }
@@ -1269,7 +1185,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 				
 				worker.execute();
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 	    }

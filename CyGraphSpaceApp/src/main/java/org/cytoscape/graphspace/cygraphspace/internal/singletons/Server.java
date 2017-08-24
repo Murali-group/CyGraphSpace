@@ -21,7 +21,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 public enum Server{
 	INSTANCE;
 	boolean authenticated = false;
-	GraphSpaceClient client;
+	public GraphSpaceClient client;
 	private String host = "http://www.graphspace.org";
 	private String username;
 	private String password;

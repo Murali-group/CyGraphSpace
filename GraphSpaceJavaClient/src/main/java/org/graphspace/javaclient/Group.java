@@ -4,40 +4,60 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+//internal imports
 import org.graphspace.javaclient.exceptions.ExceptionCode;
 import org.graphspace.javaclient.exceptions.ExceptionMessage;
-import org.graphspace.javaclient.exceptions.GraphException;
 import org.graphspace.javaclient.exceptions.GroupException;
 import org.graphspace.javaclient.util.Config;
-import org.json.JSONArray;
+
 import org.json.JSONObject;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
-
+/**
+ * This class defines Group Object and corresponding methods (extends {@link org.graphspace.javaclient#Resource})
+ * @author rishabh
+ *
+ */
 public class Group extends Resource {
+	
 	private String description;
 	private int totalGraphs;
 	private int totalMembers;
 	private String inviteCode;
 	private String createdAt;
 	private String updatedAt;
-	private String url;
-	private String inviteLink;
 	ArrayList<Member> members;
-
-//	public JSONObject groupJson;
-
+	
+	/**
+	 * Constructor for Group Object
+	 * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+	 */
 	public Group(RestClient restClient) {
 		super(restClient);
 	}
-
+	
+	/**
+	 * Constructor for Group Object
+	 * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+	 * @param groupJson(JSONObject) response body retrieved from GraphSpace
+	 */
 	public Group(RestClient restClient, JSONObject groupJson) {
 		super(restClient, groupJson);
 		if (groupJson.getString("description") != null) {
 			this.description = groupJson.getString("description");
+			this.totalGraphs = groupJson.getInt("total_graphs");
+			this.totalMembers = groupJson.getInt("total_members");
+			this.updatedAt = groupJson.getString("updated_at");
+			this.createdAt = groupJson.getString("updated_at");
+			this.inviteCode = groupJson.getString("invite_code");			
 		}
 	}
-
+	
+	/**
+	 * Constructor for Group Object
+	 * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+	 * @param name(String) name of the group
+	 * @param description(String) description of the group
+	 */
 	public Group(RestClient restClient, String name, String description) {
 		super(restClient);
 		this.name = name;
@@ -45,32 +65,90 @@ public class Group extends Resource {
 			this.description = description;
 		}
 	}
-
+	
+	/**
+	 * @return name of the group
+	 */
 	public String getName() {
 		return this.name;
 	}
-
+	
+	/**
+	 * @return description of the group
+	 */
 	public String getDescription () {
 		return this.description;
 	}
-
-	public void setName(String name) {
-		this.name = name;
+	
+	/**
+	 * get json of a group
+	 * @return json of a group
+	 */
+	public JSONObject getGroupJson() {
+		return this.json;
+	}
+	
+	/**
+	 * @return number of graphs shared by the group
+	 */
+	public int getTotalGraphs() {
+		return this.totalGraphs;
+	}
+	
+	/**
+	 * @return number of members in the group
+	 */
+	public int getTotalMembers() {
+		return this.totalMembers;
+	}
+	
+	/**
+	 * @return time stamp at which the group was last updated
+	 */
+	public String getUpdatedAt() {
+		return this.updatedAt;
+	}
+	
+	/**
+	 * @return time stamp at which the group was created
+	 */
+	public String getCreatedAt() {
+		return this.createdAt;
+	}
+	
+	/**
+	 * @return invite code for the group
+	 */
+	public String getInviteCode() {
+		return this.inviteCode;
+	}
+	
+	/**
+	 * set name of the group
+	 * @param groupName(String) name of the group
+	 */
+	public void setName(String groupName) {
+		this.name = groupName;
 	}
 
+	/**
+	 * set description of the group
+	 * @param description(String) description of the group
+	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
+	/**
+	 * set json of the group
+	 * @param groupJson(JSONObject) json of the group
+	 */
 	public void setGroupJson(JSONObject groupJson) {
 		this.json = groupJson;
 	}
-
-	public JSONObject getGroupJson() {
-		return this.json;
-	}
-
-	public Map<String, Object> toMap(){
+	
+	//Convert group object to a map
+	private Map<String, Object> toMap(){
 		Map<String, Object> group = new HashMap<String, Object>();
 		group.put("name", name);
 		group.put("description", description);
@@ -82,11 +160,12 @@ public class Group extends Resource {
      * GET GROUP METHODS
      * ============================================
      */
-
+	
 	/**
-	 * Get group by name
+	 * Get group from GraphSpace with groupName
+	 * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
 	 * @param name(String) name of the group
-	 * @return group JSON Object
+	 * @return group object returned from GraphSpace 
 	 * @throws Exception
 	 */
     public static Group getGroup(RestClient restClient, String name) throws Exception{
@@ -100,10 +179,11 @@ public class Group extends Resource {
     }
 
     /**
-     * Get all personal groups
-     * @param limit(int) limit the number of groups to return
-     * @param offset(int) offset the group search
-     * @return array of the groups json objects
+     * Get all groups owned by you
+     * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+     * @param limit(int) Number of entities to return
+     * @param offset(int) Offset the list of returned entities by this number
+     * @return list of groups owned by you
      * @throws Exception
      */
     public static ArrayList<Group> getMyGroups(RestClient restClient, int limit, int offset) throws Exception{
@@ -118,10 +198,11 @@ public class Group extends Resource {
     }
 
     /**
-     * Get all groups
-     * @param limit(int) limit the number of groups to return
-     * @param offset(int) offset the group search
-     * @return array of the groups json objects
+     * Get all groups where you are a member
+     * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+     * @param limit(int) Number of entities to return
+     * @param offset(int) Offset the list of returned entities by this number
+     * @return list of groups where you are a member
      * @throws Exception
      */
     public static ArrayList<Group> getAllGroups(RestClient restClient, int limit, int offset) throws Exception{
@@ -137,8 +218,7 @@ public class Group extends Resource {
 
     /**
      * Post a group to GraphSpace
-     * @param group(GSGroup) group object containing name and description
-     * @return response from GraphSpace
+     * @return response status on post request to GraphSpace
      * @throws Exception
      */
     public String postGroup() throws Exception {
@@ -153,11 +233,8 @@ public class Group extends Resource {
     }
 
     /**
-     * Update a group. Use either group name or group Id to update group
-     * @param group(GSGroup) group object to update
-     * @param groupId(Integer) id of the group
-     * @param groupName(String) name of the group
-     * @return response from GraphSpace
+     * Update an existing group on GraphSpace
+     * @return response status on update request to GraphSpace
      * @throws Exception
      */
     public String updateGroup() throws Exception {
@@ -169,37 +246,37 @@ public class Group extends Resource {
     }
 
     /**
-     * Delete a group
-     * @param groupName(String) name of the group
-     * @param groupId(Integer) id of the group
-     * @return response on deleting the group
+     * Delete an existing group on GraphSpace with groupName
+     * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+     * @param groupName(String) name of the group to be deleted
+     * @return response status on delete request to GraphSpace
      * @throws Exception
      */
-    public static String deleteGroup(RestClient restClient, String groupName, Integer groupId) throws Exception {
-    	if (groupId != null) {
-    		String path = Config.getGroupPath(groupId);
-    		JSONObject jsonResponse = restClient.delete(path);
-        	Response response = new Response(jsonResponse);
-        	return response.getResponseStatus();
-    	}
-    	if (groupName != null) {
-    		Group group = getGroup(restClient, groupName);
-    		String path = Config.getGroupPath(group.getId());
-    		JSONObject jsonResponse = restClient.delete(path);
-        	Response response = new Response(jsonResponse);
-        	return response.getResponseStatus();
-    	}
-    	throw new GroupException(ExceptionCode.GROUP_NOT_FOUND_EXCEPTION, ExceptionMessage.GROUP_NOT_FOUND_EXCEPTION,
-    				"Group not found");
+    public static String deleteGroup(RestClient restClient, String groupName) throws Exception {
+		Group group = getGroup(restClient, groupName);
+		String path = Config.getGroupPath(group.getId());
+		JSONObject jsonResponse = restClient.delete(path);
+    	Response response = new Response(jsonResponse);
+    	return response.getResponseStatus();
+    }
+    
+    /**
+     * Delete an existing group on GraphSpace with groupId
+     * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+     * @param groupName(String) name of the group to be deleted
+     * @return response status on delete request to GraphSpace
+     * @throws Exception
+     */
+    public static String deleteGroup(RestClient restClient, Integer groupId) throws Exception {
+		String path = Config.getGroupPath(groupId);
+		JSONObject jsonResponse = restClient.delete(path);
+    	Response response = new Response(jsonResponse);
+    	return response.getResponseStatus();
     }
 
     /**
-     * Get members of a group
-     * @param groupName(String) name of the group
-     * @param groupId(Integer) id of the group
-     * @param group(GSGroup) group object
-     * @return members of the group as a JSON Array
-     * @throws UnirestException
+     * Get list of members in a group 
+     * @return list of members in a group
      * @throws Exception
      */
     public ArrayList<Member> getGroupMembers() throws Exception{
@@ -208,7 +285,13 @@ public class Group extends Resource {
     	Response response = new Response(jsonResponse);
     	return response.getMembers();
     }
-
+    
+    /**
+     * Get a particular member in a group with memberEmail
+     * @param memberEmail(String) email of the member to be returned
+     * @return member with memberEmail belonging to the group
+     * @throws Exception
+     */
     public Member getGroupMember(String memberEmail) throws Exception{
     	String path = Config.getMembersPath(this.id);
 		JSONObject jsonResponse = restClient.get(path, null);
@@ -225,11 +308,8 @@ public class Group extends Resource {
 
     /**
      * Add member to a group
-     * @param memberEmail(String) email id of the member to be added
-     * @param groupName(String) name of the group
-     * @param groupId(Integer) id of the group
-     * @param group(GSGroup) group object
-     * @return response JSON Object on adding the member to the group
+     * @param member(Member) member to be added to the group
+     * @return response status from GraphSpace on adding member to a group
      * @throws Exception
      */
     public String addGroupMember(Member member) throws Exception {
@@ -246,15 +326,11 @@ public class Group extends Resource {
     }
 
     /**
-     * Delte a group member
-     * @param memberId(Integer) id of the member to be deleted
-     * @param member(GSMember) member that has to be deleted
-     * @param groupName(String) name of the group
-     * @param groupId(Integer) id of the group
-     * @param group(GSGroup) group GSGroup Object
-     * @return response from GraphSpace on deleting the group member
+     * Delete member from a group
+     * @param member(Member) member to be deleted from the group
+     * @return response status from GraphSpace on deleted member from a group
      * @throws Exception
-     */
+     */    
     public String deleteGroupMember(Member member) throws Exception {
     	if(member.getEmail() == null) {
     		throw new GroupException(ExceptionCode.BAD_REQUEST_FORMAT, ExceptionMessage.BAD_REQUEST_FORMAT_EXCEPTION,
@@ -271,11 +347,8 @@ public class Group extends Resource {
     }
 
     /**
-     * Get Graphs belonging to a group
-     * @param groupName(String) name of the group
-     * @param groupId(Integer) id of the group
-     * @param group(GSGroup) group GSGroup object
-     * @return graphs JSONArray for the specified group
+     * Get a list of graphs belonging to group
+     * @return list of graphs belonging to the group
      * @throws Exception
      */
     public ArrayList<Graph> getGroupGraphs() throws Exception {
@@ -286,14 +359,9 @@ public class Group extends Resource {
     }
 
     /**
-     * Share a graph with a particular group
-     * @param graphName(String) name of the graph
-     * @param graphId(Integer) id of the graph
-     * @param graph(GSGraph) graph GSGraph Object
-     * @param groupName(String) name of the group
-     * @param groupId(Integer) id of the group
-     * @param group(GSGroup) group GSGroup Object
-     * @return response from GraphSpace on sharing the graph
+     * Share a graph with a group
+     * @param graph(Graph) graph to be shared with the group
+     * @return response status on post request to GraphSpace
      * @throws Exception
      */
     public String shareGraph(Graph graph) throws Exception {
@@ -311,14 +379,9 @@ public class Group extends Resource {
 
 
     /**
-     * Un-Share a previously shared graph with a particular group
-     * @param graphName(String) name of the graph
-     * @param graphId(Integer) id of the graph
-     * @param graph(GSGraph) graph GSGraph Object
-     * @param groupName(String) name of the group
-     * @param groupId(Integer) id of the group
-     * @param group(GSGroup) group GSGroup Object
-     * @return response from GraphSpace on un-sharing the graph
+     * Un-Share a shared graph with a group
+     * @param graph(Graph) shared graph to be un-shared with the group
+     * @return response status on delete request to GraphSpace
      * @throws Exception
      */
     public String unshareGraph(Graph graph) throws Exception{

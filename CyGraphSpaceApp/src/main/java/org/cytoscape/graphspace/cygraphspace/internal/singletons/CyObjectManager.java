@@ -226,7 +226,6 @@ public enum CyObjectManager {
     public CyNetworkTableManager getNetworkTableManager() { return networkTableManager; }
     public CyTableManager getTableManager() { return this.tableManager; }
     
-    // Slightly More Sophisticated Getters
     public CyNetwork getCurrentNetwork()
     {
         CyApplicationManager applicationManager = adapter.getCyApplicationManager();

@@ -10,7 +10,14 @@ import org.graphspace.javaclient.exceptions.LayoutException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Encapsulates all Response objects from GraphSpace
+ * @author rishabh
+ *
+ */
 public class Response {
+	
+	//private variables
 	private int status;
 	private String statusText;
 	private JSONObject json;
@@ -24,20 +31,36 @@ public class Response {
 	private ArrayList<Group> groups;
 	private ArrayList<Member> members;
 
+	/**
+	 * Constructor for Response object
+	 * @param json(JSONObject) response body retured from GraphSpace
+	 */
 	public Response(JSONObject json) {
 		this.json = json;
 		this.status = json.getInt("status");
 		this.statusText = json.getString("statusText");
 	}
-
+	
+	/**
+	 * get status of respose from GraphSpace
+	 * @return response status from GraphSpace
+	 */
 	public String getResponseStatus() {
 		return this.status + " : " + this.statusText;
 	}
 
+	/**
+	 * get json response body returned from GraphSpace
+	 * @return response json object from GraphSpace
+	 */
 	public JSONObject getJsonResponse() {
 		return this.json;
 	}
-
+	
+	/**
+	 * get list of graphs from GraphSpace
+	 * @return list of graphs from GraphSpace
+	 */
 	public ArrayList<Graph> getGraphs() {
 		JSONObject responseBody = this.json.getJSONObject("body").getJSONObject("object");
 		graphs = new ArrayList<Graph>();
@@ -55,6 +78,10 @@ public class Response {
 		return graphs;
 	}
 
+	/**
+	 * get list of layouts from GraphSpace
+	 * @return list of layouts from GraphSpace
+	 */
 	public ArrayList<Layout> getLayouts() {
 		JSONObject responseBody = this.json.getJSONObject("body").getJSONObject("object");
 		layouts = new ArrayList<Layout>();
@@ -71,7 +98,11 @@ public class Response {
 		}
 		return layouts;
 	}
-
+	
+	/**
+	 * get list of groups from GraphSpace
+	 * @return list of Groups from GraphSpace
+	 */
 	public ArrayList<Group> getGroups() {
 		JSONObject responseBody = this.json.getJSONObject("body").getJSONObject("object");
 		groups = new ArrayList<Group>();
@@ -89,6 +120,11 @@ public class Response {
 		return groups;
 	}
 
+	/**
+	 * get list of members from GraphSpace
+	 * @return list of members from GraphSpace
+	 * @throws GroupException
+	 */
 	public ArrayList<Member> getMembers() throws GroupException {
 		JSONObject responseBody = this.json.getJSONObject("body").getJSONObject("object");
 		members = new ArrayList<Member>();
@@ -112,7 +148,12 @@ public class Response {
 				"Members not found.");
 		
 	}
-
+	
+	/**
+	 * get graph from GraphSpace
+	 * @return graph from GraphSpace
+	 * @throws GraphException
+	 */
 	public Graph getGraph() throws GraphException {
 		JSONObject responseBody = this.json.getJSONObject("body").getJSONObject("object");
 		if (responseBody.has("graph_json")) {
@@ -132,7 +173,12 @@ public class Response {
 		throw new GraphException(ExceptionCode.GRAPH_NOT_FOUND_EXCEPTION, ExceptionMessage.GRAPH_NOT_FOUND_EXCEPTION,
 				"Could not find graph.");
 	}
-
+	
+	/**
+	 * get layout from GraphSpace
+	 * @return layout from GraphSpace
+	 * @throws LayoutException
+	 */
 	public Layout getLayout() throws LayoutException {
 		JSONObject responseBody = this.json.getJSONObject("body").getJSONObject("object");
 		if (responseBody.has("style_json")) {
@@ -154,6 +200,11 @@ public class Response {
 				"Could not find layout.");
 	}
 
+	/**
+	 * get group from GraphSpace
+	 * @return group from GraphSpace
+	 * @throws GroupException
+	 */
 	public Group getGroup() throws GroupException {
 		JSONObject responseBody = this.json.getJSONObject("body").getJSONObject("object");
 		if (responseBody.has("name")) {
@@ -175,6 +226,11 @@ public class Response {
 				"Could not find group.");
 	}
 
+	/**
+	 * get member from GraphSpace
+	 * @return member from GraphSpace
+	 * @throws GroupException
+	 */
 	public Member getMember() throws GroupException {
 		JSONObject responseBody = this.json.getJSONObject("body").getJSONObject("object");
 		if (responseBody.has("email")) {

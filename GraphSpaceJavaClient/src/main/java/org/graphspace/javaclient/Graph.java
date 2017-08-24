@@ -4,11 +4,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+//internal imports
 import org.graphspace.javaclient.exceptions.ExceptionCode;
 import org.graphspace.javaclient.exceptions.ExceptionMessage;
 import org.graphspace.javaclient.exceptions.GraphException;
 import org.graphspace.javaclient.util.Config;
+
 import org.json.JSONObject;
+
+/**
+ * This class defines Graph Object and corresponding methods (extends {@link org.graphspace.javaclient#Resource})
+ * @author rishabh
+ *
+ */
 public class Graph extends Resource {
 
 	private JSONObject styleJson;
@@ -16,29 +24,55 @@ public class Graph extends Resource {
 	private ArrayList<String> tags;
 	private JSONObject graphJson;
 	
+	/**
+	 * Constructor for Graph Object.
+	 * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+	 */
 	public Graph(RestClient restClient) {
 		super(restClient);
 		this.isGraphPublic = false;
 	}
 	
+	/**
+	 * Constructor for Graph Object
+	 * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+	 * @param json(JSONObject) response body retrieved from GraphSpace
+	 */
 	public Graph(RestClient restClient, JSONObject json) {
 		super(restClient, json);
 		this.isGraphPublic = false;
 	}
 	
+	/**
+	 * Constructor for Graph Object
+	 * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+	 * @param isGraphPublic(boolean) true if graph is public, false otherwise
+	 */
 	public Graph(RestClient restClient, boolean isGraphPublic) {
 		super(restClient);
 		this.isGraphPublic = isGraphPublic;
 	}
 	
+	/**
+	 * get style json from graph
+	 * @return the style json corresponding to a graph object
+	 */
 	public JSONObject getStyleJson() {
 		return this.styleJson;
 	}
 	
+	/**
+	 * get graph json from graph
+	 * @return the graph json corresponding to a graph object
+	 */
 	public JSONObject getGraphJson() {
 		return this.graphJson;
 	}
 	
+	/**
+	 * set graph json
+	 * @param graphJson(JSONObject) graph json defining nodes and edges of a graph in cyjs format
+	 */
 	public void setGraphJson(JSONObject graphJson) {
 		this.graphJson = graphJson;
 		if (graphJson.has("data")) {
@@ -46,14 +80,26 @@ public class Graph extends Resource {
 		}
 	}
 	
+	/**
+	 * set style json
+	 * @param styleJson(JSONObject) style json defining style for various elements of a graph
+	 */
 	public void setStyleJson(JSONObject styleJson) {
 		this.styleJson = styleJson;
 	}
 	
+	/**
+	 * Add tags to a graph object
+	 * @param tag(String) Tags are used to attach additional metadata to the graph to make them identifiable
+	 */
 	public void addTag(String tag) {
 		this.tags.add(tag);
 	}
 	
+	/**
+	 * Remove a tag from a graph object
+	 * @param tag(String) Tags are used to attach additional metadata to the graph to make them identifiable
+	 */
 	public void removeTag(String tag) {
 		if (tags.contains(tag)) {
 			tags.remove(tag);
@@ -63,20 +109,29 @@ public class Graph extends Resource {
 		}
 	}
 	
+	/**
+	 * get tags associated with a graph object
+	 * @return(ArrayList) arraylist of tags
+	 */
 	public ArrayList<String> getTags(){
 		return this.tags;
 	}
 	
+	/**
+	 * Tells if graph is public or private
+	 * @return true if graph is public, false otherwise
+	 */
 	public boolean isPublic() {
 		return this.isGraphPublic;
 	}
+	
 	/**
-     * Get a graph with the graphId
-     * 
-     * @param graphId(int) id of the graph
-     * @return graph with id <b>graphId</b>
-     * @throws Exception
-     */
+	 * Get a graph with the graphId
+	 * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+	 * @param graphId(int) id of the graph on GraphSpace
+	 * @return graph object returned from GraphSpace
+	 * @throws Exception
+	 */
     public static Graph getGraph(RestClient restClient, int graphId) throws Exception{
     	String path = Config.GRAPHS_PATH+graphId;
     	JSONObject jsonResponse = restClient.get(path, null);
@@ -84,14 +139,13 @@ public class Graph extends Resource {
     	return response.getGraph();
     }
 
-	/**
-	 * Get a graph with the graph name
-	 * 
-	 * @param graphName(String) Name of the graph to be fetched
-	 * @param ownerEmail(String) Email of the owner of the graph
-	 * @return graph JSONObject, if graph with the given name exists
-	 * @throws Exception
-	 */
+    /**
+     * Get a graph with graphName
+     * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+     * @param graphName(String) name of the graph on graphspace
+     * @return graph object returned from graphspace
+     * @throws Exception
+     */
     public static Graph getGraph(RestClient restClient, String graphName) throws Exception {
     	String path = Config.GRAPHS_PATH;
     	String ownerEmail = restClient.getUser();
@@ -104,13 +158,13 @@ public class Graph extends Resource {
     }
     
     /**
-	 * Get a graph with the graph name
-	 * 
-	 * @param graphName(String) Name of the graph to be fetched
-	 * @param ownerEmail(String) Email of the owner of the graph
-	 * @return graph JSONObject, if graph with the given name exists
-	 * @throws Exception
-	 */
+     * Get a graph with graphName published by a user with id ownerEmail
+     * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+     * @param graphName(String) name of the graph
+     * @param ownerEmail(String) email of the owner of the graph
+     * @return graph object returned from graphspace
+     * @throws Exception
+     */
     public static Graph getGraph(RestClient restClient, String graphName, String ownerEmail) throws Exception {
     	String path = Config.GRAPHS_PATH;
     	Map<String, Object> urlParams = new HashMap<String, Object>();
@@ -122,36 +176,11 @@ public class Graph extends Resource {
     }
     
     /**
-     * This method returns the response object for getGraph request from GraphSpace using the graph name and graph owner's email. 
-     * 
-     * @param graphName(String) name of the graph requested
-     * @param ownerEmail(String) email of the owner of the graph requested
-     * @return response JSONObject for getGraph request
-     * @throws Exception
-     * 
-     */
-//    public static JSONObject getGraphResponse(String graphName, String ownerEmail) throws Exception{
-//    	Map<String, Object> urlParams = new HashMap<String, Object>();
-//    	urlParams.put("owner_email", ownerEmail);
-//    	urlParams.put("names[]", graphName);
-//    	JSONObject response = RestClient.makeRequest("GET", Config.GRAPHS_PATH, urlParams, null);
-//		JSONObject body = response.getJSONObject("body");
-//		JSONArray array = body.getJSONArray("array");
-//		int total = array.getJSONObject(0).getInt("total");
-//    	if (total > 0){
-//    		return response;
-//    	}
-//    	else{
-//    		return null;
-//    	}
-//    }
-    
-    
-    /**
      * This method can be used to get public graphs from GraphSpace.
      * REMEMBER: Using both graphNames and tagsList will return the intersection of the the matches. If you need the union
      * of those searches make two individual requests instead.
      * 
+     * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
      * @param graphNames(ArrayList&lt;String&gt;) 
      * 			Search for graphs with the given given list of possible graph names.
 	 *			In order to search for graphs with given names as a substring, wrap the name of the graph with percentage symbol.
@@ -186,12 +215,12 @@ public class Graph extends Resource {
     	return response.getGraphs();
     }
     
-    
     /**
      * This method can be used to get shared graphs from GraphSpace.
      * REMEMBER: Using both graphNames and tagsList will return the intersection of the the matches. If you need the union
      * of those searches make two individual requests instead.
      * 
+     * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
      * @param graphNames(ArrayList&lt;String&gt;) 
      * 			Search for graphs with the given given list of possible graph names.
 	 *			In order to search for graphs with given names as a substring, wrap the name of the graph with percentage symbol.
@@ -231,6 +260,7 @@ public class Graph extends Resource {
      * REMEMBER: Using both graphNames and tagsList will return the intersection of the the matches. If you need the union
      * of those searches make two individual requests instead.
      * 
+     * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
      * @param graphNames(ArrayList&lt;String&gt;) 
      * 			Search for graphs with the given given list of possible graph names.
 	 *			In order to search for graphs with given names as a substring, wrap the name of the graph with percentage symbol.
@@ -272,12 +302,8 @@ public class Graph extends Resource {
      */
     
     /**
-     * Post graph to GraphSpace
-     * @param graphJSON(JSONObject) graph JSONObject
-     * @param styleJSON(JSONObject) style JSONObject
-     * @param isGraphPublic(boolean) true if graph is public, false otherwise
-     * @param tagsList(ArrayList&lt;String&gt;)
-     * @return Saved graph on GraphSpace
+     * Export a local graph to GraphSpace
+     * @return response status on post request to GraphSpace
      * @throws Exception
      */
     public String postGraph() throws Exception{
@@ -304,12 +330,8 @@ public class Graph extends Resource {
     }
     
     /**
-     * Update existing graph on GraphSpace
-     * @param graphJSON(JSONObject) graph JSONObject
-     * @param styleJSON(JSONObject) style JSONObject
-     * @param isGraphPublic(boolean) true if graph is public, false otherwise
-     * @param tagsList(ArrayList&lt;String&gt;)
-     * @return Saved graph on GraphSpace
+     * Upadate an existing graph on GraphSpace
+     * @return response status on update request to GraphSpace
      * @throws Exception
      */
     public String updateGraph() throws Exception{
@@ -338,9 +360,8 @@ public class Graph extends Resource {
     }
     
     /**
-     * Make an existing graph Public
-     * @param graphName(String) graph's name
-     * @return the response on updating the graph after making it public
+     * make a graph public
+     * @return response status on update request to GraphSpace
      * @throws Exception
      */
     public String makeGraphPublic() throws Exception {
@@ -349,9 +370,8 @@ public class Graph extends Resource {
     }
     
     /**
-     * Make an existing graph Private
-     * @param graphName(String) graph's name
-     * @return the response on updating the graph after making it private
+     * make a graph private
+     * @return response status on update request to GraphSpace
      * @throws Exception
      */
     public String makeGraphPrivate() throws Exception {
@@ -366,10 +386,11 @@ public class Graph extends Resource {
      */
     
     /**
-     * Delete an existing graph on GraphSpace 
-     * @param graphName(String) name of the graph to be deleted
-     * @return message received from GraphSpace
-     * @throws Exception (Graph Not Found)
+     * delete an existing graph on GraphSpace
+     * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
+     * @param graphId(int) id of the graph to be deleted
+     * @return response status on delete request to GraphSpace
+     * @throws Exception
      */
     public static String deleteGraph(RestClient restClient, int graphId) throws Exception{
     	String path = Config.GRAPHS_PATH + graphId;
@@ -379,10 +400,11 @@ public class Graph extends Resource {
     }
     
     /**
-     * Delete an existing graph on GraphSpace 
+     * delete an existing graph on GraphSpace
+     * @param restClient(RestClient) defines the methods and other connection variables used by the Rest API
      * @param graphName(String) name of the graph to be deleted
-     * @return message received from GraphSpace
-     * @throws Exception (Graph Not Found)
+     * @return response status on delete request to GraphSpace
+     * @throws Exception
      */
     public static String deleteGraph(RestClient restClient, String graphName) throws Exception{
     	String ownerEmail = restClient.getUser();

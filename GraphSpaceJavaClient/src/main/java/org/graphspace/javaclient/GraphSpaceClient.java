@@ -283,8 +283,12 @@ public class GraphSpaceClient {
     /**
      * Reference: {@link org.graphspace.javaclient.Groups#deleteGroup(String groupName, Integer groupId)}
      */
-    public String deleteGroup(String groupName, Integer groupId) throws Exception {
-    	return Group.deleteGroup(restClient, groupName, groupId);
+    public String deleteGroup(Integer groupId) throws Exception {
+    	return Group.deleteGroup(restClient, groupId);
+    }
+    
+    public String deleteGroup(String groupName) throws Exception {
+    	return Group.deleteGroup(restClient, groupName);
     }
     
     /**

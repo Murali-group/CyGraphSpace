@@ -1,5 +1,10 @@
 package org.graphspace.javaclient.util;
 
+/**
+ * Stores properties to be used to connect to GraphSpace and methods to retrieve formatted paths 
+ * @author rishabh
+ *
+ */
 public class Config {
 	public static String VERSION = "v1";
 	public static String HOST = "http://www.graphspace.org";

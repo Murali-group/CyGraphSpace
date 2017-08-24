@@ -1,5 +1,10 @@
 package org.graphspace.javaclient.exceptions;
 
+/**
+ * Enumerates the codes for exceptions
+ * @author rishabh
+ *
+ */
 public final class ExceptionCode{
 	public static final int GRAPH_NOT_FOUND_EXCEPTION = 400;
 	public static final int BAD_REQUEST_FORMAT = 300;

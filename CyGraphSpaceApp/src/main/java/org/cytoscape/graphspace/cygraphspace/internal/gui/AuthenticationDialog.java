@@ -1,5 +1,6 @@
 package org.cytoscape.graphspace.cygraphspace.internal.gui;
 
+//importing swing components
 import javax.swing.JDialog;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -7,49 +8,52 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JPasswordField;
 
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 
 import java.awt.Component;
 import java.awt.Frame;
 
-import javax.swing.JPanel;
-import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.JPasswordField;
 
+/**
+ * This class defines the UI for Authentication dialog
+ * @author rishabh
+ *
+ */
 public class AuthenticationDialog extends JDialog {
+	
+	//UI component variables
 	private JTextField hostField;
 	private JTextField usernameField;
 	private JPasswordField passwordField;
-	private JButton signInButton;
+	private JButton loginButton;
 	JButton cancelButton;
+	
 	public AuthenticationDialog(Frame parent) {
+		
 		setTitle("Log in to the Server");
 		JLabel hostLabel = new JLabel("Host");
-		
 		hostField = new JTextField();
 		hostField.setColumns(10);
-		
 		JLabel usernameLabel = new JLabel("Username");
-		
 		usernameField = new JTextField();
 		usernameField.setColumns(10);
-		
 		JLabel passwordLabel = new JLabel("Password");
-		
 		passwordField = new JPasswordField();
-		
 		JPanel buttonsPanel = new JPanel();
+		loginButton = new JButton("Log In");
 		
-		signInButton = new JButton("Log In");
-		
-		signInButton.addActionListener(new ActionListener(){
+		//action listener for login button
+		loginButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt)
             {
                 try {
-					signInActionPerformed(evt);
+					loginActionPerformed(evt);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -57,15 +61,10 @@ public class AuthenticationDialog extends JDialog {
             }
         });
 		
-		buttonsPanel.add(signInButton);
-
-		
+		buttonsPanel.add(loginButton);
 		cancelButton = new JButton("Cancel");
-		
-		cancelButton.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent evt)
-            {
+		cancelButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt){
                 cancelActionPerformed(evt);
             }
         });
@@ -122,25 +121,34 @@ public class AuthenticationDialog extends JDialog {
 		pack();
 	}
 	
-	private void signInActionPerformed(ActionEvent evt) throws Exception{
-		signInButton.setText("Checking");
-		signInButton.setEnabled(false);
+	//called when login button clicked
+	private void loginActionPerformed(ActionEvent evt) throws Exception{
+		loginButton.setText("Checking");
+		loginButton.setEnabled(false);
 		cancelButton.setEnabled(false);
+		
+		//sets user authentication variables from the entered values
     	String hostText = hostField.getText();
     	String usernameText = usernameField.getText();
     	String passwordText = new String(passwordField.getPassword());
+    	
+    	//throws error if values not filled
     	if (hostText.isEmpty() || usernameText.isEmpty() || passwordText.isEmpty()){
     		JOptionPane.showMessageDialog((Component)evt.getSource(), "Please enter all the values", "Error", JOptionPane.ERROR_MESSAGE);
-    		signInButton.setText("Log In");
-    		signInButton.setEnabled(true);
+    		loginButton.setText("Log In");
+    		loginButton.setEnabled(true);
     		cancelButton.setEnabled(true);
     	}
+    	
+    	//throws error if cannot authenticate the user
     	else if (!Server.INSTANCE.authenticate(hostText, usernameText, passwordText)){
     		JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not authenticate you. Please ensure the username and password are correct and that you are connected to the internet.", "Error", JOptionPane.ERROR_MESSAGE);
-    		signInButton.setText("Log In");
-    		signInButton.setEnabled(true);
+    		loginButton.setText("Log In");
+    		loginButton.setEnabled(true);
     		cancelButton.setEnabled(true);
     	}
+    	
+    	//logs in the user
     	else{
     		System.out.println(hostText + " : " + usernameText + " : " + passwordText);
     		System.out.println(Server.INSTANCE.getHost()+Server.INSTANCE.getUsername()+Server.INSTANCE.getPassword());
@@ -148,6 +156,7 @@ public class AuthenticationDialog extends JDialog {
     	}
     }
 	
+	//populate user values in the authentication dialog
 	private void populateFields(){
 		hostField.setText(Server.INSTANCE.getHost());
 		if (Server.INSTANCE.getUsername()!=null){
@@ -158,6 +167,7 @@ public class AuthenticationDialog extends JDialog {
 		}
 	}
 	
+	//closes the dialog when cancel button clicked
 	private void cancelActionPerformed(ActionEvent evt) {
         this.dispose();
     }

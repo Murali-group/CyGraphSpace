@@ -1,7 +1,6 @@
 package org.cytoscape.graphspace.cygraphspace.internal.gui;
 
 import java.awt.Component;
-import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -9,10 +8,10 @@ import java.awt.event.MouseEvent;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+//importing swing components
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -27,24 +26,6 @@ import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-
-//import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
-import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
-import org.cytoscape.io.webservice.NetworkImportWebServiceClient;
-import org.cytoscape.io.webservice.swing.AbstractWebServiceGUIClient;
-import org.cytoscape.model.CyNetwork;
-import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
-import org.cytoscape.task.read.LoadVizmapFileTaskFactory;
-import org.cytoscape.util.swing.OpenBrowser;
-import org.cytoscape.work.TaskIterator;
-import org.cytoscape.work.TaskManager;
-import org.cytoscape.work.TaskMonitor;
-import org.graphspace.javaclient.Graph;
-import org.graphspace.javaclient.GraphSpaceClient;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
@@ -53,15 +34,38 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.JTabbedPane;
 
+import org.apache.commons.io.IOUtils;
+import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
+import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
+import org.cytoscape.io.webservice.NetworkImportWebServiceClient;
+import org.cytoscape.io.webservice.swing.AbstractWebServiceGUIClient;
+import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
+import org.cytoscape.task.read.LoadVizmapFileTaskFactory;
+import org.cytoscape.util.swing.OpenBrowser;
+import org.cytoscape.work.TaskIterator;
+import org.cytoscape.work.TaskManager;
+import org.graphspace.javaclient.Graph;
+import org.graphspace.javaclient.GraphSpaceClient;
+import org.json.JSONObject;
+
+/**
+ * Cytoscape panel to get graphs
+ * @author rishabh
+ *
+ */
 public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		implements NetworkImportWebServiceClient{
+	
 	static final String APP_DESCRIPTION = "<html>" + "CyGraphSpace App is used to import and export graphs from "
 			+ "<a href=\"http://www.grapshace.org\">GraphSpace</a> website. ";
 
 	OpenBrowser openBrowser;
 	LoadNetworkFileTaskFactory loadNetworkFileTaskFactory;
 	LoadVizmapFileTaskFactory loadVizmapFileTaskFactory;
+	
 	TaskManager taskManager;
+
+	//UI component variables
 	private JTextField usernameTextField;
 	private JTextField hostTextField;
 	private JPasswordField passwordField;
@@ -71,12 +75,12 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private JPanel searchPanel = new JPanel();
 	private JPanel buttonPanel = new JPanel();
 	private JButton searchButton;
-	DefaultTableModel myGraphsTableModel;
-	TableRowSorter<TableModel> myGraphsTableSorter;
-	DefaultTableModel sharedGraphsTableModel;
-	TableRowSorter<TableModel> sharedGraphsTableSorter;
-	DefaultTableModel publicGraphsTableModel;
-	TableRowSorter<TableModel> publicGraphsTableSorter;
+	private DefaultTableModel myGraphsTableModel;
+	private TableRowSorter<TableModel> myGraphsTableSorter;
+	private DefaultTableModel sharedGraphsTableModel;
+	private TableRowSorter<TableModel> sharedGraphsTableSorter;
+	private DefaultTableModel publicGraphsTableModel;
+	private TableRowSorter<TableModel> publicGraphsTableSorter;
 	private JButton importButton;
 	private JButton openInBrowserButton;
 	private JPanel parentPanel;
@@ -90,13 +94,9 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private JPanel myGraphsPaginationPanel = new JPanel();
 	private JPanel sharedGraphsPaginationPanel = new JPanel();
 	private JPanel publicGraphsPaginationPanel = new JPanel();
-	JScrollPane myGraphsScrollPane = new JScrollPane();
-	JScrollPane sharedGraphsScrollPane = new JScrollPane();
-	JScrollPane publicGraphsScrollPane = new JScrollPane();
-	private int limit = 20;
-	private int myGraphsOffSet = 0;
-	private int sharedGraphsOffSet = 0;
-	private int publicGraphsOffSet = 0;
+	private JScrollPane myGraphsScrollPane = new JScrollPane();
+	private JScrollPane sharedGraphsScrollPane = new JScrollPane();
+	private JScrollPane publicGraphsScrollPane = new JScrollPane();
 	private boolean loggedIn = false;
 	private JButton myGraphsNextButton;
 	private JButton myGraphsPreviousButton;
@@ -111,9 +111,17 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private JButton clearSearchButton;
 	private GraphSpaceClient client;
 	
-	@SuppressWarnings({ "serial", "static-access" })
+	//state variables
+	private int limit = 20;
+	private int myGraphsOffSet = 0;
+	private int sharedGraphsOffSet = 0;
+	private int publicGraphsOffSet = 0;
+	
+	@SuppressWarnings({ "rawtypes", "serial" })
 	public GetGraphsPanel(TaskManager taskManager, OpenBrowser openBrowser) {
+		
 		super("http://www.graphspace.org", "GraphSpace", APP_DESCRIPTION);
+		
 		this.taskManager = taskManager;
 		this.client = Server.INSTANCE.client;
 		this.openBrowser = openBrowser;
@@ -204,6 +212,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	                "Graph ID", "Graph Name", "Owner", "Tags"
 	            }
 	        ){
+
 			@Override
 			public boolean isCellEditable(int row, int column) {
 		        return false;
@@ -660,6 +669,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		populate();
 	}
 
+	//populate the panel based on user values
 	private void populate(){
 		if (Server.INSTANCE.isAuthenticated()){
 			try {
@@ -672,7 +682,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 				usernameTextField.setEnabled(false);
 				passwordField.setEnabled(false);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -681,42 +690,60 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		}
 	}
 	
+	//remove table entries
 	private void clearSearch(){
 		importGraphListActionPerformed();
 		clearSearchButton.setEnabled(false);
 	}
 	
+	//called when login button is clicked
 	private void loginActionPerformed(ActionEvent evt) throws Exception{
+		
+		//if the user is not logged in, then try to login the user and retrieve graphs
 		if (!this.loggedIn){
-			System.out.println("login performed");
-	    	String hostText = hostTextField.getText();
+			
+			//read user entered values
+			String hostText = hostTextField.getText();
 	    	String usernameText = usernameTextField.getText();
 	    	String passwordText = new String(passwordField.getPassword());
+	    	
+	    	//log the values entered by the user
 	    	System.out.println(hostText + " : " + usernameText + " : " + passwordText);
+	    	
+	    	//throw error if values not filled
 	    	if (hostText.isEmpty() || usernameText.isEmpty() || passwordText.isEmpty()){    		
 	    		JOptionPane.showMessageDialog((Component)evt.getSource(), "Please enter all the values", "Error", JOptionPane.ERROR_MESSAGE);
 	    		loginButton.setText("Log In");
 	    		loginButton.setEnabled(true);
 	    	}
+	    	
+	    	//throw error if user can't be authenticated
 	    	else if (!Server.INSTANCE.authenticate(hostText, usernameText, passwordText)){
 	    		JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not authenticate you. Please ensure the username and password are correct.", "Error", JOptionPane.ERROR_MESSAGE);
 	    		loginButton.setText("Log In");
 	    		loginButton.setEnabled(true);
 	    	}
+	    	
+	    	//login the user and import graphs list from GraphSpace
 	    	else{
 	    		try {
-	    			this.loggedIn = true;
+	    			this.loggedIn = true; //change state variable
 	    			loginButton.setText("Log Out");
 	    			loginButton.setEnabled(true);
+	    			
+	    			//Disable text fields
 		    		hostTextField.setEnabled(false);
 		    		usernameTextField.setEnabled(false);
 		    		passwordField.setEnabled(false);
+		    		
 		    		importGraphListActionPerformed();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 	    	}
 		}
+		
+		//if user already logged in, log out.
 		else{
 			this.loggedIn = false;
 			Server.INSTANCE.logout();
@@ -745,6 +772,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		}
 	}
 	
+	//import graph list from GraphSpace
 	private void importGraphListActionPerformed(){
 		try {
 			this.searchTerm = null;
@@ -790,6 +818,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		return new TaskIterator();
 	}
 	
+	//search graphs on GraphSpace based on search term by the user
 	private void searchPerformed(){
 		clearSearchButton.setEnabled(true);
 		this.searchTerm = searchField.getText();
@@ -902,6 +931,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		}
 	}
 
+	//utility method to populate tables
 	private void populateTable(DefaultTableModel tableModel, ArrayList<Graph> graphs, String searchTerm, int limit, int offset) throws Exception {
 		if (searchTerm == null){
 			tableModel.setRowCount(0);
@@ -936,6 +966,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		}
 	}
 	
+	//called when import graph is clicked
 	private void getGraphActionPerformed(ActionEvent e, String graphId){
 		System.out.println("get graph action performed");
 		try {
@@ -947,6 +978,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		}
 	}
 	
+	//called when graph in the table is double clicked
 	private void getGraphActionPerformed(MouseEvent e, String graphId){
 		System.out.println("get graph action performed");
 		try {
@@ -958,25 +990,31 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		}
 	}
 	
+	
+	//get graph by graphId from GraphSpace
 	private void getGraph(String graphId) throws Exception {
 		int id = Integer.valueOf(graphId);
 		Graph graph = Server.INSTANCE.getGraphById(id);
-		System.out.println(graph.getName());
+		
+		//read graph json of the graph retrieved from GraphSpace
 		JSONObject graphJson = graph.getGraphJson();
-//		JSONObject graphJson = Server.INSTANCE.getGraphById(id).getGraphJson();
-		System.out.println(graphJson.toString());
 //		JSONObject styleJson = Server.INSTANCE.getGraphById(id).getStyleJson();
-//		System.out.println(styleJson.toString());
 		String graphJsonString = graphJson.toString();
 //		String styleJsonString = styleJson.toString();
 		InputStream graphJSONInputStream = new ByteArrayInputStream(graphJsonString.getBytes());
 //		InputStream styleJSONInputStream = new ByteArrayInputStream(styleJsonString.getBytes());
+		
+		//write the graph json to a temporary file
 		File tempFile = File.createTempFile("CyGraphSpaceImport", ".cyjs");
 		try (FileOutputStream out = new FileOutputStream(tempFile)) {
             IOUtils.copy(graphJSONInputStream, out);
         }
+		
+		//load the network from the temporary file to Cytoscape using cytoscape's loadnetworkfiletaskfactory
 		TaskIterator ti = loadNetworkFileTaskFactory.createTaskIterator(tempFile);
 		CyObjectManager.INSTANCE.getTaskManager().execute(ti);
+		
+		//delete the temporary file
 		tempFile.delete();
 	}
 	
@@ -988,6 +1026,10 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		openBrowser.openURL(Server.INSTANCE.getHost()+"/graphs/"+id);
 	}
 	
+	
+	/**
+	 * set offset for graph tables
+	 */
 	public void setMyGraphsOffSet(int offset){
 		this.myGraphsOffSet = offset;
 	}
@@ -1000,6 +1042,8 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		this.publicGraphsOffSet = offset;
 	}
 
+	
+	//button listener for next button for my graphs table
 	class MyGraphsNextButtonActionListener implements ActionListener{
 	    public MyGraphsNextButtonActionListener() {
 	    	super();
@@ -1033,6 +1077,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	    }
 	}
 	
+	//button listener for previous button for my graphs table
 	class MyGraphsPreviousButtonActionListener implements ActionListener{
 	    public MyGraphsPreviousButtonActionListener() {
 	    	super();
@@ -1065,6 +1110,8 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	    }
 	}
 	
+	
+	//button listener for next button for shared graphs table
 	class SharedGraphsNextButtonActionListener implements ActionListener{
 	    public SharedGraphsNextButtonActionListener() {
 	    	super();
@@ -1099,6 +1146,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	    }
 	}
 	
+	//button listener for previous button for shared graphs table
 	class SharedGraphsPreviousButtonActionListener implements ActionListener{
 	    public SharedGraphsPreviousButtonActionListener() {
 	    	super();
@@ -1131,6 +1179,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	    }
 	}
 	
+	//button listener for next button for public graphs table
 	class PublicGraphsNextButtonActionListener implements ActionListener{
 	    public PublicGraphsNextButtonActionListener() {
 	    	super();
@@ -1163,6 +1212,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	    }
 	}
 
+	//button listener for previous button for public graphs table
 	class PublicGraphsPreviousButtonActionListener implements ActionListener{
 	    public PublicGraphsPreviousButtonActionListener() {
 	    	super();
@@ -1195,15 +1245,4 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			}
 	    }
 	}
-	
-//	private static void setWidthAsPercentages(JTable table,
-//	        double... percentages) {
-//	    final double factor = 10000;
-//	 
-//	    TableModel model = table.getModel();
-//	    for (int columnIndex = 0; columnIndex < percentages.length; columnIndex++) {
-//	        TableColumn column = model.getColumn(columnIndex);
-//	        column.setPreferredWidth((int) (percentages[columnIndex] * factor));
-//	    }
-//	}
 }

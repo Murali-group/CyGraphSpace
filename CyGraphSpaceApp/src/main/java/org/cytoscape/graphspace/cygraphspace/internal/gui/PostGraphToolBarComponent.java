@@ -31,25 +31,37 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.apache.commons.io.FileUtils;
 
+/**
+ * Toolbar component on Cytoscape toolbar to post and update graphs to GraphSpace
+ * @author rishabh
+ *
+ */
 public class PostGraphToolBarComponent extends AbstractToolBarComponent implements CyAction{
+	
+	//UI elements
 	private JButton button;
 	private JFrame loadingFrame;
+	
 	public PostGraphToolBarComponent(){
 		super();
 		button = new JButton();
+		
+		//imageicon used as for the toolbar menu
 		ImageIcon icon = new ImageIcon(this.getClass().getClassLoader().getResource("graphspaceicon.png"));
 		button.setIcon(icon);
 		button.setBorderPainted(false);
 		button.setFocusPainted(false);
 		button.setContentAreaFilled(true);
-		button.setToolTipText("Export To GraphSpace");
+		button.setToolTipText("Export To GraphSpace"); //set tooltip to notify users about the functionality of the button
+		
+		//action attached to the button
 		button.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent evt){
 
 				JFrame parent = CyObjectManager.INSTANCE.getApplicationFrame();
-
 		        CyNetwork currentNetwork = CyObjectManager.INSTANCE.getCurrentNetwork();
 		        
+		        //loading frame while checking if updating the graph is possible
 		        loadingFrame = new JFrame("Checking if update Possible");
 				ImageIcon loading = new ImageIcon(this.getClass().getClassLoader().getResource("loading.gif"));
 				JLabel loadingLabel = new JLabel("", loading, JLabel.CENTER);
@@ -57,21 +69,26 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 				loadingFrame.setSize(400, 300);
 				loadingFrame.add(loadingLabel);
 				loadingFrame.setLocationRelativeTo(parent);
+				
+				//if there is no network to export, display an error
 		        if( currentNetwork == null ){
 		            String msg = "There is no graph to export.";
 		            String dialogTitle = "No Graph Found";
 		            JOptionPane.showMessageDialog(parent, msg, dialogTitle, JOptionPane.ERROR_MESSAGE );
 		            return;
 		        }
+		        
+		        //if there is a network and the user is currently authenticated, create a post graph dialog
 		        if (Server.INSTANCE.isAuthenticated()){
 					loadingFrame.setVisible(true);
 		    		try {
 						populate(parent);
 					} catch (Exception e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 		        }
+		        
+		        //if there is a network but the user is not authenticated, open the login dialog for the user to log in. Once logged in, open the post graph dialog
 		        else{
 		        	AuthenticationDialog dialog = new AuthenticationDialog(parent);
 		            dialog.setLocationRelativeTo(parent);
@@ -93,11 +110,14 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 		});
 	}
 	
+	//populate the values in the post graph dialog
    private void populate(Frame parent) throws Exception{
 		JSONObject graphJSON = exportNetworkToJSON();
 		JSONObject styleJSON = exportStyleToJSON();
 		String graphName = graphJSON.getJSONObject("data").getString("name");
 		boolean isGraphPublic = false;
+		
+		//if updating the graph is possible, open the update graph dialog.
 		if(Server.INSTANCE.updatePossible(graphName)){
 			loadingFrame.dispose();
 			Graph graph = Server.INSTANCE.getGraphByName(graphName);
@@ -106,6 +126,8 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 			updateDialog.setLocationRelativeTo(parent);
 			updateDialog.setVisible(true);
 		}
+		
+		//if updating the graph is not possible, open the post graph dialog
 		else{
 			loadingFrame.dispose();
 			PostGraphDialog postDialog = new PostGraphDialog(parent, graphName, graphJSON, styleJSON, isGraphPublic, null);
@@ -114,12 +136,23 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 		}
     }
     
+   	//Utility method to export the current network to a json object to be exported to GraphSpace
     private JSONObject exportNetworkToJSON() throws IOException{
+    	
+    	//create a temporary json file for the network of cyjs format
 		File tempFile = File.createTempFile("CyGraphSpaceExport", ".cyjs");
+		
+		//read the network
 		CyNetwork network = CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork();
+		
+		//export the network to the temporary cyjs file
 		TaskIterator ti = CyObjectManager.INSTANCE.getExportNetworkTaskFactory().createTaskIterator(network, tempFile);
 		CyObjectManager.INSTANCE.getTaskManager().execute(ti);
+		
+		//read the file contents to a string
 		String graphJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
+		
+		//ugly way to wait for the parallel process of reading to be completed
 		int count = 0;
 		while(graphJSONString.isEmpty()){
 			try {
@@ -134,27 +167,49 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 				return null;
 			}
 		}
+		
+		//delete the temporary file
 		tempFile.delete();
+		
+		/**
+		 * There is a design flaw in Cytoscape that results in a few parameters to be added to the graphs automatically on import.
+		 * This is because cytoscape doesn't restrict apps to use any arbitary parameters to save network data, hence, they add
+		 * attributes on importing the graph that was earlier created using GraphSpace and instead of replacing the values for conflicting attributes,
+		 * those values are stored under different attribute names.
+		 * This creates duplicate attribute values which results in an error while exporting the String to a json object.
+		 * Hence, the attributes which are not required by GraphSpace and Cytoscape are deleted before exporting to resolve this conflict.
+		 * This might be problematic in case the user needs to use the graph with other apps which uses conflicting attributes.
+		 */
 		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"shared_name\".*", "");
 		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"id_original\".*", "");
 		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"shared_interaction\".*", "");
 		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"source_original\".*", "");
 		graphJSONString = graphJSONString.replaceAll("(?m)^*.\"target_original\".*", "");
+		
+		//graph string converted to graphJson
 		JSONObject graphJSON = new JSONObject(graphJSONString);
         return graphJSON;
 	}
 	
+    //Utility method to export the style of the current network to a json object to be exported to GraphSpace
 	private JSONObject exportStyleToJSON() throws IOException{
+		
+		//create a temporary json file for the network of json format
 		File tempFile = File.createTempFile("CyGraphSpaceStyleExport", ".json");
+		
+		//export the style json to the temporary json file
 		TaskIterator ti = CyObjectManager.INSTANCE.getExportVizmapTaskFactory().createTaskIterator(tempFile);
 		CyObjectManager.INSTANCE.getTaskManager().execute(ti);
+		
+		//read the file contents to a string
 		String styleJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
+		
+		//ugly way to wait for the parallel process of reading to be completed
 		int count = 0;
 		while(styleJSONString.isEmpty()){
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			styleJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
@@ -163,12 +218,26 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 				return null;
 			}
 		}
+		
+		//delete the temporary files
 		tempFile.delete();
+		
+		/**
+		 * There is a design flaw in Cytoscape that results in a few parameters to be added to the graphs automatically on import.
+		 * This is because cytoscape doesn't restrict apps to use any arbitary parameters to save network data, hence, they add
+		 * attributes on importing the graph that was earlier created using GraphSpace and instead of replacing the values for conflicting attributes,
+		 * those values are stored under different attribute names.
+		 * This creates duplicate attribute values which results in an error while exporting the String to a json object.
+		 * Hence, the attributes which are not required by GraphSpace and Cytoscape are deleted before exporting to resolve this conflict.
+		 * This might be problematic in case the user needs to use the graph with other apps which uses conflicting attributes.
+		 */
 		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"shared_name\".*", "");
 		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"id_original\".*", "");
 		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"shared_interaction\".*", "");
 		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"source_original\".*", "");
 		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"target_original\".*", "");
+		
+		//style string converted to graphJson
 		JSONArray styleJSONArray = new JSONArray(styleJSONString);
         return styleJSONArray.getJSONObject(0);
 	}
@@ -177,15 +246,10 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 
 	@Override
 	public Component getComponent() {
-		// TODO Auto-generated method stub
-//		return null;
+		//returns the button component to be visible on the toolbar
 		return button;
 	}
-//	@Override
-//	public float getToolBarGravity() {
-//		// TODO Auto-generated method stub
-//		return 1;
-//	}
+
 	@Override
 	public Object getValue(String key) {
 		// TODO Auto-generated method stub

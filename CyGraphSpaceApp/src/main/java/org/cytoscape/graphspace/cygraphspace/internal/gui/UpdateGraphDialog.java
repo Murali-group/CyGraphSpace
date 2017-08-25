@@ -1,44 +1,33 @@
 package org.cytoscape.graphspace.cygraphspace.internal.gui;
 
+//importing swing components
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.GroupLayout;
-import javax.swing.ImageIcon;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JPanel;
+import javax.swing.JButton;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
-import org.cytoscape.model.CyNetwork;
-import org.cytoscape.work.TaskIterator;
-import org.json.JSONArray;
+
 import org.json.JSONObject;
+import java.util.ArrayList;
 
 import java.awt.Component;
 import java.awt.Frame;
-
-import javax.swing.JPanel;
-import javax.swing.JButton;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.awt.event.ActionEvent;
-import javax.swing.JCheckBox;
-import javax.swing.JSpinner;
-import javax.swing.JComboBox;
 
+/**
+ * This class defines the UI for the UpdateGraph dialog
+ * @author rishabh
+ *
+ */
 public class UpdateGraphDialog extends JDialog {
+	
+	//UI component variables
 	private JLabel hostValueLabel;
 	private JLabel usernameValueLabel;
 	private JLabel usernameLabel;
@@ -127,58 +116,9 @@ public class UpdateGraphDialog extends JDialog {
 		getContentPane().setLayout(groupLayout);
 		populateFields(graphName);
 		pack();
-//		check();
 	}
-
-//	public void check(){
-//		try {
-//			if(Server.INSTANCE.updatePossible(graphName)){
-//				getContentPane().remove(loadingPanel);
-//				loadingPanel.setVisible(false);
-//				getContentPane().setLayout(groupLayout);
-//				postGraphButton.setText("Update");
-//				postGraphButton.setEnabled(true);
-//				JSONObject responseFromGraphSpace = Server.INSTANCE.client.getGraphByName(graphName);
-//				int isPublic = responseFromGraphSpace.getInt("is_public");
-//				postGraphButton.addActionListener(new ActionListener(){
-//					public void actionPerformed(ActionEvent evt) {
-//						boolean isGraphPublic = false;
-//						if (isPublic == 1){
-//							isGraphPublic = true;
-//						}
-//						updateActionPerformed(evt, graphJSON, styleJSON, isGraphPublic);
-//					}
-//				});
-//			}
-//			else{
-//				getContentPane().remove(loadingPanel);
-//				loadingPanel.setVisible(false);
-//				getContentPane().setLayout(groupLayout);
-//				postGraphButton.setText("Export");
-//				postGraphButton.setEnabled(true);
-////				ArrayList<GSGroupMetaData> groups = Server.INSTANCE.getMyGroups(20, 0);
-////				for (GSGroupMetaData group: groups){
-////				}
-////				postGraphButton.addActionListener(new ExportActionListener(graphJSON, styleJSON, isGraphPublic, tagsList));
-//				postGraphButton.addActionListener(new ActionListener(){
-//					public void actionPerformed(ActionEvent evt) {
-//						boolean isGraphPublic = false;
-//						exportActionPerformed(evt, graphJSON, styleJSON, isGraphPublic);
-//					}
-//				});
-//			}
-//			
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			dispose();
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			dispose();
-//		}
-//	}
 	
+	//populate dialog with user values
 	private void populateFields(String graphName){
 		if (Server.INSTANCE.getUsername() != null){
 			usernameValueLabel.setText(Server.INSTANCE.getUsername());
@@ -189,6 +129,7 @@ public class UpdateGraphDialog extends JDialog {
 		graphNameValue.setText(graphName);
 	}
 	
+	//called when update button clicked
 	private void updateActionPerformed(ActionEvent evt, JSONObject graphJSON, JSONObject styleJSON, boolean isPublic){
 		try{
 			this.dispose();
@@ -201,11 +142,13 @@ public class UpdateGraphDialog extends JDialog {
 		}
 	}
 	
+	//post the current network to GraphSpace
 	private void updateGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isPublic, ArrayList<String> tagsList) throws Exception{
 		String name = graphJSON.getJSONObject("data").getString("name");
 		Server.INSTANCE.updateGraph(name, graphJSON, isPublic, tagsList);
 	}
 	
+	//close the dialog box on cancel clicked
 	private void cancelActionPerformed(ActionEvent e){
 		this.dispose();
 	}

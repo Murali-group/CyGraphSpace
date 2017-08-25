@@ -1,9 +1,7 @@
 package org.cytoscape.graphspace.cygraphspace.internal.gui;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -24,7 +22,6 @@ import javax.swing.event.PopupMenuEvent;
 
 import org.cytoscape.application.swing.AbstractToolBarComponent;
 import org.cytoscape.application.swing.CyAction;
-import org.cytoscape.application.swing.ToolBarComponent;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 import org.cytoscape.model.CyNetwork;
@@ -33,23 +30,15 @@ import org.graphspace.javaclient.Graph;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.apache.commons.io.FileUtils;
-import org.cytoscape.application.swing.AbstractCyAction;
 
 public class PostGraphToolBarComponent extends AbstractToolBarComponent implements CyAction{
 	private JButton button;
 	private JFrame loadingFrame;
 	public PostGraphToolBarComponent(){
 		super();
-//		ImageIcon icon = createImageIcon("/graphspace.png", "Graphspace");
-//		this.setIcon(icon);
-//		this.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("graphspace-icon.png")));
 		button = new JButton();
-//		button.setText("GraphSpace");
 		ImageIcon icon = new ImageIcon(this.getClass().getClassLoader().getResource("graphspaceicon.png"));
 		button.setIcon(icon);
-//		button.setPreferredSize(new Dimension(10,10));
-//		button.setMargin(new Insets(0, 0, 0, 0));
-//		button.setBorder(null);
 		button.setBorderPainted(false);
 		button.setFocusPainted(false);
 		button.setContentAreaFilled(true);
@@ -64,14 +53,11 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 		        loadingFrame = new JFrame("Checking if update Possible");
 				ImageIcon loading = new ImageIcon(this.getClass().getClassLoader().getResource("loading.gif"));
 				JLabel loadingLabel = new JLabel("", loading, JLabel.CENTER);
-//				loadingLabel.setHorizontalTextPosition(JLabel.CENTER);
-//				loadingLabel.setVerticalTextPosition(JLabel.BOTTOM);
 				loadingFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				loadingFrame.setSize(400, 300);
 				loadingFrame.add(loadingLabel);
 				loadingFrame.setLocationRelativeTo(parent);
-		        if( currentNetwork == null )
-		        {
+		        if( currentNetwork == null ){
 		            String msg = "There is no graph to export.";
 		            String dialogTitle = "No Graph Found";
 		            JOptionPane.showMessageDialog(parent, msg, dialogTitle, JOptionPane.ERROR_MESSAGE );
@@ -111,16 +97,11 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 		JSONObject graphJSON = exportNetworkToJSON();
 		JSONObject styleJSON = exportStyleToJSON();
 		String graphName = graphJSON.getJSONObject("data").getString("name");
-		System.out.println(graphName);
 		boolean isGraphPublic = false;
 		if(Server.INSTANCE.updatePossible(graphName)){
 			loadingFrame.dispose();
 			Graph graph = Server.INSTANCE.getGraphByName(graphName);
 			isGraphPublic = graph.isPublic();
-//			int isPublic = responseFromGraphSpace.getInt("is_public");
-//			if (isPublic==1){
-//				isGraphPublic = true;
-//			}
 			UpdateGraphDialog updateDialog = new UpdateGraphDialog(parent, graphName, graphJSON, styleJSON, isGraphPublic, null);
 			updateDialog.setLocationRelativeTo(parent);
 			updateDialog.setVisible(true);

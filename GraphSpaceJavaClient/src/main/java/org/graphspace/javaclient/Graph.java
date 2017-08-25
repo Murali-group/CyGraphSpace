@@ -41,6 +41,12 @@ public class Graph extends Resource {
 	public Graph(RestClient restClient, JSONObject json) {
 		super(restClient, json);
 		this.isGraphPublic = false;
+		if (this.json.has("graph_json")) {
+			this.graphJson = json.getJSONObject("graph_json");
+		}
+		if (this.json.has("style_json")) {
+			this.styleJson = json.getJSONObject("style_json");
+		}
 	}
 	
 	/**
@@ -340,17 +346,27 @@ public class Graph extends Resource {
     				"Graph JSON is not set.");
     	}
     	Map<String, Object> data = new HashMap<String, Object>();
-    	int isPublic = this.isGraphPublic ? 1 : 0;
+    	Graph graphToBeUpdated = getGraph(restClient, this.name, restClient.getUser());
+    	int isPublic = graphToBeUpdated.isPublic() ? 1 : 0;
+    	JSONObject existingStyleJson = graphToBeUpdated.getStyleJson();
     	if (getGraph(restClient, this.name, restClient.getUser()) != null) {
     		data.put("name", this.name);
     		data.put("is_public", isPublic);
-    		data.put("owner_email", this.ownerEmail);
+    		data.put("owner_email", restClient.getUser());
     		data.put("graph_json", this.graphJson);
-    		data.put("style_json", this.styleJson);
+    		if (this.styleJson == null) {
+    			if (existingStyleJson != null) {
+    				data.put("style_json", existingStyleJson);
+    			}
+    		}
+    		else {
+    			data.put("style_json", this.styleJson);
+    		}
     		if (tags!=null && !tags.isEmpty()) {
     			data.put("tags[]", tags);
     		}
-    		String path = Config.GRAPHS_PATH + this.id;
+    		int graphId = graphToBeUpdated.getId();
+    		String path = Config.GRAPHS_PATH + graphId;
         	JSONObject jsonResponse = restClient.put(path, data);
         	Response response = new Response(jsonResponse);
         	return response.getResponseStatus();

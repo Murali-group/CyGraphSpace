@@ -48,7 +48,6 @@ import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
 import org.cytoscape.task.read.LoadVizmapFileTaskFactory;
 import org.cytoscape.task.write.ExportNetworkTaskFactory;
 import org.cytoscape.task.write.ExportVizmapTaskFactory;
-import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.model.CyNetworkViewManager;
@@ -60,23 +59,19 @@ import org.cytoscape.view.vizmap.VisualStyleFactory;
 import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.swing.DialogTaskManager;
 
+//utility variables and methods to maintain Cytoscape singleton properties
 public enum CyObjectManager {
+	
     INSTANCE;
-    // App Configuration Directory where configuraton may be stored.
+
     private File configDir;
-    // The Cytoscape helper class that allows us to easily get all sorts of Cytoscape objects.
     public CySwingAppAdapter adapter;
-    // The network table manager.
     private CyNetworkTableManager networkTableManager;
-    
-//    private CyNetworkViewWriterFactory cytoscapeJsWriterFactory;
-//	private CytoscapeJsReaderFactory cytoscapeJsReaderFactory;
 	private LoadNetworkFileTaskFactory loadNetworkFileTaskFactory;
 	private ExportNetworkTaskFactory exportNetworkTaskFactory;
-//	private CyNetworkReader cyNetworkReader;
 	private CyTableManager tableManager;
-	private TaskManager taskManager;
 	private CySwingApplication desktop;
+	private TaskManager taskManager;
 	private LoadVizmapFileTaskFactory loadVizmapFileTaskFactory;
 	private ExportVizmapTaskFactory exportVizmapTaskFactory;
     private CyNetworkFactory cyNetworkFactory;
@@ -87,48 +82,49 @@ public enum CyObjectManager {
 	public void setCyProperties(CyProperty<Properties> cyProperties) {
 		this.cyProperties = cyProperties;
 	}
+	
+	public void setTaskManager(TaskManager taskManager){
+    	this.taskManager = taskManager;
+    }
 	public CyProperty<Properties> getCyProperties(){
 		return this.cyProperties;
 	}
+	
 	public void setCyNetworkFactory(CyNetworkFactory cyNetworkFactory) {
 		this.cyNetworkFactory = cyNetworkFactory;
 	}
+	
 	public CyNetworkFactory getCyNetworkFactory() {
 		return this.cyNetworkFactory;
 	}
+	
 	public void setCyNetworkManager(CyNetworkManager cyNetworkManager) {
 		this.cyNetworkManager = cyNetworkManager;
 	}
+	
 	public CyNetworkManager getCyNetworkManager() {
 		return this.cyNetworkManager;
 	}
+	
 	public void setCyRootNetworkManager(CyRootNetworkManager cyRootNetworkManager) {
 		this.cyRootNetworkManager = cyRootNetworkManager;
 	}
+	
 	public CyRootNetworkManager getRootCyNetworkManager() {
 		return this.cyRootNetworkManager;
 	}
 	
-    public File getConfigDir()
-    {
+    public File getConfigDir(){
         return configDir;
     }
-    public void setConfigDir(File configDir)
-    {
+    
+    public void setConfigDir(File configDir){
         this.configDir = configDir;
     }
-    public void setCySwingAppAdapter(CySwingAppAdapter appAdapter)
-    {
+    
+    public void setCySwingAppAdapter(CySwingAppAdapter appAdapter){
         this.adapter = appAdapter;
     }
-    
-//    public void setCytoscapeJsWriterFactory(CyNetworkViewWriterFactory cytoscapeJsWriterFactory){
-//    	this.cytoscapeJsWriterFactory = cytoscapeJsWriterFactory;
-//    }
-//    
-//    public void setCytoscapeJsReaderFactory(InputStreamTaskFactory cytoscapeJsReaderFactory){
-//    	this.cytoscapeJsReaderFactory = cytoscapeJsReaderFactory;
-//    }
     
     public void setLoadNetworkFileTaskFactory(LoadNetworkFileTaskFactory loadNetworkFileTaskFactory){
     	this.loadNetworkFileTaskFactory = loadNetworkFileTaskFactory;
@@ -145,48 +141,39 @@ public enum CyObjectManager {
     public void setLoadVizmapTaskFactory(LoadVizmapFileTaskFactory loadVizmapFileTaskFactory){
     	this.loadVizmapFileTaskFactory = loadVizmapFileTaskFactory;
     }
-//    public void setCyNetworkReader(CyNetworkReader cyNetworkReader){
-//    	this.cyNetworkReader = cyNetworkReader;
-//    }
-    
-    // Trivial Getters
+
     public CyVersion getCyVersion(){
     	return adapter.getCyVersion();
     }
+    
     public StreamUtil getStreamUtil(){
     	return adapter.getStreamUtil();
     }
+    
     public CyRootNetworkManager getRootNetworkManager(){
     	return adapter.getCyRootNetworkManager();
     }
+    
     public CyApplicationManager getApplicationManager(){
     	return adapter.getCyApplicationManager();
     }
     
-    public CyNetworkFactory getNetworkFactory()
-    {
+    public CyNetworkFactory getNetworkFactory(){
         return adapter.getCyNetworkFactory();
     }
-    public CyNetworkManager getNetworkManager()
-    {
+    
+    public CyNetworkManager getNetworkManager(){
         return adapter.getCyNetworkManager();
     }
-    public CyNetworkViewFactory getNetworkViewFactory()
-    {
+    
+    public CyNetworkViewFactory getNetworkViewFactory(){
         return adapter.getCyNetworkViewFactory();
     }
-    public CyNetworkViewManager getNetworkViewManager()
-    {
+    
+    public CyNetworkViewManager getNetworkViewManager(){
         return adapter.getCyNetworkViewManager();
     }
-//    public CyNetworkViewWriterFactory getCytoscapeJsWriterFactory(){
-//    	return this.cytoscapeJsWriterFactory;
-//    }
-//    
-//    public InputStreamTaskFactory getCytoscapeJsReaderFactory(){
-//    	return this.cytoscapeJsReaderFactory;
-//    }
-    
+
     public LoadNetworkFileTaskFactory getLoadNetworkFileTaskFactory(){
     	return this.loadNetworkFileTaskFactory;
     }
@@ -202,38 +189,67 @@ public enum CyObjectManager {
     public ExportNetworkTaskFactory getExportNetworkTaskFactory(){
     	return this.exportNetworkTaskFactory;
     }
-    
-//    public CyNetworkReader getCyNetworkReader(){
-//    	return this.cyNetworkReader;
-//    }
-    public void setTaskManager(TaskManager taskManager){
-    	this.taskManager = taskManager;
+    public VisualLexicon getDefaultVisualLexicon(){
+    	return adapter.getRenderingEngineManager().getDefaultVisualLexicon();
     }
-    public VisualLexicon getDefaultVisualLexicon() { return adapter.getRenderingEngineManager().getDefaultVisualLexicon(); }
-    public JFrame getApplicationFrame() { return adapter.getCySwingApplication().getJFrame(); }
-    public DialogTaskManager getTaskManager() { return this.adapter.getDialogTaskManager(); }
-    public CyLayoutAlgorithmManager getLayoutAlgorithmManager() { return adapter.getCyLayoutAlgorithmManager(); }
-    public VisualMappingManager getVisualMappingManager() { return adapter.getVisualMappingManager(); }
-    public CyGroupManager getCyGroupManager() { return adapter.getCyGroupManager(); }
-    public VisualStyleFactory getVisualStyleFactory() { return adapter.getVisualStyleFactory(); }
-    public VisualMappingFunctionFactory getVisualMappingFunctionContinuousFactory() { return adapter.getVisualMappingFunctionContinuousFactory(); }
-    public VisualMappingFunctionFactory getVisualMappingFunctionDiscreteFactory() { return adapter.getVisualMappingFunctionDiscreteFactory(); }
-    public VisualMappingFunctionFactory getVisualMappingFunctionPassthroughFactory() { return adapter.getVisualMappingFunctionPassthroughFactory(); }
-    public RenderingEngineManager getRenderingEngineManager() { return adapter.getRenderingEngineManager(); }
-
-	public void setNetworkTableManager(CyNetworkTableManager networkTableManager) { this.networkTableManager = networkTableManager; }
-	public void setTableManager(CyTableManager tableManager) { this.tableManager = tableManager; }
-    public CyNetworkTableManager getNetworkTableManager() { return networkTableManager; }
-    public CyTableManager getTableManager() { return this.tableManager; }
+    public JFrame getApplicationFrame(){
+    	return adapter.getCySwingApplication().getJFrame();
+    }
     
-    public CyNetwork getCurrentNetwork()
-    {
+    public DialogTaskManager getTaskManager(){
+    	return this.adapter.getDialogTaskManager();
+    }
+
+    public VisualMappingManager getVisualMappingManager() {
+    	return adapter.getVisualMappingManager();
+    }
+    
+    public CyGroupManager getCyGroupManager(){
+    	return adapter.getCyGroupManager();
+    }
+    
+    public VisualStyleFactory getVisualStyleFactory(){
+    	return adapter.getVisualStyleFactory();
+    }
+    
+    public VisualMappingFunctionFactory getVisualMappingFunctionContinuousFactory() {
+    	return adapter.getVisualMappingFunctionContinuousFactory();
+    }
+    
+    public VisualMappingFunctionFactory getVisualMappingFunctionDiscreteFactory(){
+    	return adapter.getVisualMappingFunctionDiscreteFactory();
+    }
+    
+    public VisualMappingFunctionFactory getVisualMappingFunctionPassthroughFactory(){
+    	return adapter.getVisualMappingFunctionPassthroughFactory();
+    }
+    
+    public RenderingEngineManager getRenderingEngineManager(){
+    	return adapter.getRenderingEngineManager();
+    }
+
+	public void setNetworkTableManager(CyNetworkTableManager networkTableManager){
+		this.networkTableManager = networkTableManager;
+	}
+	
+	public void setTableManager(CyTableManager tableManager){
+		this.tableManager = tableManager;
+	}
+	
+    public CyNetworkTableManager getNetworkTableManager(){
+    	return networkTableManager;
+    }
+    
+    public CyTableManager getTableManager(){
+    	return this.tableManager;
+    }
+    
+    public CyNetwork getCurrentNetwork(){
         CyApplicationManager applicationManager = adapter.getCyApplicationManager();
         return applicationManager == null ? null : applicationManager.getCurrentNetwork();
     }
 
-    public CyNetworkView getCurrentNetworkView()
-    {
+    public CyNetworkView getCurrentNetworkView(){
         CyApplicationManager applicationManager = adapter.getCyApplicationManager();
         return applicationManager == null ? null : applicationManager.getCurrentNetworkView();
     }
@@ -245,5 +261,4 @@ public enum CyObjectManager {
     public CySwingApplication getCySwingApplition(){
     	return this.desktop;
     }
-
 }

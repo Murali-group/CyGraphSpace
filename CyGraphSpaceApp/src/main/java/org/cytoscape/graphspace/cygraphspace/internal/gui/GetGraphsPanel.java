@@ -689,7 +689,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private void loginActionPerformed(ActionEvent evt) throws Exception{
 		if (!this.loggedIn){
 			System.out.println("login performed");
-			loginButton.setEnabled(false);
 	    	String hostText = hostTextField.getText();
 	    	String usernameText = usernameTextField.getText();
 	    	String passwordText = new String(passwordField.getPassword());
@@ -708,6 +707,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	    		try {
 	    			this.loggedIn = true;
 	    			loginButton.setText("Log Out");
+	    			loginButton.setEnabled(true);
 		    		hostTextField.setEnabled(false);
 		    		usernameTextField.setEnabled(false);
 		    		passwordField.setEnabled(false);
@@ -739,6 +739,9 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			myGraphsPreviousButton.setEnabled(false);
 			sharedGraphsPreviousButton.setEnabled(false);
 			publicGraphsPreviousButton.setEnabled(false);
+			myGraphsScrollPane.setViewportView(myGraphsTable);
+			sharedGraphsScrollPane.setViewportView(sharedGraphsTable);
+			publicGraphsScrollPane.setViewportView(publicGraphsTable);
 		}
 	}
 	
@@ -936,7 +939,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private void getGraphActionPerformed(ActionEvent e, String graphId){
 		System.out.println("get graph action performed");
 		try {
-			
+			getGraph(graphId);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog((Component)e.getSource(), "Could not get graph", "Error", JOptionPane.ERROR_MESSAGE);
@@ -957,14 +960,17 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	
 	private void getGraph(String graphId) throws Exception {
 		int id = Integer.valueOf(graphId);
-		JSONObject graphJson = Server.INSTANCE.getGraphById(id).getGraphJson();
+		Graph graph = Server.INSTANCE.getGraphById(id);
+		System.out.println(graph.getName());
+		JSONObject graphJson = graph.getGraphJson();
+//		JSONObject graphJson = Server.INSTANCE.getGraphById(id).getGraphJson();
 		System.out.println(graphJson.toString());
-		JSONObject styleJson = Server.INSTANCE.getGraphById(id).getStyleJson();
-		System.out.println(styleJson.toString());
+//		JSONObject styleJson = Server.INSTANCE.getGraphById(id).getStyleJson();
+//		System.out.println(styleJson.toString());
 		String graphJsonString = graphJson.toString();
-		String styleJsonString = styleJson.toString();
+//		String styleJsonString = styleJson.toString();
 		InputStream graphJSONInputStream = new ByteArrayInputStream(graphJsonString.getBytes());
-		InputStream styleJSONInputStream = new ByteArrayInputStream(styleJsonString.getBytes());
+//		InputStream styleJSONInputStream = new ByteArrayInputStream(styleJsonString.getBytes());
 		File tempFile = File.createTempFile("CyGraphSpaceImport", ".cyjs");
 		try (FileOutputStream out = new FileOutputStream(tempFile)) {
             IOUtils.copy(graphJSONInputStream, out);

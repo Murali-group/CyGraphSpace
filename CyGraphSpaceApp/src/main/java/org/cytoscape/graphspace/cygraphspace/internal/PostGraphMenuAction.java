@@ -50,14 +50,15 @@ public class PostGraphMenuAction extends AbstractCyAction {
 	    loadingFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		loadingFrame.setSize(400, 300);
 		loadingFrame.setLocationRelativeTo(parent);
-        if( currentNetwork == null )
-        {
+        
+		if(currentNetwork == null){
             String msg = "There is no graph to export.";
             String dialogTitle = "No Graph Found";
             JOptionPane.showMessageDialog(parent, msg, dialogTitle, JOptionPane.ERROR_MESSAGE );
             return;
         }
-        if (Server.INSTANCE.isAuthenticated()){
+        
+		if (Server.INSTANCE.isAuthenticated()){
 			loadingFrame.setVisible(true);
     		try {
 				populate(parent, loadingFrame);
@@ -66,7 +67,8 @@ public class PostGraphMenuAction extends AbstractCyAction {
 				e1.printStackTrace();
 			}
         }
-        else{
+        
+		else{
         	AuthenticationDialog dialog = new AuthenticationDialog(parent);
             dialog.setLocationRelativeTo(parent);
             dialog.setVisible(true);
@@ -89,16 +91,11 @@ public class PostGraphMenuAction extends AbstractCyAction {
 		JSONObject graphJSON = exportNetworkToJSON();
 		JSONObject styleJSON = exportStyleToJSON();
 		String graphName = graphJSON.getJSONObject("data").getString("name");
-		System.out.println(graphName);
 		boolean isGraphPublic = false;
 		if(Server.INSTANCE.updatePossible(graphName)){
 			loadingFrame.dispose();
 			Graph graph = Server.INSTANCE.getGraphByName(graphName);
 			isGraphPublic = graph.isPublic();
-//			int isPublic = responseFromGraphSpace.getInt("is_public");
-//			if (isPublic==1){
-//				isGraphPublic = true;
-//			}
 			UpdateGraphDialog updateDialog = new UpdateGraphDialog(parent, graphName, graphJSON, styleJSON, isGraphPublic, null);
 			updateDialog.setLocationRelativeTo(parent);
 			updateDialog.setVisible(true);

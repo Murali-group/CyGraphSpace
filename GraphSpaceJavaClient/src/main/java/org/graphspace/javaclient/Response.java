@@ -166,6 +166,9 @@ public class Response {
 				throw new GraphException(ExceptionCode.BAD_REQUEST_FORMAT, ExceptionMessage.BAD_REQUEST_FORMAT_EXCEPTION,
 						"More than 1 graph are returned. Please use getGraphs method instead to get an ArrayList of Graphs");
 			}
+			if (graphsArr.length()==0) {
+				return null;
+			}
 			JSONObject graphObj = graphsArr.getJSONObject(0);
 			graph = new Graph(restClient, graphObj);
 			return graph;
@@ -190,6 +193,9 @@ public class Response {
 			if (layoutsArr.length()>1) {
 				throw new LayoutException(ExceptionCode.BAD_REQUEST_FORMAT, ExceptionMessage.BAD_REQUEST_FORMAT_EXCEPTION,
 						"More than 1 layout are returned. Please use getLayouts method instead to get an ArrayList of Layouts");
+			}
+			if (layoutsArr.length()==0) {
+				return null;
 			}
 			JSONObject layoutObj = layoutsArr.getJSONObject(0);
 			layout = new Layout(restClient, layoutObj);
@@ -217,6 +223,9 @@ public class Response {
 				throw new GroupException(ExceptionCode.BAD_REQUEST_FORMAT, ExceptionMessage.BAD_REQUEST_FORMAT_EXCEPTION,
 						"More than 1 group are returned. Please use getGroups method instead to get an ArrayList of Groups");
 			}
+			if (groupsArr.length()==0) {
+				return null;
+			}
 			JSONObject groupObj = groupsArr.getJSONObject(0);
 			group = new Group(restClient, groupObj);
 			return group;
@@ -242,6 +251,9 @@ public class Response {
 			if (membersArr.length()>1) {
 				throw new GroupException(ExceptionCode.BAD_REQUEST_FORMAT, ExceptionMessage.BAD_REQUEST_FORMAT_EXCEPTION,
 						"More than 1 member are returned. Please use getMembers method instead to get an ArrayList of Members");
+			}
+			if (membersArr.length()==0) {
+				return null;
 			}
 			JSONObject memberObj = membersArr.getJSONObject(0);
 			member = new Member(memberObj);

@@ -1,1 +1,1 @@
-Read the docs [here](http://cygraphspace.rishabhsethi.com)
+Read the docs [here](https://cygraphspace.github.io)

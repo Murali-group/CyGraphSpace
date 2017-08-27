@@ -375,7 +375,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 				String id = "";
 				int selectedTable = tabbedPane.getSelectedIndex();
 				if (selectedTable==0){
-					if (myGraphsTable.getSelectedRow()<=0){
+					if (myGraphsTable.getSelectedRow()<0){
 						id = null;
 					}
 					else{
@@ -383,7 +383,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 					}
 				}
 				else if (selectedTable==1){
-					if (sharedGraphsTable.getSelectedRow()<=0){
+					if (sharedGraphsTable.getSelectedRow()<0){
 						id = null;
 					}
 					else{
@@ -391,7 +391,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 					}
 				}
 				else if(selectedTable==2){
-					if (publicGraphsTable.getSelectedRow()<=0){
+					if (publicGraphsTable.getSelectedRow()<0){
 						id = null;
 					}
 					else{

@@ -45,7 +45,10 @@ public enum Server{
 			this.authenticated = true;
 			return true;
 		}
-		return false;
+		else {
+			this.client = null;
+			return false;
+		}
 	}
 	
 	//returns if user is authenticated
@@ -133,6 +136,7 @@ public enum Server{
 	public ArrayList<Graph> searchMyGraphs(String searchTerm, int limit, int offset) throws Exception{
 		ArrayList<Graph> graphs = new ArrayList<Graph>();
 		ArrayList<String> graphNames = new ArrayList<String>();
+		searchTerm = "%"+searchTerm+"%";
 		if(searchTerm != null) {
 			graphNames.add(searchTerm);
 		}
@@ -147,11 +151,12 @@ public enum Server{
 	public ArrayList<Graph> searchSharedGraphs(String searchTerm, int limit, int offset) throws Exception{
 		ArrayList<Graph> graphs = new ArrayList<Graph>();
 		ArrayList<String> graphNames = new ArrayList<String>();
+		searchTerm = "%"+searchTerm+"%";
 		if(searchTerm != null) {
 			graphNames.add(searchTerm);
 		}
 		ArrayList<Graph> nameSearchGraphs = client.getSharedGraphs(graphNames, null, limit, offset);
-		ArrayList<Graph> tagSearchGraphs = client.getSharedGraphs(null, graphNames, limit, offset);
+		ArrayList<Graph> tagSearchGraphs = client.getSharedGraphs(null, graphNames, limit, offset);		
 		graphs.addAll(nameSearchGraphs);
 		graphs.addAll(tagSearchGraphs);
 		return graphs;
@@ -161,6 +166,7 @@ public enum Server{
 	public ArrayList<Graph> searchPublicGraphs(String searchTerm, int limit, int offset) throws Exception{
 		ArrayList<Graph> graphs = new ArrayList<Graph>();
 		ArrayList<String> graphNames = new ArrayList<String>();
+		searchTerm = "%"+searchTerm+"%";
 		if(searchTerm != null) {
 			graphNames.add(searchTerm);
 		}

@@ -809,7 +809,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 			sharedGraphsPreviousButton.setEnabled(true);
 			publicGraphsPreviousButton.setEnabled(true);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -822,7 +821,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	private void searchPerformed(){
 		clearSearchButton.setEnabled(true);
 		this.searchTerm = searchField.getText();
-		System.out.println(searchTerm);
 		try {
 			myGraphsTableModel.setRowCount(0);
 			sharedGraphsTableModel.setRowCount(0);
@@ -887,7 +885,6 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	                return 1;
 	            }
 			};
-			
 			worker.execute();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

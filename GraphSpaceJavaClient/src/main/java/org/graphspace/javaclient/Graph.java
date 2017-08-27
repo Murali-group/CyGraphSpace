@@ -9,7 +9,7 @@ import org.graphspace.javaclient.exceptions.ExceptionCode;
 import org.graphspace.javaclient.exceptions.ExceptionMessage;
 import org.graphspace.javaclient.exceptions.GraphException;
 import org.graphspace.javaclient.util.Config;
-
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -30,6 +30,7 @@ public class Graph extends Resource {
 	 */
 	public Graph(RestClient restClient) {
 		super(restClient);
+		tags = new ArrayList<String>();
 		this.isGraphPublic = false;
 	}
 	
@@ -40,13 +41,32 @@ public class Graph extends Resource {
 	 */
 	public Graph(RestClient restClient, JSONObject json) {
 		super(restClient, json);
-		this.isGraphPublic = false;
+		tags = new ArrayList<String>();
+		if(this.json.has("is_public")) {
+			if(this.json.getInt("is_public")==0) {
+				this.isGraphPublic = false;
+			}
+			else {
+				this.isGraphPublic = true;
+			}
+		}
+		else {
+			isGraphPublic = false;
+		}
 		if (this.json.has("graph_json")) {
 			this.graphJson = json.getJSONObject("graph_json");
 		}
 		if (this.json.has("style_json")) {
 			this.styleJson = json.getJSONObject("style_json");
 		}
+		if(this.json.has("tags")) {
+			JSONArray tagsArr = json.getJSONArray("tags");
+			for(int i=0; i<tagsArr.length(); i++) {
+				String tag = tagsArr.getString(i);
+				this.addTag(tag);
+			}
+		}
+		
 	}
 	
 	/**
@@ -56,6 +76,7 @@ public class Graph extends Resource {
 	 */
 	public Graph(RestClient restClient, boolean isGraphPublic) {
 		super(restClient);
+		tags = new ArrayList<String>();
 		this.isGraphPublic = isGraphPublic;
 	}
 	
@@ -206,15 +227,15 @@ public class Graph extends Resource {
     	query.put("is_public", 1);
     	query.put("limit", limit);
     	query.put("offset", offset);
-    	if (tagsList != null && !tagsList.isEmpty()){
-    		String[] tags = new String[tagsList.size()];
-    		tags = tagsList.toArray(tags);
-    		query.put("tags[]", tags.toString());
-    	}
     	if (graphNames != null && !graphNames.isEmpty()){
-    		String[] names = new String[graphNames.size()];
-    		names = graphNames.toArray(names);
-    		query.put("names[]", names.toString());
+    		for (String graphName: graphNames) {
+    			query.put("names[]", graphName);
+    		}
+    	}
+    	if (tagsList != null && !tagsList.isEmpty()){
+    		for (String tagName: tagsList) {
+    			query.put("tags[]", tagName);
+    		}
     	}
     	JSONObject jsonResponse = restClient.get(path, query);
     	Response response = new Response(jsonResponse);
@@ -247,14 +268,17 @@ public class Graph extends Resource {
 		query.put("limit", limit);
     	query.put("offset", offset);
     	if (graphNames != null && !graphNames.isEmpty()){
-    		String[] names = new String[graphNames.size()];
-    		names = graphNames.toArray(names);
-    		query.put("names[]", names.toString());
+//    		String[] names = new String[graphNames.size()];
+//    		names = graphNames.toArray(names);
+//    		query.put("names[]", names.toString());
+    		for (String graphName: graphNames) {
+    			query.put("names[]", graphName);
+    		}
     	}
     	if (tagsList != null && !tagsList.isEmpty()){
-    		String[] tags = new String[tagsList.size()];
-    		tags = tagsList.toArray(tags);
-    		query.put("tags[]", tags.toString());
+    		for (String tagName: tagsList) {
+    			query.put("tags[]", tagName);
+    		}
     	}
     	JSONObject jsonResponse = restClient.get(path, query);
     	Response response = new Response(jsonResponse);
@@ -287,14 +311,17 @@ public class Graph extends Resource {
 		query.put("limit", limit);
     	query.put("offset", offset);
     	if (graphNames != null && !graphNames.isEmpty()){
-    		String[] names = new String[graphNames.size()];
-    		names = graphNames.toArray(names);
-    		query.put("names[]", names.toString());
+//    		String[] names = new String[graphNames.size()];
+//    		names = graphNames.toArray(names);
+//    		query.put("names[]", names.toString());
+    		for (String graphName: graphNames) {
+    			query.put("names[]", graphName);
+    		}
     	}
     	if (tagsList != null && !tagsList.isEmpty()){
-    		String[] tags = new String[tagsList.size()];
-    		tags = tagsList.toArray(tags);
-    		query.put("tags[]", tags.toString());
+    		for (String tagName: tagsList) {
+    			query.put("tags[]", tagName);
+    		}
     	}
     	JSONObject jsonResponse = restClient.get(path, query);
     	Response response = new Response(jsonResponse);

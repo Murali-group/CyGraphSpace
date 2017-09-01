@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <properties>
+        <bundle.symbolicName>org.cytoscape.graphspace.cygraphspace</bundle.symbolicName>
+        <bundle.namespace>org.cytoscape.graphspace.cygraphspace</bundle.namespace>
+        <cytoscape-version>3.3.0</cytoscape-version>
+    </properties>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.cytoscape.graphspace</groupId>
+    <artifactId>CyGraphSpace</artifactId>
+    <version>1.0.0</version>
+
+    <name>CyGraphSpace</name>
+
+    <packaging>bundle</packaging>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                	<include>graphspaceicon.png</include>
+                	<include>loading.gif</include>
+                	<include>properties</include>
+                </includes>
+            </resource>
+        </resources>
+        <!-- Cytoscape requires Java 1.6 -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <executions>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <optimize>true</optimize>
+                    <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                    <compilerArguments>
+                        <Xmaxwarns>10000</Xmaxwarns>
+                        <Xmaxerrs>100</Xmaxerrs>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.7.1</version>
+                <configuration>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                </configuration>
+            </plugin>
+            <!-- Generates the OSGi metadata based on the osgi.bnd file. -->
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>3.3.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${bundle.symbolicName}</Bundle-SymbolicName>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                        <Export-Package>!${bundle.namespace}.*</Export-Package>
+                        <Private-Package>${bundle.namespace}.*</Private-Package>
+                        <Bundle-Activator>${bundle.namespace}.internal.CyActivator</Bundle-Activator>
+                        <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+                        <Embed-Transitive>true</Embed-Transitive>
+                        <Import-Package>*;resolution:=optional</Import-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-install-plugin</artifactId>
+			    <version>2.5.2</version>
+			    <executions>
+			        <execution>
+			            <id>install-external</id>
+			            <phase>clean</phase>
+			            <configuration>
+			                <file>${basedir}/lib/GraphSpaceJavaClient-1.0.0.jar</file>
+			                <repositoryLayout>default</repositoryLayout>
+			                <groupId>org.graphspace</groupId>
+			                <artifactId>javaclient</artifactId>
+			                <version>0.0.1</version>
+			                <packaging>jar</packaging>
+			                <generatePom>true</generatePom>
+			            </configuration>
+			            <goals>
+			                <goal>install-file</goal>
+			            </goals>
+			        </execution>
+			    </executions>
+			</plugin>
+        </plugins>
+    </build>
+
+    <!-- Links to the Cytoscape Maven repositories. -->
+    <repositories>
+        <repository>
+            <id>cytoscape_snapshots</id>
+            <snapshots>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <name>Cytoscape Snapshots</name>
+            <url>http://code.cytoscape.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>cytoscape_releases</id>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+            </releases>
+            <name>Cytoscape Releases</name>
+            <url>http://code.cytoscape.org/nexus/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+
+    <!-- Dependencies needed to compile this project. -->
+    <dependencies>
+		
+		<dependency>
+			<groupId>org.ops4j.pax.logging</groupId>
+			<artifactId>pax-logging-api</artifactId>
+			<version>1.5.2</version>
+			<scope>provided</scope>
+		</dependency>
+		
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>4.2.0</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- Cytoscape 3 Dependencies -->
+		<dependency>
+			<groupId>org.cytoscape</groupId>
+			<artifactId>application-api</artifactId>
+			<version>${cytoscape-version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.cytoscape</groupId>
+			<artifactId>io-api</artifactId>
+			<version>${cytoscape-version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.cytoscape</groupId>
+			<artifactId>core-task-api</artifactId>
+			<version>${cytoscape-version}</version>
+			<scope>provided</scope>
+		</dependency>
+        <dependency>
+            <groupId>org.cytoscape</groupId>
+            <artifactId>service-api</artifactId>
+            <version>${cytoscape-version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.cytoscape</groupId>
+            <artifactId>swing-application-api</artifactId>
+            <version>${cytoscape-version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- https://mvnrepository.com/artifact/org.osgi/org.osgi.util.tracker -->
+		<dependency>
+		    <groupId>org.osgi</groupId>
+		    <artifactId>org.osgi.util.tracker</artifactId>
+		    <version>1.5.1</version>
+		    <scope>provided</scope>
+		</dependency>
+		        
+
+        <dependency>
+            <groupId>org.cytoscape</groupId>
+            <artifactId>session-api</artifactId>
+            <version>${cytoscape-version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.cytoscape</groupId>
+            <artifactId>layout-api</artifactId>
+            <version>${cytoscape-version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.cytoscape</groupId>
+            <artifactId>work-swing-api</artifactId>
+            <version>${cytoscape-version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.cytoscape</groupId>
+            <artifactId>model-api</artifactId>
+            <version>${cytoscape-version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.cytoscape</groupId>
+            <artifactId>swing-app-api</artifactId>
+            <version>${cytoscape-version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- 3rd party libraries -->
+		
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.6.1</version>
+		</dependency>
+        
+		<dependency>
+	   	  <groupId>org.json</groupId>
+	      <artifactId>json</artifactId>
+	      <version>20160810</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.graphspace</groupId>
+		    <artifactId>GraphSpaceJavaClient</artifactId>
+		    <version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.mashape.unirest</groupId>
+			<artifactId>unirest-java</artifactId>
+			<version>1.4.9</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-io -->
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-io</artifactId>
+		    <version>1.3.2</version>
+		</dependency>
+    </dependencies>
+
+</project>

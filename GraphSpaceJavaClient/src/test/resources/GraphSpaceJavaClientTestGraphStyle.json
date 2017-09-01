@@ -1,0 +1,68 @@
+{
+    "format_version": "1.0",
+    "generated_by": "graphspace-2.0.0",
+    "target_cytoscapejs_version": "~2.7",
+    "style": [
+        {
+            "selector": "node[name='64']",
+            "style": {
+                "text-opacity": "1",
+                "background-opacity": "1",
+                "font-weight": "normal",
+                "border-width": "0px",
+                "border-opacity": "1",
+                "font-size": "16px",
+                "height": "28px",
+                "label": "node 1",
+                "width": "64px",
+                "shape": "ellipse",
+                "background-color": "#202f37",
+                "border-color": "rgb(204,204,204)",
+                "text-halign": "center",
+                "text-valign": "center",
+                "color": "rgb(0,0,0)",
+                "text-outline-color": "#202f37"
+            }
+        },
+        {
+            "selector": "node[name='66']",
+            "style": {
+                "text-opacity": "1",
+                "background-opacity": "1",
+                "font-weight": "normal",
+                "border-width": "0px",
+                "border-opacity": "1",
+                "font-size": "16px",
+                "height": "28px",
+                "label": "node 2",
+                "width": "62px",
+                "shape": "hexagon",
+                "background-color": "#031118",
+                "border-color": "rgb(204,204,204)",
+                "text-halign": "center",
+                "text-valign": "center",
+                "color": "rgb(0,0,0)",
+                "text-outline-color": "#031118"
+            }
+        },
+        {
+            "selector": "edge[name='64-66']",
+            "style": {
+                "curve-style": "bezier",
+                "opacity": "1",
+                "source-arrow-shape": "none",
+                "font-size": "10px",
+                "font-weight": "normal",
+                "target-arrow-shape": "none",
+                "text-opacity": "1",
+                "color": "rgb(0,0,0)",
+                "source-arrow-color": "rgb(0,0,0)",
+                "line-color": "rgb(132,132,132)",
+                "label": "",
+                "width": "2px",
+                "line-style": "solid",
+                "target-arrow-color": "rgb(0,0,0)"
+            }
+        }
+    ]
+}

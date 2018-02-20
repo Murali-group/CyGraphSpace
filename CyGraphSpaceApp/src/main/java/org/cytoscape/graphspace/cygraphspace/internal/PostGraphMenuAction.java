@@ -34,6 +34,7 @@ import javax.swing.*;
 public class PostGraphMenuAction extends AbstractCyAction {
 	
 	private static final long serialVersionUID = 1L;
+	private static boolean isStringNetwork = false;
 	
 	public PostGraphMenuAction(String menuTitle, CyApplicationManager applicationManager) {
         
@@ -173,10 +174,21 @@ public class PostGraphMenuAction extends AbstractCyAction {
 		graphJsonString = graphJsonString.replaceAll("(?m)^*.\"shared_interaction\".*", "");
 		graphJsonString = graphJsonString.replaceAll("(?m)^*.\"source_original\".*", "");
 		graphJsonString = graphJsonString.replaceAll("(?m)^*.\"target_original\".*", "");
-		
+
 		//graph string converted to graphJson
 		JSONObject graphJson = new JSONObject(graphJsonString);
-		
+
+		// check if graph comes from StringNetwork
+		isStringNetwork = false;
+        if (graphJson.has("data")) {
+            JSONObject dataJson = graphJson.getJSONObject("data");
+            if (dataJson.has("database") && dataJson.has("name")) {
+                isStringNetwork = dataJson.getString("database").equals("string") 
+                        && dataJson.getString("name").contains("String Network");
+                graphJson = handleStringNetwork(graphJsonString);
+            }
+        }
+
 		JSONObject elements = graphJson.getJSONObject("elements");
 		JSONArray nodes = elements.getJSONArray("nodes");
 		JSONArray edges = elements.getJSONArray("edges");
@@ -203,6 +215,12 @@ public class PostGraphMenuAction extends AbstractCyAction {
         return graphJson;
 	}
     
+    private JSONObject handleStringNetwork(String graphJsonString) {
+        // By capture more characters it avoids creating empty field for nodes without background image
+        graphJsonString = graphJsonString.replaceAll("string:data:image/png;", "data:image/png;");
+        return new JSONObject(graphJsonString);
+    }
+
     //Utility method to export the style of the current network to a json object to be exported to GraphSpace
 	private JSONObject exportStyleToJSON() throws IOException{
 		
@@ -248,9 +266,16 @@ public class PostGraphMenuAction extends AbstractCyAction {
 		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"shared_interaction\".*", "");
 		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"source_original\".*", "");
 		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"target_original\".*", "");
-		
+
 		//style string converted to graphJson
 		JSONArray styleJSONArray = new JSONArray(styleJSONString);
+
+		if (isStringNetwork) {
+		    JSONObject styleJSON = styleJSONArray.getJSONObject(0);
+		    styleJSON.getJSONArray("style").getJSONObject(0).getJSONObject("css").put("background-image", "data(STRING_style)");
+		    return styleJSON;
+		}
+
         return styleJSONArray.getJSONObject(0);
 	}
 	

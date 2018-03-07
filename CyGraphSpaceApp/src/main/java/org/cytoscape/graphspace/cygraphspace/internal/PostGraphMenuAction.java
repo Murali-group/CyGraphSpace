@@ -1,28 +1,16 @@
 package org.cytoscape.graphspace.cygraphspace.internal;
 
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.work.TaskIterator;
-import org.graphspace.javaclient.Graph;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.AuthenticationDialog;
-import org.cytoscape.graphspace.cygraphspace.internal.gui.PostGraphDialog;
-import org.cytoscape.graphspace.cygraphspace.internal.gui.UpdateGraphDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
+import org.cytoscape.graphspace.cygraphspace.internal.util.PostGraphExportUtils;
 
 import javax.swing.*;
 
@@ -34,7 +22,6 @@ import javax.swing.*;
 public class PostGraphMenuAction extends AbstractCyAction {
 	
 	private static final long serialVersionUID = 1L;
-	private static boolean isStringNetwork = false;
 	
 	public PostGraphMenuAction(String menuTitle, CyApplicationManager applicationManager) {
         
@@ -73,7 +60,7 @@ public class PostGraphMenuAction extends AbstractCyAction {
 		if (Server.INSTANCE.isAuthenticated()){
 			loadingFrame.setVisible(true);
     		try {
-				populate(parent, loadingFrame);
+    		    PostGraphExportUtils.populate(parent, loadingFrame);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
@@ -89,7 +76,7 @@ public class PostGraphMenuAction extends AbstractCyAction {
             	public void windowClosed(WindowEvent e){
 					loadingFrame.setVisible(true);
             		try {
-						populate(parent, loadingFrame);
+            		    PostGraphExportUtils.populate(parent, loadingFrame);
 					} catch (Exception e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -98,185 +85,4 @@ public class PostGraphMenuAction extends AbstractCyAction {
             });
         }
     }
-    
-    //populate the values in the post graph dialog
-    private void populate(Frame parent, JFrame loadingFrame) throws Exception{
-		JSONObject graphJson = exportNetworkToJSON();
-		JSONObject styleJson = exportStyleToJSON();
-		String graphName = graphJson.getJSONObject("data").getString("name");
-		boolean isGraphPublic = false;
-		
-		//if updating the graph is possible, open the update graph dialog.
-		if(Server.INSTANCE.updatePossible(graphName)){
-			loadingFrame.dispose();
-			Graph graph = Server.INSTANCE.getGraphByName(graphName);
-			isGraphPublic = graph.isPublic();
-			UpdateGraphDialog updateDialog = new UpdateGraphDialog(parent, graphName, graphJson, styleJson, isGraphPublic, null);
-			updateDialog.setLocationRelativeTo(parent);
-			updateDialog.setVisible(true);
-		}
-		
-		//if updating the graph is not possible, open the post graph dialog
-		else{
-			loadingFrame.dispose();
-			PostGraphDialog postDialog = new PostGraphDialog(parent, graphName, graphJson, styleJson, isGraphPublic, null);
-		    postDialog.setLocationRelativeTo(parent);
-		    postDialog.setVisible(true);
-		}
-    }
-    
-    //Utility method to export the current network to a json object to be exported to GraphSpace
-    private JSONObject exportNetworkToJSON() throws IOException{
-    	
-    	//create a temporary json file for the network of cyjs format
-		File tempFile = File.createTempFile("CyGraphSpaceExport", ".cyjs");
-		
-		//read the network
-		CyNetwork network = CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork();
-		
-		//export the network to the temporary cyjs file
-		TaskIterator ti = CyObjectManager.INSTANCE.getExportNetworkTaskFactory().createTaskIterator(network, tempFile);
-		CyObjectManager.INSTANCE.getTaskManager().execute(ti);
-		
-		//read the file contents to a string
-		String graphJsonString = FileUtils.readFileToString(tempFile, "UTF-8");
-		
-		//ugly way to wait for the parallel process of reading to be completed
-		int count = 0;
-		while(graphJsonString.isEmpty()){
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			graphJsonString = FileUtils.readFileToString(tempFile, "UTF-8");
-			count++;
-			if (count>=10){
-				return null;
-			}
-		}
-		
-		//delete the temporary file
-		tempFile.delete();
-		
-		/**
-		 * There is a design flaw in Cytoscape that results in a few parameters to be added to the graphs automatically on import.
-		 * This is because cytoscape doesn't restrict apps to use any arbitary parameters to save network data, hence, they add
-		 * attributes on importing the graph that was earlier created using GraphSpace and instead of replacing the values for conflicting attributes,
-		 * those values are stored under different attribute names.
-		 * This creates duplicate attribute values which results in an error while exporting the String to a json object.
-		 * Hence, the attributes which are not required by GraphSpace and Cytoscape are deleted before exporting to resolve this conflict.
-		 * This might be problematic in case the user needs to use the graph with other apps which uses conflicting attributes.
-		 */
-		graphJsonString = graphJsonString.replaceAll("(?m)^*.\"shared_name\".*", "");
-		graphJsonString = graphJsonString.replaceAll("(?m)^*.\"id_original\".*", "");
-		graphJsonString = graphJsonString.replaceAll("(?m)^*.\"shared_interaction\".*", "");
-		graphJsonString = graphJsonString.replaceAll("(?m)^*.\"source_original\".*", "");
-		graphJsonString = graphJsonString.replaceAll("(?m)^*.\"target_original\".*", "");
-
-		//graph string converted to graphJson
-		JSONObject graphJson = new JSONObject(graphJsonString);
-
-		// check if graph comes from StringNetwork
-		isStringNetwork = false;
-        if (graphJson.has("data")) {
-            JSONObject dataJson = graphJson.getJSONObject("data");
-            if (dataJson.has("database") && dataJson.has("name")) {
-                isStringNetwork = dataJson.getString("database").equals("string") 
-                        && dataJson.getString("name").contains("String Network");
-                graphJson = handleStringNetwork(graphJsonString);
-            }
-        }
-
-		JSONObject elements = graphJson.getJSONObject("elements");
-		JSONArray nodes = elements.getJSONArray("nodes");
-		JSONArray edges = elements.getJSONArray("edges");
-		
-		Map<String, String> nodeId2Name = new HashMap<String, String>();
-		Map<String, String> edgeId2Name = new HashMap<String, String>();
-		
-		for(int i=0; i<nodes.length(); i++) {
-			JSONObject node = nodes.getJSONObject(i);
-			String id = node.getJSONObject("data").getString("id");
-			String name = node.getJSONObject("data").getString("name");
-			nodeId2Name.put(id, name);
-			node.getJSONObject("data").put("id", (String)nodeId2Name.get(id));
-		}
-		
-		for(int i=0; i<edges.length(); i++) {
-			JSONObject edge = edges.getJSONObject(i);
-			String id = edge.getJSONObject("data").getString("id");
-			String name = edge.getJSONObject("data").getString("name");
-			edgeId2Name.put(id, name);
-			edge.getJSONObject("data").put("source", nodeId2Name.get(edge.getJSONObject("data").getString("source")));
-			edge.getJSONObject("data").put("target", nodeId2Name.get(edge.getJSONObject("data").getString("target")));
-		}
-        return graphJson;
-	}
-    
-    private JSONObject handleStringNetwork(String graphJsonString) {
-        // By capture more characters it avoids creating empty field for nodes without background image
-        graphJsonString = graphJsonString.replaceAll("string:data:image/png;", "data:image/png;");
-        return new JSONObject(graphJsonString);
-    }
-
-    //Utility method to export the style of the current network to a json object to be exported to GraphSpace
-	private JSONObject exportStyleToJSON() throws IOException{
-		
-		//create a temporary json file for the network of json format
-		File tempFile = File.createTempFile("CyGraphSpaceStyleExport", ".json");
-		
-		//export the style json to the temporary json file
-		TaskIterator ti = CyObjectManager.INSTANCE.getExportVizmapTaskFactory().createTaskIterator(tempFile);
-		CyObjectManager.INSTANCE.getTaskManager().execute(ti);
-		
-		//read the file contents to a string
-		String styleJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
-		
-		//ugly way to wait for the parallel process of reading to be completed
-		int count = 0;
-		while(styleJSONString.isEmpty()){
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			styleJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
-			count++;
-			if (count>=10){
-				return null;
-			}
-		}
-		
-		//delete the temporary files
-		tempFile.delete();
-		
-		/**
-		 * There is a design flaw in Cytoscape that results in a few parameters to be added to the graphs automatically on import.
-		 * This is because cytoscape doesn't restrict apps to use any arbitary parameters to save network data, hence, they add
-		 * attributes on importing the graph that was earlier created using GraphSpace and instead of replacing the values for conflicting attributes,
-		 * those values are stored under different attribute names.
-		 * This creates duplicate attribute values which results in an error while exporting the String to a json object.
-		 * Hence, the attributes which are not required by GraphSpace and Cytoscape are deleted before exporting to resolve this conflict.
-		 * This might be problematic in case the user needs to use the graph with other apps which uses conflicting attributes.
-		 */
-		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"shared_name\".*", "");
-		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"id_original\".*", "");
-		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"shared_interaction\".*", "");
-		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"source_original\".*", "");
-		styleJSONString = styleJSONString.replaceAll("(?m)^*.\"target_original\".*", "");
-
-		//style string converted to graphJson
-		JSONArray styleJSONArray = new JSONArray(styleJSONString);
-
-		if (isStringNetwork) {
-		    JSONObject styleJSON = styleJSONArray.getJSONObject(0);
-		    styleJSON.getJSONArray("style").getJSONObject(0).getJSONObject("css").put("background-image", "data(STRING_style)");
-		    return styleJSON;
-		}
-
-        return styleJSONArray.getJSONObject(0);
-	}
-	
 }

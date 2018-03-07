@@ -21,6 +21,7 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
+					<include>glass_style.svg</include>
                 	<include>graphspaceicon.png</include>
                 	<include>loading.gif</include>
                 	<include>properties</include>

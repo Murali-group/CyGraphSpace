@@ -3,6 +3,8 @@ package org.cytoscape.graphspace.cygraphspace.internal.util;
 import java.awt.Frame;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JFrame;
 
@@ -121,6 +123,30 @@ public class PostGraphExportUtils {
                         && dataJson.getString("name").contains("String Network");
                 graphJSON = handleStringNetwork(graphJSONString);
             }
+        }
+
+        JSONObject elements = graphJSON.getJSONObject("elements");
+        JSONArray nodes = elements.getJSONArray("nodes");
+        JSONArray edges = elements.getJSONArray("edges");
+
+        Map<String, String> nodeId2Name = new HashMap<String, String>();
+        Map<String, String> edgeId2Name = new HashMap<String, String>();
+
+        for(int i=0; i<nodes.length(); i++) {
+            JSONObject node = nodes.getJSONObject(i);
+            String id = node.getJSONObject("data").getString("id");
+            String name = node.getJSONObject("data").getString("name");
+            nodeId2Name.put(id, name);
+            node.getJSONObject("data").put("id", (String)nodeId2Name.get(id));
+        }
+
+        for(int i=0; i<edges.length(); i++) {
+            JSONObject edge = edges.getJSONObject(i);
+            String id = edge.getJSONObject("data").getString("id");
+            String name = edge.getJSONObject("data").getString("name");
+            edgeId2Name.put(id, name);
+            edge.getJSONObject("data").put("source", nodeId2Name.get(edge.getJSONObject("data").getString("source")));
+            edge.getJSONObject("data").put("target", nodeId2Name.get(edge.getJSONObject("data").getString("target")));
         }
 
         return graphJSON;

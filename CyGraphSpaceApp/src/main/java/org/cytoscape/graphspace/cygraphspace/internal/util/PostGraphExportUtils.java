@@ -68,26 +68,10 @@ public class PostGraphExportUtils {
 
         //export the network to the temporary cyjs file
         TaskIterator ti = CyObjectManager.INSTANCE.getExportNetworkTaskFactory().createTaskIterator(network, tempFile);
-        CyObjectManager.INSTANCE.getTaskManager().execute(ti);
+        CyObjectManager.INSTANCE.getSynchrounousTaskManager().execute(ti);
 
         //read the file contents to a string
         String graphJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
-
-        //ugly way to wait for the parallel process of reading to be completed
-        int count = 0;
-        while(graphJSONString.isEmpty()){
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            graphJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
-            count++;
-            if (count>=10){
-                return null;
-            }
-        }
 
         //delete the temporary file
         tempFile.delete();
@@ -125,25 +109,10 @@ public class PostGraphExportUtils {
 
         //export the style json to the temporary json file
         TaskIterator ti = CyObjectManager.INSTANCE.getExportVizmapTaskFactory().createTaskIterator(tempFile);
-        CyObjectManager.INSTANCE.getTaskManager().execute(ti);
+        CyObjectManager.INSTANCE.getSynchrounousTaskManager().execute(ti);
 
         //read the file contents to a string
         String styleJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
-
-        //ugly way to wait for the parallel process of reading to be completed
-        int count = 0;
-        while(styleJSONString.isEmpty()){
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            styleJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
-            count++;
-            if (count>=10){
-                return null;
-            }
-        }
 
         //delete the temporary files
         tempFile.delete();

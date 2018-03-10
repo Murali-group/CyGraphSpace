@@ -56,6 +56,7 @@ import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.vizmap.VisualMappingFunctionFactory;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyleFactory;
+import org.cytoscape.work.SynchronousTaskManager;
 import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.swing.DialogTaskManager;
 
@@ -198,6 +199,10 @@ public enum CyObjectManager {
     
     public DialogTaskManager getTaskManager(){
     	return this.adapter.getDialogTaskManager();
+    }
+
+    public SynchronousTaskManager<?> getSynchrounousTaskManager() {
+        return this.adapter.getCyServiceRegistrar().getService(SynchronousTaskManager.class);
     }
 
     public VisualMappingManager getVisualMappingManager() {

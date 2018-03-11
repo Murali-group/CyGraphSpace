@@ -19,6 +19,7 @@ import javax.swing.event.PopupMenuEvent;
 
 import org.cytoscape.application.swing.AbstractToolBarComponent;
 import org.cytoscape.application.swing.CyAction;
+import org.cytoscape.graphspace.cygraphspace.internal.PostGraphMenuActionListener;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 import org.cytoscape.graphspace.cygraphspace.internal.util.PostGraphExportUtils;
@@ -29,11 +30,10 @@ import org.cytoscape.model.CyNetwork;
  * @author rishabh
  *
  */
-public class PostGraphToolBarComponent extends AbstractToolBarComponent implements CyAction{
+public class PostGraphToolBarComponent extends AbstractToolBarComponent implements CyAction {
 	
 	//UI elements
 	private JButton button;
-	private JFrame loadingFrame;
 	
 	public PostGraphToolBarComponent(){
 		super();
@@ -48,59 +48,7 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 		button.setToolTipText("Export To GraphSpace"); //set tooltip to notify users about the functionality of the button
 		
 		//action attached to the button
-		button.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent evt){
-
-				JFrame parent = CyObjectManager.INSTANCE.getApplicationFrame();
-		        CyNetwork currentNetwork = CyObjectManager.INSTANCE.getCurrentNetwork();
-		        
-		        //loading frame while checking if updating the graph is possible
-		        loadingFrame = new JFrame("Checking if update Possible");
-				ImageIcon loading = new ImageIcon(this.getClass().getClassLoader().getResource("loading.gif"));
-				JLabel loadingLabel = new JLabel("", loading, JLabel.CENTER);
-				loadingFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				loadingFrame.setSize(400, 300);
-				loadingFrame.add(loadingLabel);
-				loadingFrame.setLocationRelativeTo(parent);
-				
-				//if there is no network to export, display an error
-		        if( currentNetwork == null ){
-		            String msg = "There is no graph to export.";
-		            String dialogTitle = "No Graph Found";
-		            JOptionPane.showMessageDialog(parent, msg, dialogTitle, JOptionPane.ERROR_MESSAGE );
-		            return;
-		        }
-		        
-		        //if there is a network and the user is currently authenticated, create a post graph dialog
-		        if (Server.INSTANCE.isAuthenticated()){
-					loadingFrame.setVisible(true);
-		    		try {
-		    		    PostGraphExportUtils.populate(parent, loadingFrame);
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
-		        }
-		        
-		        //if there is a network but the user is not authenticated, open the login dialog for the user to log in. Once logged in, open the post graph dialog
-		        else{
-		        	AuthenticationDialog dialog = new AuthenticationDialog(parent);
-		            dialog.setLocationRelativeTo(parent);
-		            dialog.setVisible(true);
-		            dialog.addWindowListener(new WindowAdapter(){
-		            	@Override
-		            	public void windowClosed(WindowEvent e){
-							loadingFrame.setVisible(true);
-		            		try {
-		            		    PostGraphExportUtils.populate(parent, loadingFrame);
-							} catch (Exception e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-		            	}
-		            });
-		        }
-			}
-		});
+		button.addActionListener(new PostGraphMenuActionListener());
 	}
 		
 	/** Returns an ImageIcon, or null if the path was invalid. */

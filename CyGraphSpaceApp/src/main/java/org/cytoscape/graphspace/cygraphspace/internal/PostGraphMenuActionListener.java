@@ -5,8 +5,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import org.cytoscape.application.CyApplicationManager;
-import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.AuthenticationDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
@@ -68,22 +66,10 @@ public class PostGraphMenuActionListener implements ActionListener {
         //if there is a network but the user is not authenticated, open the login dialog for the user to log in. Once logged in, open the post graph dialog
         else {
             if (dialog == null)
-                dialog = new AuthenticationDialog(parent);
+                dialog = new AuthenticationDialog(loadingFrame);
 
             dialog.setLocationRelativeTo(parent);
             dialog.setVisible(true);
-            dialog.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosed(WindowEvent e) {
-                    loadingFrame.setVisible(true);
-                    try {
-                        PostGraphExportUtils.populate(parent, loadingFrame);
-                    } catch (Exception e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
-                }
-            });
         }
     }
 }

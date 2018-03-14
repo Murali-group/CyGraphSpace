@@ -40,22 +40,15 @@ public class UpdateGraphDialog extends JDialog {
 	
 	public UpdateGraphDialog(Frame parent, String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags) {
 		this.setTitle("Export Graphs to GraphSpace");
-		
+		this.setAlwaysOnTop(true);
 		JLabel hostLabel = new JLabel("Host");
-		
 		hostValueLabel = new JLabel("www.graphspace.org");
-		
 		usernameValueLabel = new JLabel("Anonymous");
-		
-		
 		usernameLabel = new JLabel("Username");
-		
 		buttonsPanel = new JPanel();
-		
 		graphNameLabel = new JLabel("Graph Name");
-		
 		graphNameValue = new JLabel("");
-		
+
 		groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)

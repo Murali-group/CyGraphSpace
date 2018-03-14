@@ -2,17 +2,11 @@ package org.cytoscape.graphspace.cygraphspace.internal.gui;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.PopupMenuEvent;
@@ -20,10 +14,6 @@ import javax.swing.event.PopupMenuEvent;
 import org.cytoscape.application.swing.AbstractToolBarComponent;
 import org.cytoscape.application.swing.CyAction;
 import org.cytoscape.graphspace.cygraphspace.internal.PostGraphMenuActionListener;
-import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
-import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
-import org.cytoscape.graphspace.cygraphspace.internal.util.PostGraphExportUtils;
-import org.cytoscape.model.CyNetwork;
 
 /**
  * Toolbar component on Cytoscape toolbar to post and update graphs to GraphSpace

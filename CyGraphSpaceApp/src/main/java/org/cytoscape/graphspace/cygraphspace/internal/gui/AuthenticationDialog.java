@@ -8,6 +8,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JPanel;
 import javax.swing.JButton;
@@ -159,13 +160,22 @@ public class AuthenticationDialog extends JDialog {
     		System.out.println(Server.INSTANCE.getHost()+Server.INSTANCE.getUsername()+Server.INSTANCE.getPassword());
             this.dispose();
 
-    		// perform export
-            try {
-                loadingFrame.setVisible(true);
-                PostGraphExportUtils.populate(CyObjectManager.INSTANCE.getApplicationFrame(), loadingFrame);
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    loadingFrame.setVisible(true);
+                }
+            });
+
+            new Thread() {
+                public void run() {
+                    try {
+                        PostGraphExportUtils.populate(CyObjectManager.INSTANCE.getApplicationFrame(), loadingFrame);
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
     	}
     }
 
@@ -182,7 +192,12 @@ public class AuthenticationDialog extends JDialog {
 	
 	//closes the dialog when cancel button clicked
 	private void cancelActionPerformed(ActionEvent evt) {
-	    loadingFrame.dispose();
+	    SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                loadingFrame.dispose();
+            }
+        });
+
         this.dispose();
     }
 }

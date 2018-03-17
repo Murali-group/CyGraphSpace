@@ -2,8 +2,6 @@ package org.cytoscape.graphspace.cygraphspace.internal;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.AuthenticationDialog;
@@ -20,11 +18,11 @@ import javax.swing.*;
  */
 public class PostGraphMenuActionListener implements ActionListener {
 
-    private JFrame parent;
-    private JFrame loadingFrame;
-    private ImageIcon loading;
-    private JLabel loadingLabel;
-    private AuthenticationDialog dialog;
+    private static JFrame parent;
+    private static JFrame loadingFrame;
+    private static ImageIcon loading;
+    private static JLabel loadingLabel;
+    private static AuthenticationDialog dialog;
 
     public PostGraphMenuActionListener() {
         loadingFrame = new JFrame("Checking if update Possible");
@@ -40,10 +38,9 @@ public class PostGraphMenuActionListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         parent = CyObjectManager.INSTANCE.getApplicationFrame();
-        CyNetwork currentNetwork = CyObjectManager.INSTANCE.getCurrentNetwork();
-
-        //loading frame while checking if updating the graph is possible
         loadingFrame.setLocationRelativeTo(parent);
+
+        CyNetwork currentNetwork = CyObjectManager.INSTANCE.getCurrentNetwork();
 
         //if there is no network to export, display an error
         if (currentNetwork == null) {
@@ -55,12 +52,22 @@ public class PostGraphMenuActionListener implements ActionListener {
 
         //if there is a network and the user is currently authenticated, create a post graph dialog
         if (Server.INSTANCE.isAuthenticated()) {
-            loadingFrame.setVisible(true);
-            try {
-                PostGraphExportUtils.populate(parent, loadingFrame);
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    loadingFrame.setVisible(true);
+                }
+            });
+
+            new Thread() {
+                public void run() {
+                    try {
+                        PostGraphExportUtils.populate(CyObjectManager.INSTANCE.getApplicationFrame(), loadingFrame);
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
         }
 
         //if there is a network but the user is not authenticated, open the login dialog for the user to log in. Once logged in, open the post graph dialog

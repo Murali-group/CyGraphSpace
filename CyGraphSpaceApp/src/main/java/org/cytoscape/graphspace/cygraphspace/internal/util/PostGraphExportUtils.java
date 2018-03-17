@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.io.FileUtils;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.PostGraphDialog;
@@ -36,7 +37,12 @@ public class PostGraphExportUtils {
 
         //if updating the graph is possible, open the update graph dialog.
         if(Server.INSTANCE.updatePossible(graphName)){
-            loadingFrame.dispose();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    loadingFrame.dispose();
+                }
+            });
+
             Graph graph = Server.INSTANCE.getGraphByName(graphName);
             isGraphPublic = graph.isPublic();
             UpdateGraphDialog updateDialog = new UpdateGraphDialog(parent, graphName, graphJSON, styleJSON, isGraphPublic, null);
@@ -46,7 +52,12 @@ public class PostGraphExportUtils {
 
         //if updating the graph is not possible, open the post graph dialog
         else{
-            loadingFrame.dispose();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    loadingFrame.dispose();
+                }
+            });
+
             PostGraphDialog postDialog = new PostGraphDialog(parent, graphName, graphJSON, styleJSON, isGraphPublic, null);
             postDialog.setLocationRelativeTo(parent);
             postDialog.setVisible(true);

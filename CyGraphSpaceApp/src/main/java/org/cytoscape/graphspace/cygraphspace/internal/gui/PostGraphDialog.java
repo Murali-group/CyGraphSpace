@@ -46,6 +46,7 @@ public class PostGraphDialog extends JDialog {
 	public PostGraphDialog(Frame parent, String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags) {
 		
 		this.setTitle("Export Graphs to GraphSpace");
+		this.setAlwaysOnTop(true);
 		JLabel hostLabel = new JLabel("Host");
 		hostValueLabel = new JLabel("www.graphspace.org");
 		usernameValueLabel = new JLabel("Anonymous");

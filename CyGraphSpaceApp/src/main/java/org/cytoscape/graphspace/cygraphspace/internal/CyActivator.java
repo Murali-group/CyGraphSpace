@@ -41,7 +41,7 @@ public class CyActivator extends AbstractCyActivator {
         BundleContext bc = context;
         
         //register Post Graph Action
-        action = new PostGraphMenuAction("Network to GraphSpace", applicationManager);
+        action = new CyGraphSpaceMenuAction("Network to GraphSpace", applicationManager);
         properties = new Properties();
         registerAllServices(context, action, properties);
         

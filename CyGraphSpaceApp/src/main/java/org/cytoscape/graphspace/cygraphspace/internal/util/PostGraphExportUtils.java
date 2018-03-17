@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.io.FileUtils;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.PostGraphDialog;
@@ -40,7 +41,12 @@ public class PostGraphExportUtils {
 
         //if updating the graph is possible, open the update graph dialog.
         if(Server.INSTANCE.updatePossible(graphName)){
-            loadingFrame.dispose();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    loadingFrame.dispose();
+                }
+            });
+
             Graph graph = Server.INSTANCE.getGraphByName(graphName);
             isGraphPublic = graph.isPublic();
             UpdateGraphDialog updateDialog = new UpdateGraphDialog(parent, graphName, graphJSON, styleJSON, isGraphPublic, null);
@@ -50,7 +56,12 @@ public class PostGraphExportUtils {
 
         //if updating the graph is not possible, open the post graph dialog
         else{
-            loadingFrame.dispose();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    loadingFrame.dispose();
+                }
+            });
+
             PostGraphDialog postDialog = new PostGraphDialog(parent, graphName, graphJSON, styleJSON, isGraphPublic, null);
             postDialog.setLocationRelativeTo(parent);
             postDialog.setVisible(true);
@@ -72,26 +83,10 @@ public class PostGraphExportUtils {
 
         //export the network to the temporary cyjs file
         TaskIterator ti = CyObjectManager.INSTANCE.getExportNetworkTaskFactory().createTaskIterator(network, tempFile);
-        CyObjectManager.INSTANCE.getTaskManager().execute(ti);
+        CyObjectManager.INSTANCE.getSynchrounousTaskManager().execute(ti);
 
         //read the file contents to a string
         String graphJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
-
-        //ugly way to wait for the parallel process of reading to be completed
-        int count = 0;
-        while(graphJSONString.isEmpty()){
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            graphJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
-            count++;
-            if (count>=10){
-                return null;
-            }
-        }
 
         //delete the temporary file
         tempFile.delete();
@@ -165,25 +160,10 @@ public class PostGraphExportUtils {
 
         //export the style json to the temporary json file
         TaskIterator ti = CyObjectManager.INSTANCE.getExportVizmapTaskFactory().createTaskIterator(tempFile);
-        CyObjectManager.INSTANCE.getTaskManager().execute(ti);
+        CyObjectManager.INSTANCE.getSynchrounousTaskManager().execute(ti);
 
         //read the file contents to a string
         String styleJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
-
-        //ugly way to wait for the parallel process of reading to be completed
-        int count = 0;
-        while(styleJSONString.isEmpty()){
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            styleJSONString = FileUtils.readFileToString(tempFile, "UTF-8");
-            count++;
-            if (count>=10){
-                return null;
-            }
-        }
 
         //delete the temporary files
         tempFile.delete();

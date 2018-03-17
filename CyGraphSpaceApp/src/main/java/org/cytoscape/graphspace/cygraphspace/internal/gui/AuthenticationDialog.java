@@ -2,20 +2,23 @@ package org.cytoscape.graphspace.cygraphspace.internal.gui;
 
 //importing swing components
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JPasswordField;
 
+import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
+import org.cytoscape.graphspace.cygraphspace.internal.util.PostGraphExportUtils;
 
 import java.awt.Component;
-import java.awt.Frame;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -33,8 +36,9 @@ public class AuthenticationDialog extends JDialog {
 	private JPasswordField passwordField;
 	private JButton loginButton;
 	JButton cancelButton;
-	
-	public AuthenticationDialog(Frame parent) {
+	private JFrame loadingFrame;
+
+	public AuthenticationDialog(JFrame loadingFrame) {
 		
 		setTitle("Log in to the Server");
 		JLabel hostLabel = new JLabel("Host");
@@ -47,7 +51,9 @@ public class AuthenticationDialog extends JDialog {
 		passwordField = new JPasswordField();
 		JPanel buttonsPanel = new JPanel();
 		loginButton = new JButton("Log In");
-		
+
+		this.loadingFrame = loadingFrame;
+
 		//action listener for login button
 		loginButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt)
@@ -152,10 +158,27 @@ public class AuthenticationDialog extends JDialog {
     	else{
     		System.out.println(hostText + " : " + usernameText + " : " + passwordText);
     		System.out.println(Server.INSTANCE.getHost()+Server.INSTANCE.getUsername()+Server.INSTANCE.getPassword());
-	    	this.dispose();
+            this.dispose();
+
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    loadingFrame.setVisible(true);
+                }
+            });
+
+            new Thread() {
+                public void run() {
+                    try {
+                        PostGraphExportUtils.populate(CyObjectManager.INSTANCE.getApplicationFrame(), loadingFrame);
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
     	}
     }
-	
+
 	//populate user values in the authentication dialog
 	private void populateFields(){
 		hostField.setText(Server.INSTANCE.getHost());
@@ -169,6 +192,12 @@ public class AuthenticationDialog extends JDialog {
 	
 	//closes the dialog when cancel button clicked
 	private void cancelActionPerformed(ActionEvent evt) {
+	    SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                loadingFrame.dispose();
+            }
+        });
+
         this.dispose();
     }
 }

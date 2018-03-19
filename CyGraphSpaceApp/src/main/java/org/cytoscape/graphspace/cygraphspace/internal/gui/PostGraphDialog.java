@@ -137,7 +137,10 @@ public class PostGraphDialog extends JDialog {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not post graph", "Error", JOptionPane.ERROR_MESSAGE);
 			this.dispose();
+			return;
 		}
+
+		JOptionPane.showMessageDialog((Component)evt.getSource(), "Post graph successful.", "Message", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	//post the current network to GraphSpace

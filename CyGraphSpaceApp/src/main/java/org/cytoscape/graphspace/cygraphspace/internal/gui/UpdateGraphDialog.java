@@ -132,7 +132,10 @@ public class UpdateGraphDialog extends JDialog {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not update graph", "Error", JOptionPane.ERROR_MESSAGE);
 			this.dispose();
+			return;
 		}
+
+	    JOptionPane.showMessageDialog((Component)evt.getSource(), "Update graph successful.", "Message", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	//post the current network to GraphSpace

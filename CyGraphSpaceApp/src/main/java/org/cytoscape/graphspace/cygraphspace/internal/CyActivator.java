@@ -25,8 +25,6 @@ import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.osgi.framework.BundleContext;
 
-import static org.cytoscape.work.ServiceProperties.IN_NETWORK_PANEL_CONTEXT_MENU;
-
 /**
  * Used to register services used by CyGraphSpaceApp
  * @author rishabh

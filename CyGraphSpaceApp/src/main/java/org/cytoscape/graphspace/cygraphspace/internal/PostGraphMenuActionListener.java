@@ -40,16 +40,6 @@ public class PostGraphMenuActionListener implements ActionListener {
         parent = CyObjectManager.INSTANCE.getApplicationFrame();
         loadingFrame.setLocationRelativeTo(parent);
 
-        CyNetwork currentNetwork = CyObjectManager.INSTANCE.getCurrentNetwork();
-
-        //if there is no network to export, display an error
-        if (currentNetwork == null) {
-            String msg = "There is no graph to export.";
-            String dialogTitle = "No Graph Found";
-            JOptionPane.showMessageDialog(parent, msg, dialogTitle, JOptionPane.ERROR_MESSAGE );
-            return;
-        }
-
         //if there is a network and the user is currently authenticated, create a post graph dialog
         if (Server.INSTANCE.isAuthenticated()) {
             SwingUtilities.invokeLater(new Runnable() {

@@ -7,6 +7,7 @@ import org.cytoscape.app.swing.CySwingAppAdapter;
 import org.cytoscape.application.CyApplicationConfiguration;
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.application.swing.CyAction;
 import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.model.CyNetworkFactory;
 import org.cytoscape.model.CyNetworkManager;
@@ -39,12 +40,12 @@ public class CyActivator extends AbstractCyActivator {
         AbstractCyAction action = null;
         Properties properties = null;
         BundleContext bc = context;
-        
+
         //register Post Graph Action
         action = new CyGraphSpaceMenuAction("Network to GraphSpace", applicationManager);
         properties = new Properties();
-        registerAllServices(context, action, properties);
-        
+        registerService(context, action, CyAction.class, properties);
+
         //getting cytoscape services
         CyApplicationConfiguration config = getService(context,CyApplicationConfiguration.class);
         CySwingAppAdapter appAdapter = getService(context, CySwingAppAdapter.class);
@@ -79,12 +80,10 @@ public class CyActivator extends AbstractCyActivator {
         //registering Toolbar component
         PostGraphToolBarComponent toolBarComponent = new PostGraphToolBarComponent();
         registerAllServices(bc, toolBarComponent, new Properties());
-        
 		
 		//registering openBrowser for opening graph in GraphSpace
 		OpenBrowser openBrowser = getService(context, OpenBrowser.class);
 	    GetGraphsPanel getGraphsPanel = new GetGraphsPanel(taskManager, openBrowser);
 	    registerAllServices(context, getGraphsPanel, new Properties());
-	    
     }
 }

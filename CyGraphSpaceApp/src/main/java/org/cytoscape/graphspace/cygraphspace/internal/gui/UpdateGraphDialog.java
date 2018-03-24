@@ -121,23 +121,24 @@ public class UpdateGraphDialog extends JDialog {
 		}
 		graphNameValue.setText(graphName);
 	}
-	
+
 	//called when update button clicked
 	private void updateActionPerformed(ActionEvent evt, JSONObject graphJSON, JSONObject styleJSON, boolean isPublic){
-		try{
-			this.dispose();
-			updateGraph(graphJSON, styleJSON, isPublic, null);
-		}
-		catch (Exception e){
-			e.printStackTrace();
-			JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not update graph", "Error", JOptionPane.ERROR_MESSAGE);
-			this.dispose();
-			return;
-		}
-
-	    JOptionPane.showMessageDialog((Component)evt.getSource(), "Update graph successful.", "Message", JOptionPane.INFORMATION_MESSAGE);
+	    this.dispose();
+	    new Thread() {
+	        public void run() {
+	            try {
+	                updateGraph(graphJSON, styleJSON, isPublic, null);
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	                JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not update graph", "Error", JOptionPane.ERROR_MESSAGE);
+	                return;
+	            }
+	            JOptionPane.showMessageDialog((Component)evt.getSource(), "Update graph successful.", "Message", JOptionPane.INFORMATION_MESSAGE);
+	        }
+	    }.start();
 	}
-	
+
 	//post the current network to GraphSpace
 	private void updateGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isPublic, ArrayList<String> tagsList) throws Exception{
 		String name = graphJSON.getJSONObject("data").getString("name");

@@ -129,18 +129,19 @@ public class PostGraphDialog extends JDialog {
 	
 	//called when export button clicked
 	private void exportActionPerformed(ActionEvent evt, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic){
-		try{
-			this.dispose();
-			postGraph(graphJSON, styleJSON, isGraphPublic, null);
-		}
-		catch (Exception e){
-			e.printStackTrace();
-			JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not post graph", "Error", JOptionPane.ERROR_MESSAGE);
-			this.dispose();
-			return;
-		}
-
-		JOptionPane.showMessageDialog((Component)evt.getSource(), "Post graph successful.", "Message", JOptionPane.INFORMATION_MESSAGE);
+        this.dispose();
+	    new Thread() {
+	        public void run() {
+	            try {
+	                postGraph(graphJSON, styleJSON, isGraphPublic, null);
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	                JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not post graph", "Error", JOptionPane.ERROR_MESSAGE);
+	                return;
+	            }
+	            JOptionPane.showMessageDialog((Component)evt.getSource(), "Post graph successful.", "Message", JOptionPane.INFORMATION_MESSAGE);
+	        }
+	    }.start();
 	}
 	
 	//post the current network to GraphSpace

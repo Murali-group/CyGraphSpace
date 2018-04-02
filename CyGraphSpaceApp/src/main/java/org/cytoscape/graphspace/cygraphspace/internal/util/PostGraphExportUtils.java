@@ -26,6 +26,9 @@ import org.json.JSONObject;
 public class PostGraphExportUtils {
 
     private static boolean isStringNetwork;
+    private static String glassStyle;
+    private static JSONObject graphJSON;
+    private static Map<String, String> stringStyleMap;
 
     /**
      * populate the values in the post graph dialog
@@ -34,7 +37,7 @@ public class PostGraphExportUtils {
      * @throws Exception
      */
     public static void populate(Frame parent, JFrame loadingFrame) throws Exception {
-        JSONObject graphJSON = exportNetworkToJSON();
+        graphJSON = exportNetworkToJSON();
         JSONObject styleJSON = exportStyleToJSON();
         String graphName = graphJSON.getJSONObject("data").getString("name");
         boolean isGraphPublic = false;
@@ -107,7 +110,7 @@ public class PostGraphExportUtils {
         graphJSONString = graphJSONString.replaceAll("(?m)^*.\"target_original\".*", "");
 
         //graph string converted to graphJson
-        JSONObject graphJSON = new JSONObject(graphJSONString);
+        graphJSON = new JSONObject(graphJSONString);
 
         // check if graph comes from StringNetwork
         isStringNetwork = false;
@@ -116,7 +119,7 @@ public class PostGraphExportUtils {
             if (dataJson.has("database") && dataJson.has("name")) {
                 isStringNetwork = dataJson.getString("database").equals("string") 
                         && dataJson.getString("name").contains("String Network");
-                graphJSON = handleStringNetwork(graphJSONString);
+                handleStringNetwork();
             }
         }
 
@@ -188,19 +191,34 @@ public class PostGraphExportUtils {
 
         if (isStringNetwork) {
             JSONObject styleJSON = styleJSONArray.getJSONObject(0);
-            styleJSON.getJSONArray("style").getJSONObject(0).getJSONObject("css").put("background-image", "data(STRING_style)");
-            //styleJSON.getJSONArray("style").getJSONObject(0).getJSONObject("css").put("background-image-opacity", 0.5);
+            // styleJSON.getJSONArray("style").getJSONObject(0).getJSONObject("css").put("background-image", glassStyle.substring(16, glassStyle.length() - 2));
+            // styleJSON.getJSONArray("style").getJSONObject(0).getJSONObject("css").put("background-image", "data(STRING_style)");
+
+            JSONArray styleArray = styleJSON.getJSONArray("style");
+            for (int i = 0; i < styleArray.length(); i++) {
+                if (styleArray.getJSONObject(i).has("selector")) {
+                    String current = styleArray.getJSONObject(i).getString("selector");
+                    if (current.contains("node[name = '")) {
+                        // styleArray.getJSONObject(i).getJSONObject("css").put("background-image", 
+                        //        stringStyleMap.get(current.substring(13, current.length() - 2)) + " " + glassStyle);
+
+                        styleArray.getJSONObject(i).getJSONObject("css").put("background-image", 
+                                "['https://upload.wikimedia.org/wikipedia/commons/b/b4/High_above_the_Cloud_the_Sun_Stays_the_Same.jpg', " 
+                                        + "'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Pigeon_silhouette_4874.svg/1000px-Pigeon_silhouette_4874.svg.png']");
+                    }
+                }
+            }
+
+            styleJSON.getJSONArray("style").getJSONObject(0).getJSONObject("css").put("background-fit", "cover cover");
+            styleJSON.getJSONArray("style").getJSONObject(0).getJSONObject("css").put("background-image-opacity", "0.5");
             return styleJSON;
         }
 
         return styleJSONArray.getJSONObject(0);
     }
 
-    private static JSONObject handleStringNetwork(String graphJsonString) {
-        // By capture more characters it avoids creating empty field for nodes without background image
-        graphJsonString = graphJsonString.replaceAll("\"STRING_style\" : \"string:data:image/png;", "PlaceHolder\n\"STRING_style\" : \"data:image/png;");
-
-        String glassStyle = "\"GLASS_style\": \"data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGL"
+    private static void handleStringNetwork() {
+        glassStyle = "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGL"
                 + "TgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4"
                 + "xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+Cjxz"
                 + "dmcgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsa"
@@ -243,10 +261,17 @@ public class PostGraphExportUtils {
                 + "LXdpZHRoPSIyIiBzdHJva2Utb3BhY2l0eT0iMSI+PC91c2U+PC9nPjwvZz48Zz48dXNlIHhsaW5rOmhyZWY9Ii"
                 + "NjVEdWcjRVWXgiIG9wYWNpdHk9IjEiIGZpbGw9InVybCgjZ3JhZGllbnRjMllqT3JIMHBYKSI+PC91c2U+PGc+PH"
                 + "VzZSB4bGluazpocmVmPSIjY1RHVnI0VVl4IiBvcGFjaXR5PSIxIiBmaWxsLW9wYWNpdHk9IjAiIHN0cm9rZT0iIz"
-                + "E0MTMxMyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2Utb3BhY2l0eT0iMSI+PC91c2U+PC9nPjwvZz48L2c+PC9nPjwvc3ZnPg==\",";
+                + "E0MTMxMyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2Utb3BhY2l0eT0iMSI+PC91c2U+PC9nPjwvZz48L2c+PC9nPjwvc3ZnPg==";
 
-        graphJsonString = graphJsonString.replaceAll("PlaceHolder", glassStyle);
+        JSONArray elementArray = graphJSON.getJSONObject("elements").getJSONArray("nodes");
+        stringStyleMap = new HashMap<String, String>();
 
-        return new JSONObject(graphJsonString);
+        String replace;
+        for (int i = 0; i < elementArray.length(); i++) {
+            replace = elementArray.getJSONObject(i).getJSONObject("data").getString("STRING_style").replace("string:", "");
+            elementArray.getJSONObject(i).getJSONObject("data").put("STRING_style", replace);
+            elementArray.getJSONObject(i).getJSONObject("data").put("GLASS_style", glassStyle);
+            stringStyleMap.put(elementArray.getJSONObject(i).getJSONObject("data").getString("name"), replace);
+        }
     }
 }

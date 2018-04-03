@@ -29,11 +29,6 @@ public class PostGraphTask extends AbstractTask {
         this.isGraphPublic = isGraphPublic;
     }
 
-    //post the current network to GraphSpace
-    private void postGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
-        Server.INSTANCE.postGraph(graphJSON, styleJSON, isGraphPublic, tagsList);
-    }
-
     @Override
     public void run(TaskMonitor taskMonitor) throws Exception {
 
@@ -61,5 +56,10 @@ public class PostGraphTask extends AbstractTask {
         taskMonitor.setStatusMessage("Post graph successful.");
         JOptionPane.showMessageDialog((Component)evt.getSource(), "Post graph successful.", 
                 "Message", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    //post the current network to GraphSpace
+    private void postGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
+        Server.INSTANCE.postGraph(graphJSON, styleJSON, isGraphPublic, tagsList);
     }
 }

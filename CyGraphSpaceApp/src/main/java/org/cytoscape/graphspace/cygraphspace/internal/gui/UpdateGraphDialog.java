@@ -5,17 +5,18 @@ import javax.swing.JDialog;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 
+import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
-
+import org.cytoscape.graphspace.cygraphspace.internal.task.UpdateGraphTask;
+import org.cytoscape.work.SynchronousTaskManager;
+import org.cytoscape.work.TaskIterator;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
-import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -124,25 +125,10 @@ public class UpdateGraphDialog extends JDialog {
 
 	//called when update button clicked
 	private void updateActionPerformed(ActionEvent evt, JSONObject graphJSON, JSONObject styleJSON, boolean isPublic){
-	    this.dispose();
-	    new Thread() {
-	        public void run() {
-	            try {
-	                updateGraph(graphJSON, styleJSON, isPublic, null);
-	            } catch (Exception e) {
-	                e.printStackTrace();
-	                JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not update graph", "Error", JOptionPane.ERROR_MESSAGE);
-	                return;
-	            }
-	            JOptionPane.showMessageDialog((Component)evt.getSource(), "Update graph successful.", "Message", JOptionPane.INFORMATION_MESSAGE);
-	        }
-	    }.start();
-	}
-
-	//post the current network to GraphSpace
-	private void updateGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isPublic, ArrayList<String> tagsList) throws Exception{
-		String name = graphJSON.getJSONObject("data").getString("name");
-		Server.INSTANCE.updateGraph(name, graphJSON, isPublic, tagsList);
+        this.dispose();
+        SynchronousTaskManager<?> synTaskMan = CyObjectManager.INSTANCE.getSynchrounousTaskManager();
+        UpdateGraphTask updateGraphTask = new UpdateGraphTask(evt, graphJSON, styleJSON, isPublic);
+        synTaskMan.execute(new TaskIterator(updateGraphTask));
 	}
 	
 	//close the dialog box on cancel clicked

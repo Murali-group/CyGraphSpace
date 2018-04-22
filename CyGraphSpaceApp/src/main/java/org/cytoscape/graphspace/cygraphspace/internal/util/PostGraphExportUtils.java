@@ -13,6 +13,9 @@ import org.cytoscape.graphspace.cygraphspace.internal.gui.UpdateGraphDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyNode;
+import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.View;
 import org.cytoscape.work.TaskIterator;
 import org.graphspace.javaclient.Graph;
 import org.json.JSONArray;
@@ -74,11 +77,18 @@ public class PostGraphExportUtils {
         //create a temporary json file for the network of cyjs format
         File tempFile = File.createTempFile("CyGraphSpaceExport", ".cyjs");
 
-        //read the network
-        CyNetwork network = CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork();
+        TaskIterator ti;
+        //read the network view
+        CyNetworkView networkView = CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetworkView();
+        if (networkView != null) { // export based on networkView
+            ti = CyObjectManager.INSTANCE.getExportNetworkViewTaskFactory().createTaskIterator(networkView, tempFile);
+        }
+        else { // if network doesn't exist, export based on network
+            CyNetwork network = CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork();
+            ti = CyObjectManager.INSTANCE.getExportNetworkTaskFactory().createTaskIterator(network, tempFile);
+        }
 
         //export the network to the temporary cyjs file
-        TaskIterator ti = CyObjectManager.INSTANCE.getExportNetworkTaskFactory().createTaskIterator(network, tempFile);
         CyObjectManager.INSTANCE.getSynchrounousTaskManager().execute(ti);
 
         //read the file contents to a string
@@ -104,6 +114,7 @@ public class PostGraphExportUtils {
 
         //graph string converted to graphJson
         JSONObject graphJSON = new JSONObject(graphJSONString);
+        //printPosition(graphJSON);
         return graphJSON;
     }
 

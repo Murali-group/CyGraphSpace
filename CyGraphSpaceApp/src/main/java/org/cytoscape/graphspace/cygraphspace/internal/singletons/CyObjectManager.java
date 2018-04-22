@@ -47,6 +47,7 @@ import org.cytoscape.property.CyProperty;
 import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
 import org.cytoscape.task.read.LoadVizmapFileTaskFactory;
 import org.cytoscape.task.write.ExportNetworkTaskFactory;
+import org.cytoscape.task.write.ExportNetworkViewTaskFactory;
 import org.cytoscape.task.write.ExportVizmapTaskFactory;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewFactory;
@@ -69,6 +70,7 @@ public enum CyObjectManager {
     public CySwingAppAdapter adapter;
     private CyNetworkTableManager networkTableManager;
 	private LoadNetworkFileTaskFactory loadNetworkFileTaskFactory;
+	private ExportNetworkViewTaskFactory exportNetworkViewTaskFactory;
 	private ExportNetworkTaskFactory exportNetworkTaskFactory;
 	private CyTableManager tableManager;
 	private CySwingApplication desktop;
@@ -134,7 +136,11 @@ public enum CyObjectManager {
     public void setExportNetworkTaskFactory(ExportNetworkTaskFactory exportNetworkTaskFactory){
     	this.exportNetworkTaskFactory = exportNetworkTaskFactory;
     }
-    
+
+    public void setExportNetworkViewTaskFactory(ExportNetworkViewTaskFactory exportNetworkViewTaskFactory){
+        this.exportNetworkViewTaskFactory = exportNetworkViewTaskFactory;
+    }
+
     public void setExportVizmapTaskFactory(ExportVizmapTaskFactory exportVizmapTaskFactory){
     	this.exportVizmapTaskFactory = exportVizmapTaskFactory;
     }
@@ -190,6 +196,11 @@ public enum CyObjectManager {
     public ExportNetworkTaskFactory getExportNetworkTaskFactory(){
     	return this.exportNetworkTaskFactory;
     }
+
+    public ExportNetworkViewTaskFactory getExportNetworkViewTaskFactory(){
+        return this.exportNetworkViewTaskFactory;
+    }
+
     public VisualLexicon getDefaultVisualLexicon(){
     	return adapter.getRenderingEngineManager().getDefaultVisualLexicon();
     }

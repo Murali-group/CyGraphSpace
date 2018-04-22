@@ -19,6 +19,7 @@ import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
 import org.cytoscape.task.read.LoadVizmapFileTaskFactory;
 import org.cytoscape.task.write.ExportNetworkTaskFactory;
+import org.cytoscape.task.write.ExportNetworkViewTaskFactory;
 import org.cytoscape.task.write.ExportVizmapTaskFactory;
 import org.cytoscape.util.swing.OpenBrowser;
 import org.cytoscape.work.TaskManager;
@@ -52,6 +53,7 @@ public class CyActivator extends AbstractCyActivator {
         CySwingApplication desktop = getService(bc,CySwingApplication.class);
         LoadNetworkFileTaskFactory loadNetworkFileTaskFactory = getService(bc, LoadNetworkFileTaskFactory.class);
         ExportNetworkTaskFactory exportNetworkTaskFactory = getService(bc, ExportNetworkTaskFactory.class);
+        ExportNetworkViewTaskFactory exportNetworkViewTaskFactory = getService(bc, ExportNetworkViewTaskFactory.class);
         LoadVizmapFileTaskFactory loadVizmapFileTaskFactory = getService(bc, LoadVizmapFileTaskFactory.class);
         ExportVizmapTaskFactory exportVizmapTaskFactory = getService(bc, ExportVizmapTaskFactory.class);
         TaskManager taskManager = getService(context, DialogTaskManager.class);
@@ -70,6 +72,7 @@ public class CyActivator extends AbstractCyActivator {
         manager.setCySwingApplition(desktop);
         manager.setLoadNetworkFileTaskFactory(loadNetworkFileTaskFactory);
         manager.setExportNetworkTaskFactory(exportNetworkTaskFactory);
+        manager.setExportNetworkViewTaskFactory(exportNetworkViewTaskFactory);
         manager.setLoadVizmapTaskFactory(loadVizmapFileTaskFactory);
         manager.setExportVizmapTaskFactory(exportVizmapTaskFactory);
         manager.setTaskManager(taskManager);

@@ -1,5 +1,6 @@
 package org.cytoscape.graphspace.cygraphspace.internal;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -7,6 +8,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.AuthenticationDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
+import org.cytoscape.graphspace.cygraphspace.internal.util.MessageConfig;
 import org.cytoscape.graphspace.cygraphspace.internal.util.PostGraphExportUtils;
 
 import javax.swing.*;
@@ -36,6 +38,15 @@ public class PostGraphMenuActionListener implements ActionListener {
     //called when export menu is clicked by the user
     @Override
     public void actionPerformed(ActionEvent e) {
+
+        // temporary hack for the issue that CyGraphSpace fails on uploading large network
+        // create a hard check now allowing user to upload network with more than 400 nodes
+        // remove in the future when the issue has been fixed
+        if (CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork().getNodeCount() > 400) {
+            JOptionPane.showMessageDialog(null, 
+                    MessageConfig.NETWORK_TOO_LARGE_MSG, "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         parent = CyObjectManager.INSTANCE.getApplicationFrame();
         loadingFrame.setLocationRelativeTo(parent);

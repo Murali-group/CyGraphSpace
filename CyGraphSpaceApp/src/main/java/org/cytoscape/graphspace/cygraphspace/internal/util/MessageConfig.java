@@ -36,4 +36,8 @@ public class MessageConfig {
     // Post graph task dialog message, shown in the pop up window after update graph task is done
     public final static String POST_GRAPH_TASK_DIALOG_SUCCESS = "Post graph successful.";
     public final static String POST_GRAPH_TASK_DIALOG_FAIL = "Could not post graph.";
+
+    // Error message for event where user tries to upload large network
+    public final static String NETWORK_TOO_LARGE_MSG = "Currently CyGraphSpace is unable to upload network with more than 400 nodes.\n"
+            + "Please upload network directly from the GraphSpace website.";
 }

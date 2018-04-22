@@ -8,15 +8,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 import org.graphspace.javaclient.Graph;
 import org.graphspace.javaclient.GraphSpaceClient;
-import org.json.JSONException;
-//import org.cytoscape.property.CyProperty;
 import org.json.JSONObject;
-
-import com.mashape.unirest.http.exceptions.UnirestException;
 
 /**
  * Singleton class used to store connection and session variables to be used to connect to GraphSpace

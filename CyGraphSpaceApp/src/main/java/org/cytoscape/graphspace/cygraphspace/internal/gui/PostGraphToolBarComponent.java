@@ -5,7 +5,6 @@ import java.awt.Component;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
-import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.events.SetCurrentNetworkEvent;
 import org.cytoscape.application.events.SetCurrentNetworkListener;
 import org.cytoscape.application.swing.AbstractToolBarComponent;

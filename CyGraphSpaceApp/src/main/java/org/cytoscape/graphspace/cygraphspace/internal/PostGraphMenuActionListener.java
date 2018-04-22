@@ -1,10 +1,8 @@
 package org.cytoscape.graphspace.cygraphspace.internal;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import org.cytoscape.model.CyNetwork;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.AuthenticationDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;

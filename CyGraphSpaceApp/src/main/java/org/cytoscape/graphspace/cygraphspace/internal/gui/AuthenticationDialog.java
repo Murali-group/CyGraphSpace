@@ -157,8 +157,6 @@ public class AuthenticationDialog extends JDialog {
     	
     	//logs in the user
     	else{
-    		System.out.println(hostText + " : " + usernameText + " : " + passwordText);
-    		System.out.println(Server.INSTANCE.getHost()+Server.INSTANCE.getUsername()+Server.INSTANCE.getPassword());
             this.dispose();
 
             SwingUtilities.invokeLater(new Runnable() {

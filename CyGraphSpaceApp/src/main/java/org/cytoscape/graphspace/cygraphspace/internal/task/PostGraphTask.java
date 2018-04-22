@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
+import org.cytoscape.graphspace.cygraphspace.internal.util.MessageConfig;
 import org.cytoscape.work.AbstractTask;
 import org.cytoscape.work.TaskMonitor;
 import org.json.JSONObject;
@@ -33,8 +34,8 @@ public class PostGraphTask extends AbstractTask {
     public void run(TaskMonitor taskMonitor) throws Exception {
 
         this.taskMonitor = taskMonitor;
-        taskMonitor.setTitle("Export graph to GraphSpace");
-        taskMonitor.setStatusMessage("Exporting graph to GraphSpace. Please wait...");
+        taskMonitor.setTitle(MessageConfig.POST_GRAPH_TASK_TITLE);
+        taskMonitor.setStatusMessage(MessageConfig.POST_GRAPH_TASK_STATUS_IN_PROGRESS);
 
         // run task in background
         new Thread() {
@@ -48,13 +49,13 @@ public class PostGraphTask extends AbstractTask {
         try {
             postGraph(graphJSON, styleJSON, isGraphPublic, null);
         } catch (Exception e1) {
-            taskMonitor.setStatusMessage("Post graph fails.");
-            JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not post graph", 
+            taskMonitor.setStatusMessage(MessageConfig.POST_GRAPH_TASK_STATUS_FAIL);
+            JOptionPane.showMessageDialog((Component)evt.getSource(), MessageConfig.POST_GRAPH_TASK_DIALOG_FAIL, 
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        taskMonitor.setStatusMessage("Post graph successful.");
-        JOptionPane.showMessageDialog((Component)evt.getSource(), "Post graph successful.", 
+        taskMonitor.setStatusMessage(MessageConfig.POST_GRAPH_TASK_STATUS_SUCCESS);
+        JOptionPane.showMessageDialog((Component)evt.getSource(), MessageConfig.POST_GRAPH_TASK_DIALOG_SUCCESS, 
                 "Message", JOptionPane.INFORMATION_MESSAGE);
     }
 

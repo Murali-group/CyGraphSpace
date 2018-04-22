@@ -16,6 +16,7 @@ import javax.swing.JPasswordField;
 
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
+import org.cytoscape.graphspace.cygraphspace.internal.util.MessageConfig;
 import org.cytoscape.graphspace.cygraphspace.internal.util.PostGraphExportUtils;
 
 import java.awt.Component;
@@ -140,7 +141,7 @@ public class AuthenticationDialog extends JDialog {
     	
     	//throws error if values not filled
     	if (hostText.isEmpty() || usernameText.isEmpty() || passwordText.isEmpty()){
-    		JOptionPane.showMessageDialog((Component)evt.getSource(), "Please enter all the values", "Error", JOptionPane.ERROR_MESSAGE);
+    		JOptionPane.showMessageDialog((Component)evt.getSource(), MessageConfig.AUTH_NOT_FILL_ERROR_MSG, "Error", JOptionPane.ERROR_MESSAGE);
     		loginButton.setText("Log In");
     		loginButton.setEnabled(true);
     		cancelButton.setEnabled(true);
@@ -148,7 +149,7 @@ public class AuthenticationDialog extends JDialog {
     	
     	//throws error if cannot authenticate the user
     	else if (!Server.INSTANCE.authenticate(hostText, usernameText, passwordText)){
-    		JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not authenticate you. Please ensure the username and password are correct and that you are connected to the internet.", "Error", JOptionPane.ERROR_MESSAGE);
+    		JOptionPane.showMessageDialog((Component)evt.getSource(), MessageConfig.AUTH_FAIL_MSG, "Error", JOptionPane.ERROR_MESSAGE);
     		loginButton.setText("Log In");
     		loginButton.setEnabled(true);
     		cancelButton.setEnabled(true);

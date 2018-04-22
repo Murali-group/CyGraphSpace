@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
+import org.cytoscape.graphspace.cygraphspace.internal.util.MessageConfig;
 import org.cytoscape.work.AbstractTask;
 import org.cytoscape.work.TaskMonitor;
 import org.json.JSONObject;
@@ -33,8 +34,8 @@ public class UpdateGraphTask extends AbstractTask {
     public void run(TaskMonitor taskMonitor) throws Exception {
 
         this.taskMonitor = taskMonitor;
-        taskMonitor.setTitle("Update graph to GraphSpace");
-        taskMonitor.setStatusMessage("Updating graph to GraphSpace. Please wait...");
+        taskMonitor.setTitle(MessageConfig.UPDATE_GRAPH_TASK_TITLE);
+        taskMonitor.setStatusMessage(MessageConfig.UPDATE_GRAPH_TASK_STATUS_IN_PROGRESS);
 
         // run task in background
         new Thread() {
@@ -48,14 +49,14 @@ public class UpdateGraphTask extends AbstractTask {
         try {
             updateGraph(graphJSON, styleJSON, isGraphPublic, null);
         } catch (Exception e1) {
-            taskMonitor.setStatusMessage("Update graph fails.");
+            taskMonitor.setStatusMessage(MessageConfig.UPDATE_GRAPH_TASK_STATUS_FAIL);
             JOptionPane.showMessageDialog((Component)evt.getSource(), 
-                    "Could not update graph", "Error", JOptionPane.ERROR_MESSAGE);
+                    MessageConfig.UPDATE_GRAPH_TASK_DIALOG_FAIL, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        taskMonitor.setStatusMessage("Update graph successful.");
+        taskMonitor.setStatusMessage(MessageConfig.UPDATE_GRAPH_TASK_STATUS_SUCCESS);
         JOptionPane.showMessageDialog((Component)evt.getSource(), 
-                "Update graph successful.", "Message", JOptionPane.INFORMATION_MESSAGE);
+                MessageConfig.UPDATE_GRAPH_TASK_DIALOG_SUCCESS, "Message", JOptionPane.INFORMATION_MESSAGE);
     }
 
     //post the current network to GraphSpace

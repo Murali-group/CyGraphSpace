@@ -37,6 +37,7 @@ import javax.swing.JTabbedPane;
 import org.apache.commons.io.IOUtils;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
+import org.cytoscape.graphspace.cygraphspace.internal.util.MessageConfig;
 import org.cytoscape.io.webservice.NetworkImportWebServiceClient;
 import org.cytoscape.io.webservice.swing.AbstractWebServiceGUIClient;
 import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
@@ -56,8 +57,7 @@ import org.json.JSONObject;
 public class GetGraphsPanel extends AbstractWebServiceGUIClient
 		implements NetworkImportWebServiceClient{
 	
-	static final String APP_DESCRIPTION = "<html>" + "CyGraphSpace App is used to import and export graphs from "
-			+ "<a href=\"http://www.grapshace.org\">GraphSpace</a> website. ";
+
 
 	OpenBrowser openBrowser;
 	LoadNetworkFileTaskFactory loadNetworkFileTaskFactory;
@@ -120,7 +120,7 @@ public class GetGraphsPanel extends AbstractWebServiceGUIClient
 	@SuppressWarnings({ "rawtypes", "serial" })
 	public GetGraphsPanel(TaskManager taskManager, OpenBrowser openBrowser) {
 		
-		super("http://www.graphspace.org", "GraphSpace", APP_DESCRIPTION);
+		super("http://www.graphspace.org", "GraphSpace", MessageConfig.APP_DESCRIPTION);
 		
 		this.taskManager = taskManager;
 		this.client = Server.INSTANCE.client;

@@ -15,6 +15,7 @@ import org.cytoscape.model.subnetwork.CyRootNetworkManager;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.GetGraphsPanel;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.PostGraphToolBarComponent;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
+import org.cytoscape.graphspace.cygraphspace.internal.util.MessageConfig;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
 import org.cytoscape.task.read.LoadVizmapFileTaskFactory;
@@ -43,7 +44,7 @@ public class CyActivator extends AbstractCyActivator {
         BundleContext bc = context;
 
         //register Post Graph Action
-        action = new CyGraphSpaceMenuAction("Network to GraphSpace", applicationManager);
+        action = new CyGraphSpaceMenuAction(MessageConfig.MenuActionTitle, applicationManager);
         properties = new Properties();
         registerService(context, action, CyAction.class, properties);
 

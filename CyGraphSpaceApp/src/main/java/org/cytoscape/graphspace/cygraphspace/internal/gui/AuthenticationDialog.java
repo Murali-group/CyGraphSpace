@@ -29,6 +29,7 @@ import java.awt.event.ActionEvent;
  * @author rishabh
  *
  */
+@SuppressWarnings("serial")
 public class AuthenticationDialog extends JDialog {
 	
 	//UI component variables
@@ -39,8 +40,8 @@ public class AuthenticationDialog extends JDialog {
 	JButton cancelButton;
 	private JFrame loadingFrame;
 
-	public AuthenticationDialog(JFrame parentFrame, JFrame loadingFrame) {
-	    super(parentFrame, "Log in to the Server", ModalityType.APPLICATION_MODAL);
+	public AuthenticationDialog(JFrame loadingFrame) {
+	    super(CyObjectManager.INSTANCE.getApplicationFrame(), "Log in to the Server", ModalityType.APPLICATION_MODAL);
 	    JLabel hostLabel = new JLabel("Host");
 
 	    AuthTextFieldListener textFieldListener = new AuthTextFieldListener();
@@ -171,7 +172,6 @@ public class AuthenticationDialog extends JDialog {
                     try {
                         PostGraphExportUtils.populate(CyObjectManager.INSTANCE.getApplicationFrame(), loadingFrame);
                     } catch (Exception e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 }

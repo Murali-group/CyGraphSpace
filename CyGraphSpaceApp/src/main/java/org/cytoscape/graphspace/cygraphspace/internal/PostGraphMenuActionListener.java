@@ -18,7 +18,6 @@ import javax.swing.*;
  */
 public class PostGraphMenuActionListener implements ActionListener {
 
-    private static JFrame parent;
     private static JFrame loadingFrame;
     private static ImageIcon loading;
     private static JLabel loadingLabel;
@@ -46,8 +45,7 @@ public class PostGraphMenuActionListener implements ActionListener {
             return;
         }
 
-        parent = CyObjectManager.INSTANCE.getApplicationFrame();
-        loadingFrame.setLocationRelativeTo(parent);
+        loadingFrame.setLocationRelativeTo(CyObjectManager.INSTANCE.getApplicationFrame());
 
         //if there is a network and the user is currently authenticated, create a post graph dialog
         if (Server.INSTANCE.isAuthenticated()) {
@@ -72,9 +70,9 @@ public class PostGraphMenuActionListener implements ActionListener {
         //if there is a network but the user is not authenticated, open the login dialog for the user to log in. Once logged in, open the post graph dialog
         else {
             if (dialog == null)
-                dialog = new AuthenticationDialog(parent, loadingFrame);
+                dialog = new AuthenticationDialog(loadingFrame);
 
-            dialog.setLocationRelativeTo(parent);
+            dialog.setLocationRelativeTo(CyObjectManager.INSTANCE.getApplicationFrame());
             dialog.setVisible(true);
         }
     }

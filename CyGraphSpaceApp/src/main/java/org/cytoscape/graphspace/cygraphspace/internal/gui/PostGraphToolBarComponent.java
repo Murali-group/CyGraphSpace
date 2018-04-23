@@ -1,6 +1,7 @@
 package org.cytoscape.graphspace.cygraphspace.internal.gui;
 
 import java.awt.Component;
+import java.awt.Image;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -26,6 +27,7 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 
 		//imageicon used as for the toolbar menu
 		ImageIcon icon = new ImageIcon(this.getClass().getClassLoader().getResource("graphspaceicon.png"));
+		icon = new ImageIcon(icon.getImage().getScaledInstance(38, 38, Image.SCALE_SMOOTH)); // resize image
 		button.setIcon(icon);
 		button.setBorderPainted(false);
 		button.setFocusPainted(false);

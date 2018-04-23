@@ -14,6 +14,7 @@ public class MessageConfig {
 
     // error messages related to authentication dialog
     public final static String AUTH_NOT_FILL_ERROR_MSG = "Please enter all the values";
+    public final static String AUTH_INVALID_URL = "The host you entered is invalid.";
     public final static String AUTH_FAIL_MSG = "Could not authenticate you. "
             + "Please ensure the username and password are correct and that you are connected to the internet.";
 

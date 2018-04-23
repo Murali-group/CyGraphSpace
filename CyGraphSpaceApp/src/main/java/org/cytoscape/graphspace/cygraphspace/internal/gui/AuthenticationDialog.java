@@ -22,6 +22,7 @@ import org.cytoscape.graphspace.cygraphspace.internal.util.MessageConfig;
 import org.cytoscape.graphspace.cygraphspace.internal.util.PostGraphExportUtils;
 
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
 import java.awt.event.ActionEvent;
 
 /**
@@ -65,17 +66,22 @@ public class AuthenticationDialog extends JDialog {
 	    this.loadingFrame = loadingFrame;
 
 		//action listener for login button
-		loginButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent evt)
-            {
-                try {
-					loginActionPerformed(evt);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            }
-        });
+	    loginButton.addActionListener(new ActionListener(){
+	        public void actionPerformed(ActionEvent evt)
+	        {
+	            try {
+	                loginActionPerformed(evt);
+	            } catch (Exception e) {
+	                if (e.getCause().getClass() == MalformedURLException.class) {
+	                    JOptionPane.showMessageDialog(null, MessageConfig.AUTH_INVALID_URL, "Error", JOptionPane.ERROR_MESSAGE);
+	                    loginButton.setText("Log In");
+	                    cancelButton.setEnabled(true);
+	                }else {
+	                    e.printStackTrace();
+	                }
+	            }
+	        }
+	    });
 		loginButton.setEnabled(false);
 		
 		buttonsPanel.add(loginButton);
@@ -153,7 +159,6 @@ public class AuthenticationDialog extends JDialog {
     	if (!Server.INSTANCE.authenticate(hostText, usernameText, passwordText)){
     		JOptionPane.showMessageDialog(this, MessageConfig.AUTH_FAIL_MSG, "Error", JOptionPane.ERROR_MESSAGE);
     		loginButton.setText("Log In");
-    		loginButton.setEnabled(true);
     		cancelButton.setEnabled(true);
     	}
 

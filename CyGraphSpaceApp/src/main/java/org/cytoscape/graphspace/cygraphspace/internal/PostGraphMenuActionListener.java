@@ -72,7 +72,7 @@ public class PostGraphMenuActionListener implements ActionListener {
         //if there is a network but the user is not authenticated, open the login dialog for the user to log in. Once logged in, open the post graph dialog
         else {
             if (dialog == null)
-                dialog = new AuthenticationDialog(loadingFrame);
+                dialog = new AuthenticationDialog(parent, loadingFrame);
 
             dialog.setLocationRelativeTo(parent);
             dialog.setVisible(true);

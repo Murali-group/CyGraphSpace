@@ -1,7 +1,5 @@
 package org.cytoscape.graphspace.cygraphspace.internal.task;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
@@ -16,15 +14,12 @@ import org.json.JSONObject;
  * Task class that posts graph to the GraphSpace and update related status
  */
 public class PostGraphTask extends AbstractTask {
-
-    private ActionEvent evt;
     private JSONObject graphJSON;
     private JSONObject styleJSON; 
     private boolean isGraphPublic;
     private TaskMonitor taskMonitor;
 
-    public PostGraphTask(ActionEvent evt, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic) {
-        this.evt = evt;
+    public PostGraphTask(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic) {
         this.graphJSON = graphJSON;
         this.styleJSON = styleJSON;
         this.isGraphPublic = isGraphPublic;
@@ -50,12 +45,12 @@ public class PostGraphTask extends AbstractTask {
             postGraph(graphJSON, styleJSON, isGraphPublic, null);
         } catch (Exception e1) {
             taskMonitor.setStatusMessage(MessageConfig.POST_GRAPH_TASK_STATUS_FAIL);
-            JOptionPane.showMessageDialog((Component)evt.getSource(), MessageConfig.POST_GRAPH_TASK_DIALOG_FAIL, 
+            JOptionPane.showMessageDialog(null, MessageConfig.POST_GRAPH_TASK_DIALOG_FAIL, 
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         taskMonitor.setStatusMessage(MessageConfig.POST_GRAPH_TASK_STATUS_SUCCESS);
-        JOptionPane.showMessageDialog((Component)evt.getSource(), MessageConfig.POST_GRAPH_TASK_DIALOG_SUCCESS, 
+        JOptionPane.showMessageDialog(null, MessageConfig.POST_GRAPH_TASK_DIALOG_SUCCESS, 
                 "Message", JOptionPane.INFORMATION_MESSAGE);
     }
 

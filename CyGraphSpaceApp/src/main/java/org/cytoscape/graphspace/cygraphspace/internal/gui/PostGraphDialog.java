@@ -17,7 +17,6 @@ import org.cytoscape.work.TaskIterator;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
-import java.awt.Frame;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -41,10 +40,8 @@ public class PostGraphDialog extends JDialog {
 	private JLabel graphNameLabel;
 	private JLabel graphNameValue;
 
-	public PostGraphDialog(Frame parent, String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags) {
-		
-		this.setTitle("Export Graphs to GraphSpace");
-		this.setAlwaysOnTop(true);
+	public PostGraphDialog(String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags) {
+	    super(CyObjectManager.INSTANCE.getApplicationFrame(), "Export Graphs to GraphSpace", ModalityType.APPLICATION_MODAL);
 		JLabel hostLabel = new JLabel("Host");
 		hostValueLabel = new JLabel("www.graphspace.org");
 		usernameValueLabel = new JLabel("Anonymous");
@@ -98,7 +95,7 @@ public class PostGraphDialog extends JDialog {
 		postGraphButton.setEnabled(true);
 		postGraphButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				exportActionPerformed(e, graphJSON, styleJSON, isGraphPublic);
+				exportActionPerformed(graphJSON, styleJSON, isGraphPublic);
 			}
 		});
 		buttonsPanel.add(postGraphButton);
@@ -126,10 +123,10 @@ public class PostGraphDialog extends JDialog {
 	}
 
 	//called when export button clicked
-	private void exportActionPerformed(ActionEvent evt, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic){
+	private void exportActionPerformed(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic){
         this.dispose();
         SynchronousTaskManager<?> synTaskMan = CyObjectManager.INSTANCE.getSynchrounousTaskManager();
-        PostGraphTask postGraphTask = new PostGraphTask(evt, graphJSON, styleJSON, isGraphPublic);
+        PostGraphTask postGraphTask = new PostGraphTask(graphJSON, styleJSON, isGraphPublic);
         synTaskMan.execute(new TaskIterator(postGraphTask));
 	}
 

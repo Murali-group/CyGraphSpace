@@ -17,7 +17,6 @@ import org.cytoscape.work.TaskIterator;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
-import java.awt.Frame;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -26,6 +25,7 @@ import java.awt.event.ActionEvent;
  * @author rishabh
  *
  */
+@SuppressWarnings("serial")
 public class UpdateGraphDialog extends JDialog {
 	
 	//UI component variables
@@ -39,9 +39,8 @@ public class UpdateGraphDialog extends JDialog {
 	private JLabel graphNameValue;
 	private JLabel graphNameLabel;
 	
-	public UpdateGraphDialog(Frame parent, String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags) {
-		this.setTitle("Export Graphs to GraphSpace");
-		this.setAlwaysOnTop(true);
+	public UpdateGraphDialog(String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags) {
+	    super(CyObjectManager.INSTANCE.getApplicationFrame(), "Export Graphs to GraphSpace", ModalityType.APPLICATION_MODAL);
 		JLabel hostLabel = new JLabel("Host");
 		hostValueLabel = new JLabel("www.graphspace.org");
 		usernameValueLabel = new JLabel("Anonymous");
@@ -96,7 +95,7 @@ public class UpdateGraphDialog extends JDialog {
 		updateGraphButton.setEnabled(true);
 		updateGraphButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateActionPerformed(e, graphJSON, styleJSON, isGraphPublic);
+				updateActionPerformed(graphJSON, styleJSON, isGraphPublic);
 			}
 		});
 		buttonsPanel.add(updateGraphButton);
@@ -124,10 +123,10 @@ public class UpdateGraphDialog extends JDialog {
 	}
 
 	//called when update button clicked
-	private void updateActionPerformed(ActionEvent evt, JSONObject graphJSON, JSONObject styleJSON, boolean isPublic){
+	private void updateActionPerformed(JSONObject graphJSON, JSONObject styleJSON, boolean isPublic){
         this.dispose();
         SynchronousTaskManager<?> synTaskMan = CyObjectManager.INSTANCE.getSynchrounousTaskManager();
-        UpdateGraphTask updateGraphTask = new UpdateGraphTask(evt, graphJSON, styleJSON, isPublic);
+        UpdateGraphTask updateGraphTask = new UpdateGraphTask(graphJSON, styleJSON, isPublic);
         synTaskMan.execute(new TaskIterator(updateGraphTask));
 	}
 	

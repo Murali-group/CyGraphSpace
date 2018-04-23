@@ -46,7 +46,7 @@ public class PostGraphExportUtils {
 
             Graph graph = Server.INSTANCE.getGraphByName(graphName);
             isGraphPublic = graph.isPublic();
-            UpdateGraphDialog updateDialog = new UpdateGraphDialog(parent, graphName, graphJSON, styleJSON, isGraphPublic, null);
+            UpdateGraphDialog updateDialog = new UpdateGraphDialog(graphName, graphJSON, styleJSON, isGraphPublic, null);
             updateDialog.setLocationRelativeTo(parent);
             updateDialog.setVisible(true);
         }
@@ -59,7 +59,7 @@ public class PostGraphExportUtils {
                 }
             });
 
-            PostGraphDialog postDialog = new PostGraphDialog(parent, graphName, graphJSON, styleJSON, isGraphPublic, null);
+            PostGraphDialog postDialog = new PostGraphDialog(graphName, graphJSON, styleJSON, isGraphPublic, null);
             postDialog.setLocationRelativeTo(parent);
             postDialog.setVisible(true);
         }

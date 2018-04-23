@@ -4,23 +4,21 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.event.MenuEvent;
 
-import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 
 public class CyGraphSpaceMenuAction extends AbstractCyAction {
 
     private static final long serialVersionUID = 1L;
     private PostGraphMenuActionListener actionListener;
-    private CyApplicationManager applicationManager;
 
-    public CyGraphSpaceMenuAction(String menuTitle, CyApplicationManager applicationManager) {
+    public CyGraphSpaceMenuAction(String menuTitle) {
 
-        super(menuTitle, applicationManager, null, null);
+        super(menuTitle, CyObjectManager.INSTANCE.getApplicationManager(), null, null);
 
         // Menu under File>Export
         setPreferredMenu("File.Export");
 
-        this.applicationManager = applicationManager;
         actionListener = new PostGraphMenuActionListener();
     }
 
@@ -31,6 +29,6 @@ public class CyGraphSpaceMenuAction extends AbstractCyAction {
 
     @Override
     public void menuSelected(MenuEvent e) {
-        setEnabled(applicationManager.getCurrentNetwork() != null);
+        setEnabled(CyObjectManager.INSTANCE.getCurrentNetwork() != null);
     }
 }

@@ -44,7 +44,7 @@ public class CyActivator extends AbstractCyActivator {
         BundleContext bc = context;
 
         //register Post Graph Action
-        action = new CyGraphSpaceMenuAction(MessageConfig.MenuActionTitle, applicationManager);
+        action = new CyGraphSpaceMenuAction(MessageConfig.MenuActionTitle);
         properties = new Properties();
         registerService(context, action, CyAction.class, properties);
 
@@ -68,6 +68,7 @@ public class CyActivator extends AbstractCyActivator {
         configDir.mkdirs();
         
         //setting services to manager singleton
+        manager.setCyApplicationManager(applicationManager);
         manager.setConfigDir(configDir);
         manager.setCySwingAppAdapter(appAdapter);
         manager.setCySwingApplition(desktop);
@@ -76,7 +77,6 @@ public class CyActivator extends AbstractCyActivator {
         manager.setExportNetworkViewTaskFactory(exportNetworkViewTaskFactory);
         manager.setLoadVizmapTaskFactory(loadVizmapFileTaskFactory);
         manager.setExportVizmapTaskFactory(exportVizmapTaskFactory);
-        manager.setTaskManager(taskManager);
 		manager.setCyNetworkFactory(cyNetworkFactory);
 		manager.setCyNetworkManager(cyNetworkManager);
 		manager.setCyRootNetworkManager(cyRootNetworkManager);

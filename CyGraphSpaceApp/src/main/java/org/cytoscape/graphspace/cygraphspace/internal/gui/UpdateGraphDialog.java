@@ -40,7 +40,7 @@ public class UpdateGraphDialog extends JDialog {
 	private JLabel graphNameLabel;
 	
 	public UpdateGraphDialog(String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags) {
-	    super(CyObjectManager.INSTANCE.getApplicationFrame(), "Export Graphs to GraphSpace", ModalityType.APPLICATION_MODAL);
+	    super(CyObjectManager.INSTANCE.getApplicationFrame(), "Update Graphs to GraphSpace", ModalityType.APPLICATION_MODAL);
 		JLabel hostLabel = new JLabel("Host");
 		hostValueLabel = new JLabel("www.graphspace.org");
 		usernameValueLabel = new JLabel("Anonymous");

@@ -37,9 +37,10 @@ public class PostGraphMenuActionListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         // temporary hack for the issue that CyGraphSpace fails on uploading large network
-        // create a hard check now allowing user to upload network with more than 400 nodes
+        // create a hard check now allowing user to upload network with more than 400 nodes or 2000 edges
         // remove in the future when the issue has been fixed
-        if (CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork().getNodeCount() > 400) {
+        if (CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork().getNodeCount() > 400
+                || CyObjectManager.INSTANCE.getApplicationManager().getCurrentNetwork().getEdgeCount() > 2000) {
             JOptionPane.showMessageDialog(null, 
                     MessageConfig.NETWORK_TOO_LARGE_MSG, "Error", JOptionPane.ERROR_MESSAGE);
             return;

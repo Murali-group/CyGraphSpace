@@ -5,18 +5,18 @@ import javax.swing.JDialog;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 
+import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
-
+import org.cytoscape.graphspace.cygraphspace.internal.task.UpdateGraphTask;
+import org.cytoscape.work.SynchronousTaskManager;
+import org.cytoscape.work.TaskIterator;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
-import java.awt.Component;
-import java.awt.Frame;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
  * @author rishabh
  *
  */
+@SuppressWarnings("serial")
 public class UpdateGraphDialog extends JDialog {
 	
 	//UI component variables
@@ -38,24 +39,16 @@ public class UpdateGraphDialog extends JDialog {
 	private JLabel graphNameValue;
 	private JLabel graphNameLabel;
 	
-	public UpdateGraphDialog(Frame parent, String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags) {
-		this.setTitle("Export Graphs to GraphSpace");
-		
+	public UpdateGraphDialog(String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags) {
+	    super(CyObjectManager.INSTANCE.getApplicationFrame(), "Update Graphs to GraphSpace", ModalityType.APPLICATION_MODAL);
 		JLabel hostLabel = new JLabel("Host");
-		
 		hostValueLabel = new JLabel("www.graphspace.org");
-		
 		usernameValueLabel = new JLabel("Anonymous");
-		
-		
 		usernameLabel = new JLabel("Username");
-		
 		buttonsPanel = new JPanel();
-		
 		graphNameLabel = new JLabel("Graph Name");
-		
 		graphNameValue = new JLabel("");
-		
+
 		groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -102,7 +95,7 @@ public class UpdateGraphDialog extends JDialog {
 		updateGraphButton.setEnabled(true);
 		updateGraphButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				updateActionPerformed(e, graphJSON, styleJSON, isGraphPublic);
+				updateActionPerformed(graphJSON, styleJSON, isGraphPublic);
 			}
 		});
 		buttonsPanel.add(updateGraphButton);
@@ -128,24 +121,13 @@ public class UpdateGraphDialog extends JDialog {
 		}
 		graphNameValue.setText(graphName);
 	}
-	
+
 	//called when update button clicked
-	private void updateActionPerformed(ActionEvent evt, JSONObject graphJSON, JSONObject styleJSON, boolean isPublic){
-		try{
-			this.dispose();
-			updateGraph(graphJSON, styleJSON, isPublic, null);
-		}
-		catch (Exception e){
-			e.printStackTrace();
-			JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not update graph", "Error", JOptionPane.ERROR_MESSAGE);
-			this.dispose();
-		}
-	}
-	
-	//post the current network to GraphSpace
-	private void updateGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isPublic, ArrayList<String> tagsList) throws Exception{
-		String name = graphJSON.getJSONObject("data").getString("name");
-		Server.INSTANCE.updateGraph(name, graphJSON, isPublic, tagsList);
+	private void updateActionPerformed(JSONObject graphJSON, JSONObject styleJSON, boolean isPublic){
+        this.dispose();
+        SynchronousTaskManager<?> synTaskMan = CyObjectManager.INSTANCE.getSynchrounousTaskManager();
+        UpdateGraphTask updateGraphTask = new UpdateGraphTask(graphJSON, styleJSON, isPublic);
+        synTaskMan.execute(new TaskIterator(updateGraphTask));
 	}
 	
 	//close the dialog box on cancel clicked

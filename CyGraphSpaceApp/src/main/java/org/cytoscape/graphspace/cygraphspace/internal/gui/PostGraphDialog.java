@@ -5,17 +5,18 @@ import javax.swing.JDialog;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 
+import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
+import org.cytoscape.graphspace.cygraphspace.internal.task.PostGraphTask;
+import org.cytoscape.work.SynchronousTaskManager;
+import org.cytoscape.work.TaskIterator;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
-import java.awt.Component;
-import java.awt.Frame;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -25,12 +26,9 @@ import java.awt.event.ActionEvent;
  *
  */
 public class PostGraphDialog extends JDialog {
-	
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 15L;
-	
+
 	//UI component variables
 	private JLabel hostValueLabel;
 	private JLabel usernameValueLabel;
@@ -41,11 +39,9 @@ public class PostGraphDialog extends JDialog {
 	private GroupLayout groupLayout;
 	private JLabel graphNameLabel;
 	private JLabel graphNameValue;
-	
-	
-	public PostGraphDialog(Frame parent, String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags) {
-		
-		this.setTitle("Export Graphs to GraphSpace");
+
+	public PostGraphDialog(String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags) {
+	    super(CyObjectManager.INSTANCE.getApplicationFrame(), "Export Graphs to GraphSpace", ModalityType.APPLICATION_MODAL);
 		JLabel hostLabel = new JLabel("Host");
 		hostValueLabel = new JLabel("www.graphspace.org");
 		usernameValueLabel = new JLabel("Anonymous");
@@ -99,7 +95,7 @@ public class PostGraphDialog extends JDialog {
 		postGraphButton.setEnabled(true);
 		postGraphButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				exportActionPerformed(e, graphJSON, styleJSON, isGraphPublic);
+				exportActionPerformed(graphJSON, styleJSON, isGraphPublic);
 			}
 		});
 		buttonsPanel.add(postGraphButton);
@@ -114,7 +110,7 @@ public class PostGraphDialog extends JDialog {
 		populateFields(graphName);
 		pack();
 	}
-	
+
 	//populate dialog with user values
 	private void populateFields(String graphName){
 		if (Server.INSTANCE.getUsername() != null){
@@ -125,25 +121,15 @@ public class PostGraphDialog extends JDialog {
 		}
 		graphNameValue.setText(graphName);
 	}
-	
+
 	//called when export button clicked
-	private void exportActionPerformed(ActionEvent evt, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic){
-		try{
-			this.dispose();
-			postGraph(graphJSON, styleJSON, isGraphPublic, null);
-		}
-		catch (Exception e){
-			e.printStackTrace();
-			JOptionPane.showMessageDialog((Component)evt.getSource(), "Could not post graph", "Error", JOptionPane.ERROR_MESSAGE);
-			this.dispose();
-		}
+	private void exportActionPerformed(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic){
+        this.dispose();
+        SynchronousTaskManager<?> synTaskMan = CyObjectManager.INSTANCE.getSynchrounousTaskManager();
+        PostGraphTask postGraphTask = new PostGraphTask(graphJSON, styleJSON, isGraphPublic);
+        synTaskMan.execute(new TaskIterator(postGraphTask));
 	}
-	
-	//post the current network to GraphSpace
-	private void postGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
-		Server.INSTANCE.postGraph(graphJSON, styleJSON, isGraphPublic, tagsList);
-	}
-	
+
 	//close the dialog box on cancel clicked
 	private void cancelActionPerformed(ActionEvent e){
 		this.dispose();

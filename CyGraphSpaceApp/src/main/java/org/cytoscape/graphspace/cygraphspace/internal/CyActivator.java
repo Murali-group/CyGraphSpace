@@ -7,6 +7,7 @@ import org.cytoscape.app.swing.CySwingAppAdapter;
 import org.cytoscape.application.CyApplicationConfiguration;
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.application.swing.CyAction;
 import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.model.CyNetworkFactory;
 import org.cytoscape.model.CyNetworkManager;
@@ -14,10 +15,12 @@ import org.cytoscape.model.subnetwork.CyRootNetworkManager;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.GetGraphsPanel;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.PostGraphToolBarComponent;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
+import org.cytoscape.graphspace.cygraphspace.internal.util.MessageConfig;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
 import org.cytoscape.task.read.LoadVizmapFileTaskFactory;
 import org.cytoscape.task.write.ExportNetworkTaskFactory;
+import org.cytoscape.task.write.ExportNetworkViewTaskFactory;
 import org.cytoscape.task.write.ExportVizmapTaskFactory;
 import org.cytoscape.util.swing.OpenBrowser;
 import org.cytoscape.work.TaskManager;
@@ -39,18 +42,19 @@ public class CyActivator extends AbstractCyActivator {
         AbstractCyAction action = null;
         Properties properties = null;
         BundleContext bc = context;
-        
+
         //register Post Graph Action
-        action = new PostGraphMenuAction("Network to GraphSpace", applicationManager);
+        action = new CyGraphSpaceMenuAction(MessageConfig.MenuActionTitle);
         properties = new Properties();
-        registerAllServices(context, action, properties);
-        
+        registerService(context, action, CyAction.class, properties);
+
         //getting cytoscape services
         CyApplicationConfiguration config = getService(context,CyApplicationConfiguration.class);
         CySwingAppAdapter appAdapter = getService(context, CySwingAppAdapter.class);
         CySwingApplication desktop = getService(bc,CySwingApplication.class);
         LoadNetworkFileTaskFactory loadNetworkFileTaskFactory = getService(bc, LoadNetworkFileTaskFactory.class);
         ExportNetworkTaskFactory exportNetworkTaskFactory = getService(bc, ExportNetworkTaskFactory.class);
+        ExportNetworkViewTaskFactory exportNetworkViewTaskFactory = getService(bc, ExportNetworkViewTaskFactory.class);
         LoadVizmapFileTaskFactory loadVizmapFileTaskFactory = getService(bc, LoadVizmapFileTaskFactory.class);
         ExportVizmapTaskFactory exportVizmapTaskFactory = getService(bc, ExportVizmapTaskFactory.class);
         TaskManager taskManager = getService(context, DialogTaskManager.class);
@@ -64,14 +68,15 @@ public class CyActivator extends AbstractCyActivator {
         configDir.mkdirs();
         
         //setting services to manager singleton
+        manager.setCyApplicationManager(applicationManager);
         manager.setConfigDir(configDir);
         manager.setCySwingAppAdapter(appAdapter);
         manager.setCySwingApplition(desktop);
         manager.setLoadNetworkFileTaskFactory(loadNetworkFileTaskFactory);
         manager.setExportNetworkTaskFactory(exportNetworkTaskFactory);
+        manager.setExportNetworkViewTaskFactory(exportNetworkViewTaskFactory);
         manager.setLoadVizmapTaskFactory(loadVizmapFileTaskFactory);
         manager.setExportVizmapTaskFactory(exportVizmapTaskFactory);
-        manager.setTaskManager(taskManager);
 		manager.setCyNetworkFactory(cyNetworkFactory);
 		manager.setCyNetworkManager(cyNetworkManager);
 		manager.setCyRootNetworkManager(cyRootNetworkManager);
@@ -79,12 +84,10 @@ public class CyActivator extends AbstractCyActivator {
         //registering Toolbar component
         PostGraphToolBarComponent toolBarComponent = new PostGraphToolBarComponent();
         registerAllServices(bc, toolBarComponent, new Properties());
-        
 		
 		//registering openBrowser for opening graph in GraphSpace
 		OpenBrowser openBrowser = getService(context, OpenBrowser.class);
 	    GetGraphsPanel getGraphsPanel = new GetGraphsPanel(taskManager, openBrowser);
 	    registerAllServices(context, getGraphsPanel, new Properties());
-	    
     }
 }

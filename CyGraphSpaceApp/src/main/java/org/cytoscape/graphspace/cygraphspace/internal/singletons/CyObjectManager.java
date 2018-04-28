@@ -47,6 +47,7 @@ import org.cytoscape.property.CyProperty;
 import org.cytoscape.task.read.LoadNetworkFileTaskFactory;
 import org.cytoscape.task.read.LoadVizmapFileTaskFactory;
 import org.cytoscape.task.write.ExportNetworkTaskFactory;
+import org.cytoscape.task.write.ExportNetworkViewTaskFactory;
 import org.cytoscape.task.write.ExportVizmapTaskFactory;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewFactory;
@@ -56,7 +57,7 @@ import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.vizmap.VisualMappingFunctionFactory;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyleFactory;
-import org.cytoscape.work.TaskManager;
+import org.cytoscape.work.SynchronousTaskManager;
 import org.cytoscape.work.swing.DialogTaskManager;
 
 //utility variables and methods to maintain Cytoscape singleton properties
@@ -66,26 +67,28 @@ public enum CyObjectManager {
 
     private File configDir;
     public CySwingAppAdapter adapter;
+    private CyApplicationManager applicationManager;
     private CyNetworkTableManager networkTableManager;
 	private LoadNetworkFileTaskFactory loadNetworkFileTaskFactory;
+	private ExportNetworkViewTaskFactory exportNetworkViewTaskFactory;
 	private ExportNetworkTaskFactory exportNetworkTaskFactory;
 	private CyTableManager tableManager;
 	private CySwingApplication desktop;
-	private TaskManager taskManager;
 	private LoadVizmapFileTaskFactory loadVizmapFileTaskFactory;
 	private ExportVizmapTaskFactory exportVizmapTaskFactory;
     private CyNetworkFactory cyNetworkFactory;
 	private CyNetworkManager cyNetworkManager;
 	private CyRootNetworkManager cyRootNetworkManager;
 	private CyProperty<Properties> cyProperties;
-	
+
+	public void setCyApplicationManager(CyApplicationManager applicationManager) {
+	    this.applicationManager = applicationManager;
+	}
+
 	public void setCyProperties(CyProperty<Properties> cyProperties) {
 		this.cyProperties = cyProperties;
 	}
-	
-	public void setTaskManager(TaskManager taskManager){
-    	this.taskManager = taskManager;
-    }
+
 	public CyProperty<Properties> getCyProperties(){
 		return this.cyProperties;
 	}
@@ -133,7 +136,11 @@ public enum CyObjectManager {
     public void setExportNetworkTaskFactory(ExportNetworkTaskFactory exportNetworkTaskFactory){
     	this.exportNetworkTaskFactory = exportNetworkTaskFactory;
     }
-    
+
+    public void setExportNetworkViewTaskFactory(ExportNetworkViewTaskFactory exportNetworkViewTaskFactory){
+        this.exportNetworkViewTaskFactory = exportNetworkViewTaskFactory;
+    }
+
     public void setExportVizmapTaskFactory(ExportVizmapTaskFactory exportVizmapTaskFactory){
     	this.exportVizmapTaskFactory = exportVizmapTaskFactory;
     }
@@ -155,7 +162,7 @@ public enum CyObjectManager {
     }
     
     public CyApplicationManager getApplicationManager(){
-    	return adapter.getCyApplicationManager();
+    	return this.applicationManager;
     }
     
     public CyNetworkFactory getNetworkFactory(){
@@ -189,6 +196,11 @@ public enum CyObjectManager {
     public ExportNetworkTaskFactory getExportNetworkTaskFactory(){
     	return this.exportNetworkTaskFactory;
     }
+
+    public ExportNetworkViewTaskFactory getExportNetworkViewTaskFactory(){
+        return this.exportNetworkViewTaskFactory;
+    }
+
     public VisualLexicon getDefaultVisualLexicon(){
     	return adapter.getRenderingEngineManager().getDefaultVisualLexicon();
     }
@@ -198,6 +210,10 @@ public enum CyObjectManager {
     
     public DialogTaskManager getTaskManager(){
     	return this.adapter.getDialogTaskManager();
+    }
+
+    public SynchronousTaskManager<?> getSynchrounousTaskManager() {
+        return this.adapter.getCyServiceRegistrar().getService(SynchronousTaskManager.class);
     }
 
     public VisualMappingManager getVisualMappingManager() {
@@ -245,12 +261,10 @@ public enum CyObjectManager {
     }
     
     public CyNetwork getCurrentNetwork(){
-        CyApplicationManager applicationManager = adapter.getCyApplicationManager();
         return applicationManager == null ? null : applicationManager.getCurrentNetwork();
     }
 
     public CyNetworkView getCurrentNetworkView(){
-        CyApplicationManager applicationManager = adapter.getCyApplicationManager();
         return applicationManager == null ? null : applicationManager.getCurrentNetworkView();
     }
     

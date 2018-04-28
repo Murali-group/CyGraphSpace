@@ -14,7 +14,9 @@ public class MessageConfig {
 
     // error messages related to authentication dialog
     public final static String AUTH_NOT_FILL_ERROR_MSG = "Please enter all the values.";
-    public final static String AUTH_INVALID_URL = "Malformed URL entered for host.\nPlease enter a new host.";
+    public final static String AUTH_INVALID_URL = "IP address of the entered host could not be determined.\n"
+            + "Please try again or enter a new host.";
+    public final static String AUTH_MALFORMED_URL = "Malformed URL entered for host.\nPlease enter a new host.";
     public final static String AUTH_FAIL_MSG = "Could not authenticate you. "
             + "Please ensure the username and password are correct and that you are connected to the internet.";
 

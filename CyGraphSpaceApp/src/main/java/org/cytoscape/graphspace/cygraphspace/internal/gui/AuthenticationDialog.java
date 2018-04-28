@@ -21,8 +21,11 @@ import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 import org.cytoscape.graphspace.cygraphspace.internal.util.MessageConfig;
 import org.cytoscape.graphspace.cygraphspace.internal.util.PostGraphExportUtils;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
+
 import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.awt.event.ActionEvent;
 
 /**
@@ -65,15 +68,21 @@ public class AuthenticationDialog extends JDialog {
 
 	    this.loadingFrame = loadingFrame;
 
-		//action listener for login button
+	    //action listener for login button
 	    loginButton.addActionListener(new ActionListener(){
 	        public void actionPerformed(ActionEvent evt)
 	        {
 	            try {
 	                loginActionPerformed(evt);
+	            } catch (UnirestException e) {
+	                if (e.getCause().getClass() == UnknownHostException.class) {
+	                    JOptionPane.showMessageDialog(null, MessageConfig.AUTH_INVALID_URL, "Error", JOptionPane.ERROR_MESSAGE);
+	                    loginButton.setText("Log In");
+	                    cancelButton.setEnabled(true);
+	                }
 	            } catch (Exception e) {
 	                if (e.getCause().getClass() == MalformedURLException.class) {
-	                    JOptionPane.showMessageDialog(null, MessageConfig.AUTH_INVALID_URL, "Error", JOptionPane.ERROR_MESSAGE);
+	                    JOptionPane.showMessageDialog(null, MessageConfig.AUTH_MALFORMED_URL, "Error", JOptionPane.ERROR_MESSAGE);
 	                    loginButton.setText("Log In");
 	                    cancelButton.setEnabled(true);
 	                }else {

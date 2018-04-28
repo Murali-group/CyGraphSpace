@@ -27,7 +27,7 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 
 		//imageicon used as for the toolbar menu
 		ImageIcon icon = new ImageIcon(this.getClass().getClassLoader().getResource("graphspaceicon.png"));
-		icon = new ImageIcon(icon.getImage().getScaledInstance(38, 38, Image.SCALE_SMOOTH)); // resize image
+		icon = new ImageIcon(icon.getImage().getScaledInstance(48, 35, Image.SCALE_SMOOTH)); // resize image
 		button.setIcon(icon);
 		button.setBorderPainted(false);
 		button.setFocusPainted(false);

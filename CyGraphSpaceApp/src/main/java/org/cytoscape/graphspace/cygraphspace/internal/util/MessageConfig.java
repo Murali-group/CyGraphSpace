@@ -27,7 +27,7 @@ public class MessageConfig {
     public final static String UPDATE_GRAPH_TASK_STATUS_SUCCESS = "CyGraphSpace updates graph successful.";
 
     // Update graph task dialog message, shown in the pop up window after update graph task is done
-    public final static String UPDATE_GRAPH_TASK_DIALOG_SUCCESS = "CyGraphSpace updates graph successful.";
+    public final static String UPDATE_GRAPH_TASK_DIALOG_SUCCESS = "You have updated the graph successfully.";
     public final static String UPDATE_GRAPH_TASK_DIALOG_FAIL = "CyGraphSpace could not update graph.";
 
     // Post graph task status message, shown in the status bar of the Cytoscape
@@ -37,10 +37,10 @@ public class MessageConfig {
     public final static String POST_GRAPH_TASK_STATUS_SUCCESS = "CyGraphSpace exports graph successful.";
 
     // Post graph task dialog message, shown in the pop up window after update graph task is done
-    public final static String POST_GRAPH_TASK_DIALOG_SUCCESS = "CyGraphSpace exports graph successful.";
+    public final static String POST_GRAPH_TASK_DIALOG_SUCCESS = "You have exported the graph successfully.";
     public final static String POST_GRAPH_TASK_DIALOG_FAIL = "CyGraphSpace could not export graph.";
 
     // Error message for event where user tries to upload large network
-    public final static String NETWORK_TOO_LARGE_MSG = "CyGraphSpace cannot upload graph with more than 400 nodes or 2000 edges.\n"
+    public final static String NETWORK_TOO_LARGE_MSG = "CyGraphSpace cannot upload graph with more than 400 nodes or 1000 edges.\n"
             + "Please upload network directly from the GraphSpace website.";
 }

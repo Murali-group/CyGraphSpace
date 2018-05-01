@@ -41,13 +41,13 @@ public class PostGraphDialog extends JDialog {
 	private JLabel graphNameValue;
 
 	public PostGraphDialog(String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags) {
-	    super(CyObjectManager.INSTANCE.getApplicationFrame(), "Export Graphs to GraphSpace", ModalityType.APPLICATION_MODAL);
-		JLabel hostLabel = new JLabel("Host");
+	    super(CyObjectManager.INSTANCE.getApplicationFrame(), "Upload the graph/netork GraphSpace", ModalityType.APPLICATION_MODAL);
+		JLabel hostLabel = new JLabel("Host:");
 		hostValueLabel = new JLabel("www.graphspace.org");
 		usernameValueLabel = new JLabel("Anonymous");
-		usernameLabel = new JLabel("Username");
+		usernameLabel = new JLabel("Username:");
 		buttonsPanel = new JPanel();
-		graphNameLabel = new JLabel("Graph Name");
+		graphNameLabel = new JLabel("Graph name:");
 		graphNameValue = new JLabel("");
 		groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
@@ -91,7 +91,7 @@ public class PostGraphDialog extends JDialog {
 					.addContainerGap())
 		);
 		
-		postGraphButton = new JButton("Export");
+		postGraphButton = new JButton("Upload");
 		postGraphButton.setEnabled(true);
 		postGraphButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

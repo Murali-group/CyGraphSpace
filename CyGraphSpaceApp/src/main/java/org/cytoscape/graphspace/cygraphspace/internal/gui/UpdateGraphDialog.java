@@ -38,16 +38,19 @@ public class UpdateGraphDialog extends JDialog {
 	private GroupLayout groupLayout;
 	private JLabel graphNameValue;
 	private JLabel graphNameLabel;
+    private JLabel updateMessage;
 	
 	public UpdateGraphDialog(String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags) {
-	    super(CyObjectManager.INSTANCE.getApplicationFrame(), "Update Graphs to GraphSpace", ModalityType.APPLICATION_MODAL);
-		JLabel hostLabel = new JLabel("Host");
+	    super(CyObjectManager.INSTANCE.getApplicationFrame(), "Update the graph/network on GraphSpace", ModalityType.APPLICATION_MODAL);
+		JLabel hostLabel = new JLabel("Host:");
 		hostValueLabel = new JLabel("www.graphspace.org");
 		usernameValueLabel = new JLabel("Anonymous");
-		usernameLabel = new JLabel("Username");
+		usernameLabel = new JLabel("Username:");
 		buttonsPanel = new JPanel();
-		graphNameLabel = new JLabel("Graph Name");
+		graphNameLabel = new JLabel("Graph name:");
 		graphNameValue = new JLabel("");
+        updateMessage = new JLabel("<html>" + "You have already uploaded a graph with this name." 
+                + "<br>" + "Would you like to update it?" + "</html>"); 
 
 		groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
@@ -67,7 +70,9 @@ public class UpdateGraphDialog extends JDialog {
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(graphNameLabel, GroupLayout.PREFERRED_SIZE, 145, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(graphNameValue, GroupLayout.PREFERRED_SIZE, 303, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(graphNameValue, GroupLayout.PREFERRED_SIZE, 303, GroupLayout.PREFERRED_SIZE))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(updateMessage, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -84,10 +89,14 @@ public class UpdateGraphDialog extends JDialog {
 					.addGap(18)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(graphNameValue)
-							.addPreferredGap(ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
-							.addComponent(buttonsPanel, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE))
+							.addComponent(graphNameValue))
 						.addComponent(graphNameLabel))
+					.addGap(18)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(updateMessage)
+							//.addPreferredGap(ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
+							.addComponent(buttonsPanel, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		

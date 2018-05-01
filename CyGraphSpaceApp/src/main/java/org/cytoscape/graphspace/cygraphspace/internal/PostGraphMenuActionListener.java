@@ -24,7 +24,7 @@ public class PostGraphMenuActionListener implements ActionListener {
     private static AuthenticationDialog dialog;
 
     public PostGraphMenuActionListener() {
-        loadingFrame = new JFrame("Checking if update Possible");
+        loadingFrame = new JFrame("Checking if the graph already exists");
         loading = new ImageIcon(this.getClass().getClassLoader().getResource("loading.gif"));
         loadingLabel = new JLabel("", loading, JLabel.CENTER);
         loadingFrame.add(loadingLabel);

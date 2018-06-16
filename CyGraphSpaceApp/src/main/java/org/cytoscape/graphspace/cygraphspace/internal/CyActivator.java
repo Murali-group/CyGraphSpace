@@ -12,6 +12,7 @@ import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.model.CyNetworkFactory;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.model.subnetwork.CyRootNetworkManager;
+import org.cytoscape.graphspace.cygraphspace.internal.gui.CyGraphSpaceResultPanel;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.GetGraphsPanel;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.PostGraphToolBarComponent;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
@@ -34,60 +35,63 @@ import org.osgi.framework.BundleContext;
  */
 public class CyActivator extends AbstractCyActivator {
 
-    @SuppressWarnings("rawtypes")
+	@SuppressWarnings("rawtypes")
 	@Override
-    public void start(BundleContext context) throws Exception {
-        CyApplicationManager applicationManager = getService(context, CyApplicationManager.class);
+	public void start(BundleContext context) throws Exception {
+		CyApplicationManager applicationManager = getService(context, CyApplicationManager.class);
 
-        AbstractCyAction action = null;
-        Properties properties = null;
-        BundleContext bc = context;
+		AbstractCyAction action = null;
+		Properties properties = null;
+		BundleContext bc = context;
 
-        //register Post Graph Action
-        action = new CyGraphSpaceMenuAction(MessageConfig.MenuActionTitle);
-        properties = new Properties();
-        registerService(context, action, CyAction.class, properties);
+		//register Post Graph Action
+		action = new CyGraphSpaceMenuAction(MessageConfig.MenuActionTitle);
+		properties = new Properties();
+		registerService(context, action, CyAction.class, properties);
 
-        //getting cytoscape services
-        CyApplicationConfiguration config = getService(context,CyApplicationConfiguration.class);
-        CySwingAppAdapter appAdapter = getService(context, CySwingAppAdapter.class);
-        CySwingApplication desktop = getService(bc,CySwingApplication.class);
-        LoadNetworkFileTaskFactory loadNetworkFileTaskFactory = getService(bc, LoadNetworkFileTaskFactory.class);
-        ExportNetworkTaskFactory exportNetworkTaskFactory = getService(bc, ExportNetworkTaskFactory.class);
-        ExportNetworkViewTaskFactory exportNetworkViewTaskFactory = getService(bc, ExportNetworkViewTaskFactory.class);
-        LoadVizmapFileTaskFactory loadVizmapFileTaskFactory = getService(bc, LoadVizmapFileTaskFactory.class);
-        ExportVizmapTaskFactory exportVizmapTaskFactory = getService(bc, ExportVizmapTaskFactory.class);
-        TaskManager taskManager = getService(context, DialogTaskManager.class);
-        final CyNetworkFactory cyNetworkFactory = getService(bc, CyNetworkFactory.class);
+		//getting cytoscape services
+		CyApplicationConfiguration config = getService(context,CyApplicationConfiguration.class);
+		CySwingAppAdapter appAdapter = getService(context, CySwingAppAdapter.class);
+		CySwingApplication desktop = getService(bc,CySwingApplication.class);
+		LoadNetworkFileTaskFactory loadNetworkFileTaskFactory = getService(bc, LoadNetworkFileTaskFactory.class);
+		ExportNetworkTaskFactory exportNetworkTaskFactory = getService(bc, ExportNetworkTaskFactory.class);
+		ExportNetworkViewTaskFactory exportNetworkViewTaskFactory = getService(bc, ExportNetworkViewTaskFactory.class);
+		LoadVizmapFileTaskFactory loadVizmapFileTaskFactory = getService(bc, LoadVizmapFileTaskFactory.class);
+		ExportVizmapTaskFactory exportVizmapTaskFactory = getService(bc, ExportVizmapTaskFactory.class);
+		TaskManager taskManager = getService(context, DialogTaskManager.class);
+		final CyNetworkFactory cyNetworkFactory = getService(bc, CyNetworkFactory.class);
 		final CyNetworkManager cyNetworkManager = getService(bc, CyNetworkManager.class);
 		final CyRootNetworkManager cyRootNetworkManager = getService(bc, CyRootNetworkManager.class);
-		
-        //Register these with the CyObjectManager singleton.
-        CyObjectManager manager = CyObjectManager.INSTANCE;
-        File configDir = config.getAppConfigurationDirectoryLocation(CyActivator.class);
-        configDir.mkdirs();
-        
-        //setting services to manager singleton
-        manager.setCyApplicationManager(applicationManager);
-        manager.setConfigDir(configDir);
-        manager.setCySwingAppAdapter(appAdapter);
-        manager.setCySwingApplition(desktop);
-        manager.setLoadNetworkFileTaskFactory(loadNetworkFileTaskFactory);
-        manager.setExportNetworkTaskFactory(exportNetworkTaskFactory);
-        manager.setExportNetworkViewTaskFactory(exportNetworkViewTaskFactory);
-        manager.setLoadVizmapTaskFactory(loadVizmapFileTaskFactory);
-        manager.setExportVizmapTaskFactory(exportVizmapTaskFactory);
+
+		//Register these with the CyObjectManager singleton.
+		CyObjectManager manager = CyObjectManager.INSTANCE;
+		File configDir = config.getAppConfigurationDirectoryLocation(CyActivator.class);
+		configDir.mkdirs();
+
+		//setting services to manager singleton
+		manager.setCyApplicationManager(applicationManager);
+		manager.setConfigDir(configDir);
+		manager.setCySwingAppAdapter(appAdapter);
+		manager.setCySwingApplition(desktop);
+		manager.setLoadNetworkFileTaskFactory(loadNetworkFileTaskFactory);
+		manager.setExportNetworkTaskFactory(exportNetworkTaskFactory);
+		manager.setExportNetworkViewTaskFactory(exportNetworkViewTaskFactory);
+		manager.setLoadVizmapTaskFactory(loadVizmapFileTaskFactory);
+		manager.setExportVizmapTaskFactory(exportVizmapTaskFactory);
 		manager.setCyNetworkFactory(cyNetworkFactory);
 		manager.setCyNetworkManager(cyNetworkManager);
 		manager.setCyRootNetworkManager(cyRootNetworkManager);
-        
-        //registering Toolbar component
-        PostGraphToolBarComponent toolBarComponent = new PostGraphToolBarComponent();
-        registerAllServices(bc, toolBarComponent, new Properties());
-		
+
+		//registering Toolbar component
+		PostGraphToolBarComponent toolBarComponent = new PostGraphToolBarComponent();
+		registerAllServices(bc, toolBarComponent, new Properties());
+
+		CyGraphSpaceResultPanel resultPanel = new CyGraphSpaceResultPanel("CyGraphSpace taskbar");
+		registerAllServices(context, resultPanel, new Properties());
+
 		//registering openBrowser for opening graph in GraphSpace
 		OpenBrowser openBrowser = getService(context, OpenBrowser.class);
-	    GetGraphsPanel getGraphsPanel = new GetGraphsPanel(taskManager, openBrowser);
-	    registerAllServices(context, getGraphsPanel, new Properties());
-    }
+		GetGraphsPanel getGraphsPanel = new GetGraphsPanel(taskManager, openBrowser);
+		registerAllServices(context, getGraphsPanel, new Properties());
+	}
 }

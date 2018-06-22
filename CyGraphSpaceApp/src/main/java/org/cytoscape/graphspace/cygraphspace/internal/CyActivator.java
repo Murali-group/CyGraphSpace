@@ -44,11 +44,6 @@ public class CyActivator extends AbstractCyActivator {
 		Properties properties = null;
 		BundleContext bc = context;
 
-		//register Post Graph Action
-		action = new CyGraphSpaceMenuAction(MessageConfig.MenuActionTitle);
-		properties = new Properties();
-		registerService(context, action, CyAction.class, properties);
-
 		//getting cytoscape services
 		CyApplicationConfiguration config = getService(context,CyApplicationConfiguration.class);
 		CySwingAppAdapter appAdapter = getService(context, CySwingAppAdapter.class);
@@ -82,13 +77,19 @@ public class CyActivator extends AbstractCyActivator {
 		manager.setCyNetworkManager(cyNetworkManager);
 		manager.setCyRootNetworkManager(cyRootNetworkManager);
 
-		//registering Toolbar component
-		PostGraphToolBarComponent toolBarComponent = new PostGraphToolBarComponent();
-		registerAllServices(bc, toolBarComponent, new Properties());
-
+		//register result panel
 		CyGraphSpaceResultPanel resultPanel = new CyGraphSpaceResultPanel("CyGraphSpace taskbar");
 		registerAllServices(context, resultPanel, new Properties());
 
+	    //registering Toolbar component
+        PostGraphToolBarComponent toolBarComponent = new PostGraphToolBarComponent(resultPanel);
+        registerAllServices(bc, toolBarComponent, new Properties());
+
+        //register Post Graph Action
+        action = new CyGraphSpaceMenuAction(MessageConfig.MenuActionTitle, resultPanel);
+        properties = new Properties();
+        registerService(context, action, CyAction.class, properties);
+        
 		//registering openBrowser for opening graph in GraphSpace
 		OpenBrowser openBrowser = getService(context, OpenBrowser.class);
 		GetGraphsPanel getGraphsPanel = new GetGraphsPanel(taskManager, openBrowser);

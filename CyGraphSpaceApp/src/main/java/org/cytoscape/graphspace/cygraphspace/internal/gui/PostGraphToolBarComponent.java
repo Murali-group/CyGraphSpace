@@ -20,8 +20,8 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 
     private JButton button;
     private PostGraphMenuActionListener actionListener;
-
-	public PostGraphToolBarComponent() {
+    
+	public PostGraphToolBarComponent(CyGraphSpaceResultPanel resultPanel) {
 		super();
 		button = new JButton();
 
@@ -36,7 +36,7 @@ public class PostGraphToolBarComponent extends AbstractToolBarComponent implemen
 		button.setEnabled(false);
 		
 		//action attached to the button
-		actionListener = new PostGraphMenuActionListener();
+		actionListener = new PostGraphMenuActionListener(resultPanel);
 		button.addActionListener(actionListener);
 	}
 		

@@ -39,15 +39,15 @@ public class PostGraphDialog extends JDialog {
 	private GroupLayout groupLayout;
 	private JLabel graphNameLabel;
 	private JLabel graphNameValue;
-	
+
 	private CyGraphSpaceResultPanel resultPanel;
 
 	public PostGraphDialog(String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags,
 			CyGraphSpaceResultPanel resultPanel) {
 	    super(CyObjectManager.INSTANCE.getApplicationFrame(), "Upload the graph/netork GraphSpace", ModalityType.APPLICATION_MODAL);
-	    
+
 	    this.resultPanel = resultPanel;
-	    
+
 		JLabel hostLabel = new JLabel("Host:");
 		hostValueLabel = new JLabel("www.graphspace.org");
 		usernameValueLabel = new JLabel("Anonymous");

@@ -1,6 +1,6 @@
 package org.cytoscape.graphspace.cygraphspace.internal.gui;
 
 public interface ResultPanelEventListener {
-	public void postGraphEvent();
-	public void updateGraphEvent();
+    public int postGraphEvent(ResultPanelEvent e);
+    public void updateGraphStatusEvent(ResultPanelEvent e);
 }

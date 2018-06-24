@@ -43,4 +43,9 @@ public class MessageConfig {
     // Error message for event where user tries to upload large network
     public final static String NETWORK_TOO_LARGE_MSG = "Currently GraphSpace cannot handle networks with more than 400 nodes and/or 1000 edges.\n"
             + "Please select a smaller network or subnetwork to upload.";
+    
+    // Result panel status messages
+    public static final String TASK_COMPLETE = "Complete";
+    public static final String TASK_IN_PROGRESS = "In progress";
+    public static final String TASK_FAIL = "Fail";
 }

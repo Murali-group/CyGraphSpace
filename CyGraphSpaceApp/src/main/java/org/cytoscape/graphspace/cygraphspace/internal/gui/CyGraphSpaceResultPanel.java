@@ -14,8 +14,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.MatteBorder;
 
+import org.cytoscape.application.swing.CytoPanel;
 import org.cytoscape.application.swing.CytoPanelComponent;
 import org.cytoscape.application.swing.CytoPanelName;
+import org.cytoscape.application.swing.CytoPanelState;
+import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 
 @SuppressWarnings("serial")
 public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponent, ResultPanelEventListener {
@@ -24,11 +27,13 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
     private JPanel mainList;
     private int itemCount;
     private Map<Integer, PanelItem> itemMap;
+    private CytoPanel cytoPanel;
 
     public CyGraphSpaceResultPanel(String title) {
         this.title = title;
         this.itemCount = 1;
         this.itemMap = new HashMap<>();
+        this.cytoPanel = CyObjectManager.INSTANCE.getCySwingApplition().getCytoPanel(getCytoPanelName());
         initializePanel();
     }
 
@@ -67,7 +72,6 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
         return title;
     }
 
-
     @Override
     public int postGraphEvent(ResultPanelEvent e) {
         PanelItem item = new PanelItem(itemCount, e.getGraphName(), e.getGraphStatus());
@@ -81,6 +85,7 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
 
         validate();
         repaint();
+        showPanel();
 
         return itemCount++;
     }
@@ -90,6 +95,16 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
         itemMap.get(e.getGraphIndex()).updateStatus(e.getGraphStatus());
         validate();
         repaint();
+        showPanel();
+    }
+
+    private void showPanel() {
+        if (cytoPanel.getState() == CytoPanelState.HIDE)
+            cytoPanel.setState(CytoPanelState.DOCK);
+
+        // set visible and selected
+        this.setVisible(true);
+        cytoPanel.setSelectedIndex(cytoPanel.indexOfComponent(this.getComponent()));
     }
 
     private class PanelItem extends JPanel {

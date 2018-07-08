@@ -45,7 +45,7 @@ public class UpdateGraphTask extends AbstractTask {
     }
 
     private void postGraph() {
-        int panelIndex = -1;
+        int panelIndex = -1, graphId = -1;
         try {
             if (listener != null)
                 panelIndex = listener.postGraphEvent(
@@ -59,14 +59,14 @@ public class UpdateGraphTask extends AbstractTask {
 
             if (listener != null)
                 listener.updateGraphStatusEvent(
-                        new ResultPanelEvent(panelIndex, "", MessageConfig.TASK_FAIL));
+                        new ResultPanelEvent(panelIndex, graphId, "", MessageConfig.TASK_FAIL));
 
             return;
         }
 
         if (listener != null)
             listener.updateGraphStatusEvent(
-                    new ResultPanelEvent(panelIndex, "", MessageConfig.TASK_COMPLETE));
+                    new ResultPanelEvent(panelIndex, graphId, "", MessageConfig.TASK_COMPLETE));
 
         taskMonitor.setStatusMessage(MessageConfig.UPDATE_GRAPH_TASK_STATUS_SUCCESS);
         JOptionPane.showMessageDialog(null, 

@@ -10,6 +10,7 @@ import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 import org.cytoscape.graphspace.cygraphspace.internal.util.MessageConfig;
 import org.cytoscape.work.AbstractTask;
 import org.cytoscape.work.TaskMonitor;
+import org.graphspace.javaclient.Response;
 import org.json.JSONObject;
 
 /**
@@ -45,14 +46,14 @@ public class PostGraphTask extends AbstractTask {
     }
 
     private void postGraph() {
-        int panelIndex = -1;
+        int panelIndex = -1,  graphId = -1;
 
         try {
             if (listener != null)
                 panelIndex = listener.postGraphEvent(
                         new ResultPanelEvent(graphJSON.getJSONObject("data").getString("name"),MessageConfig.TASK_IN_PROGRESS));
 
-            postGraph(graphJSON, styleJSON, isGraphPublic, null);
+            graphId = postGraph(graphJSON, styleJSON, isGraphPublic, null).getGraph().getId();
         } catch (Exception e1) {
             taskMonitor.setStatusMessage(MessageConfig.POST_GRAPH_TASK_STATUS_FAIL);
             JOptionPane.showMessageDialog(null, MessageConfig.POST_GRAPH_TASK_DIALOG_FAIL, 
@@ -60,14 +61,14 @@ public class PostGraphTask extends AbstractTask {
 
             if (listener != null)
                 listener.updateGraphStatusEvent(
-                        new ResultPanelEvent(panelIndex, "", MessageConfig.TASK_FAIL));
+                        new ResultPanelEvent(panelIndex, graphId, "", MessageConfig.TASK_FAIL));
 
             return;
         }
 
         if (listener != null)
             listener.updateGraphStatusEvent(
-                    new ResultPanelEvent(panelIndex, "", MessageConfig.TASK_COMPLETE));
+                    new ResultPanelEvent(panelIndex, graphId, "", MessageConfig.TASK_COMPLETE));
 
         taskMonitor.setStatusMessage(MessageConfig.POST_GRAPH_TASK_STATUS_SUCCESS);
         JOptionPane.showMessageDialog(null, MessageConfig.POST_GRAPH_TASK_DIALOG_SUCCESS, 
@@ -75,8 +76,8 @@ public class PostGraphTask extends AbstractTask {
     }
 
     //post the current network to GraphSpace
-    private void postGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception {
-        Server.INSTANCE.postGraph(graphJSON, styleJSON, isGraphPublic, tagsList);
+    private Response postGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception {
+        return Server.INSTANCE.postGraph(graphJSON, styleJSON, isGraphPublic, tagsList);
     }
 
     public void setResultPanelEventListener(ResultPanelEventListener listener) {

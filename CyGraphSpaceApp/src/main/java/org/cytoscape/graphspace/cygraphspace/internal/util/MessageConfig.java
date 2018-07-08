@@ -12,6 +12,9 @@ public class MessageConfig {
     public final static String APP_DESCRIPTION = "<html>" + "The CyGraphSpace App is used to upload graphs to "
             + "<a href=\"http://www.grapshace.org\">GraphSpace</a>. ";
 
+    // GraphSpace link
+    public final static String GRAPHSPACE_LINK = "http://graphspace.org/graphs/";
+
     // error messages related to authentication dialog
     public final static String AUTH_NOT_FILL_ERROR_MSG = "Please enter all the values.";
     public final static String AUTH_INVALID_URL = "IP address of the entered host could not be determined.\n"
@@ -43,7 +46,7 @@ public class MessageConfig {
     // Error message for event where user tries to upload large network
     public final static String NETWORK_TOO_LARGE_MSG = "Currently GraphSpace cannot handle networks with more than 400 nodes and/or 1000 edges.\n"
             + "Please select a smaller network or subnetwork to upload.";
-    
+
     // Result panel status messages
     public static final String TASK_COMPLETE = "Complete";
     public static final String TASK_IN_PROGRESS = "In progress";

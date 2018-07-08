@@ -5,10 +5,17 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -19,6 +26,7 @@ import org.cytoscape.application.swing.CytoPanelComponent;
 import org.cytoscape.application.swing.CytoPanelName;
 import org.cytoscape.application.swing.CytoPanelState;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
+import org.cytoscape.graphspace.cygraphspace.internal.util.MessageConfig;
 
 @SuppressWarnings("serial")
 public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponent, ResultPanelEventListener {
@@ -92,7 +100,7 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
 
     @Override
     public void updateGraphStatusEvent(ResultPanelEvent e) {
-        itemMap.get(e.getGraphIndex()).updateStatus(e.getGraphStatus());
+        itemMap.get(e.getGraphIndex()).updateStatus(e.getGraphStatus(), e.getGraphId());
         validate();
         repaint();
         showPanel();
@@ -115,6 +123,7 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
         private JLabel taskLabel;
         private JLabel graphNameLabel;
         private JLabel statusLabel;
+        private JButton urlBtn;
 
         public PanelItem(int index, String name, String status) {
             this.index = index;
@@ -134,9 +143,29 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
             this.setBorder(new MatteBorder(0, 0, 1, 0, Color.GRAY));
         }
 
-        public void updateStatus(String status) {
+        public void updateStatus(String status, int graphId) {
             this.status = status;
             statusLabel.setText("Status: " + status);
+
+            if (graphId != -1) {
+                urlBtn = new JButton("Link");
+                urlBtn.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            java.awt.Desktop.getDesktop().browse(new URI(MessageConfig.GRAPHSPACE_LINK + graphId));
+                        } catch (IOException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        } catch (URISyntaxException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+                    }
+                });
+
+                this.add(urlBtn);
+            }
         }
     }
 }

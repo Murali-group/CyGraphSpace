@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.graphspace.javaclient.Graph;
 import org.graphspace.javaclient.GraphSpaceClient;
+import org.graphspace.javaclient.Response;
 import org.json.JSONObject;
 
 /**
@@ -112,8 +113,8 @@ public enum Server{
 	}
 	
 	//post a graph to GraphSpace
-	public void postGraph(JSONObject graphJson, JSONObject styleJson, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
-		client.postGraph(graphJson, styleJson, isGraphPublic, tagsList);
+	public Response postGraph(JSONObject graphJson, JSONObject styleJson, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
+		return client.postGraph(graphJson, styleJson, isGraphPublic, tagsList);
 	}
 	
 	//check if a graph to be exported can be updated

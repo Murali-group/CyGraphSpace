@@ -339,7 +339,7 @@ public class Graph extends Resource {
      * @return response status on post request to GraphSpace
      * @throws Exception
      */
-    public String postGraph() throws Exception{
+    public Response postGraph() throws Exception{
     	if(this.graphJson == null) {
     		throw new GraphException(ExceptionCode.BAD_REQUEST_FORMAT, ExceptionMessage.BAD_REQUEST_FORMAT_EXCEPTION,
     				"Graph JSON is not set.");
@@ -358,8 +358,7 @@ public class Graph extends Resource {
         	data.put("tags[]", tags);
         }
     	JSONObject jsonResponse = restClient.post(path, data);
-    	Response response = new Response(jsonResponse);
-    	return response.getResponseStatus();
+    	return new Response(jsonResponse);
     }
     
     /**

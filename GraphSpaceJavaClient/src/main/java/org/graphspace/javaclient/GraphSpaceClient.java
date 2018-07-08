@@ -148,7 +148,7 @@ public class GraphSpaceClient {
     /**
      * Reference: {@link org.graphspace.javaclient.Graph#postGraph()}
      */
-    public String postGraph(JSONObject graphJson, JSONObject styleJson, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
+    public Response postGraph(JSONObject graphJson, JSONObject styleJson, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
     	Graph graph = new Graph(restClient, isGraphPublic);
     	graph.setGraphJson(graphJson);
     	graph.setStyleJson(styleJson);

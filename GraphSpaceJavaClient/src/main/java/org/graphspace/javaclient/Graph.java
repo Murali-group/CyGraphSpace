@@ -366,7 +366,7 @@ public class Graph extends Resource {
      * @return response status on update request to GraphSpace
      * @throws Exception
      */
-    public String updateGraph() throws Exception{
+    public Response updateGraph() throws Exception{
     	if(this.graphJson == null) {
     		throw new GraphException(ExceptionCode.BAD_REQUEST_FORMAT, ExceptionMessage.BAD_REQUEST_FORMAT_EXCEPTION,
     				"Graph JSON is not set.");
@@ -394,8 +394,7 @@ public class Graph extends Resource {
     		int graphId = graphToBeUpdated.getId();
     		String path = Config.GRAPHS_PATH + graphId;
         	JSONObject jsonResponse = restClient.put(path, data);
-        	Response response = new Response(jsonResponse);
-        	return response.getResponseStatus();
+        	return new Response(jsonResponse);
     	}
     	throw new GraphException(ExceptionCode.GRAPH_NOT_FOUND_EXCEPTION, ExceptionMessage.GRAPH_NOT_FOUND_EXCEPTION,
     			"This graph is not currently uploaded on GraphSpace. Please export the graph to GraphSpace first.");
@@ -408,7 +407,7 @@ public class Graph extends Resource {
      */
     public String makeGraphPublic() throws Exception {
     	this.isGraphPublic = true;
-    	return updateGraph();
+    	return updateGraph().getResponseStatus();
     }
     
     /**
@@ -418,7 +417,7 @@ public class Graph extends Resource {
      */
     public String makeGraphPrivate() throws Exception {
     	this.isGraphPublic = false;
-    	return updateGraph();
+    	return updateGraph().getResponseStatus();
     }
     
 	/**

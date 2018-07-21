@@ -107,9 +107,9 @@ public enum Server{
 	}
 	
 	//update an existing graph on GraphSpace
-	public void updateGraph(String name, JSONObject graphJson, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
+	public Response updateGraph(String name, JSONObject graphJson, boolean isGraphPublic, ArrayList<String> tagsList) throws Exception{
 		Graph graph = client.getGraph(name, this.username);
-		client.updateGraph(name, graphJson, graph.getStyleJson(), isGraphPublic, tagsList);
+		return client.updateGraph(name, graphJson, graph.getStyleJson(), isGraphPublic, tagsList);
 	}
 	
 	//post a graph to GraphSpace

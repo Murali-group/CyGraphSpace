@@ -10,6 +10,7 @@ import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 import org.cytoscape.graphspace.cygraphspace.internal.util.MessageConfig;
 import org.cytoscape.work.AbstractTask;
 import org.cytoscape.work.TaskMonitor;
+import org.graphspace.javaclient.Response;
 import org.json.JSONObject;
 
 /**
@@ -39,19 +40,19 @@ public class UpdateGraphTask extends AbstractTask {
         // run task in background
         new Thread() {
             public void run() {
-                postGraph();
+                updateGraph();
             }
         }.start();
     }
 
-    private void postGraph() {
+    private void updateGraph() {
         int panelIndex = -1, graphId = -1;
         try {
             if (listener != null)
-                panelIndex = listener.postGraphEvent(
+                panelIndex = listener.graphSpaceEvent(
                         new ResultPanelEvent(graphJSON.getJSONObject("data").getString("name"),MessageConfig.TASK_IN_PROGRESS));
 
-            updateGraph(graphJSON, styleJSON, isGraphPublic, null);
+            graphId = updateGraph(graphJSON, styleJSON, isGraphPublic, null).getGraph().getId();
         } catch (Exception e1) {
             taskMonitor.setStatusMessage(MessageConfig.UPDATE_GRAPH_TASK_STATUS_FAIL);
             JOptionPane.showMessageDialog(null, 
@@ -74,9 +75,9 @@ public class UpdateGraphTask extends AbstractTask {
     }
 
     //post the current network to GraphSpace
-    private void updateGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isPublic, ArrayList<String> tagsList) throws Exception{
+    private Response updateGraph(JSONObject graphJSON, JSONObject styleJSON, boolean isPublic, ArrayList<String> tagsList) throws Exception{
         String name = graphJSON.getJSONObject("data").getString("name");
-        Server.INSTANCE.updateGraph(name, graphJSON, isPublic, tagsList);
+        return Server.INSTANCE.updateGraph(name, graphJSON, isPublic, tagsList);
     }
 
     public void setResultPanelEventListener(ResultPanelEventListener listener) {

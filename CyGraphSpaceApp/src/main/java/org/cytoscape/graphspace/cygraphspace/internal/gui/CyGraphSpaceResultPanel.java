@@ -1,8 +1,8 @@
 package org.cytoscape.graphspace.cygraphspace.internal.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -10,16 +10,18 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.MatteBorder;
+import javax.swing.JTextField;
+import javax.swing.border.TitledBorder;
 
 import org.cytoscape.application.swing.CytoPanel;
 import org.cytoscape.application.swing.CytoPanelComponent;
@@ -81,7 +83,7 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
     }
 
     @Override
-    public int postGraphEvent(ResultPanelEvent e) {
+    public int graphSpaceEvent(ResultPanelEvent e) {
         PanelItem item = new PanelItem(itemCount, e.getGraphName(), e.getGraphStatus());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;
@@ -120,9 +122,14 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
         private String name;
         private String status;
 
-        private JLabel taskLabel;
+        private JPanel graphPanel;
         private JLabel graphNameLabel;
+        private JTextField graphNameText;
+
+        private JPanel statusPanel;
         private JLabel statusLabel;
+        private JLabel statusText;
+
         private JButton urlBtn;
 
         public PanelItem(int index, String name, String status) {
@@ -133,22 +140,41 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
         }
 
         private void initPanelItem() {
-            taskLabel = new JLabel("Task: " + index);
-            graphNameLabel = new JLabel("Graph: " + name);
-            statusLabel = new JLabel("Status: " + status);
+            this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-            this.add(taskLabel);
-            this.add(graphNameLabel);
-            this.add(statusLabel);
-            this.setBorder(new MatteBorder(0, 0, 1, 0, Color.GRAY));
+            TitledBorder taskBorder = BorderFactory.createTitledBorder("Task " + index);
+            this.setBorder(taskBorder);
+
+            graphNameLabel = new JLabel("Graph: ");
+
+            graphNameText = new JTextField(name);
+            graphNameText.setEditable(false);
+            graphNameText.setOpaque(false);
+
+            graphPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            graphPanel.add(graphNameLabel);
+            graphPanel.add(graphNameText);
+            this.add(graphPanel);
+
+            statusLabel = new JLabel("Status: ");
+            statusText = new JLabel(status);
+
+            statusPanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); 
+            statusPanel.add(statusLabel);
+            statusPanel.add(statusText);
+
+            urlBtn = new JButton("Link");
+            urlBtn.setVisible(false);
+            statusPanel.add(urlBtn);
+            this.add(statusPanel);
         }
 
         public void updateStatus(String status, int graphId) {
             this.status = status;
-            statusLabel.setText("Status: " + status);
+            statusText.setText(status);
 
             if (graphId != -1) {
-                urlBtn = new JButton("Link");
+                urlBtn.setVisible(true);
                 urlBtn.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -163,8 +189,6 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
                         }
                     }
                 });
-
-                this.add(urlBtn);
             }
         }
     }

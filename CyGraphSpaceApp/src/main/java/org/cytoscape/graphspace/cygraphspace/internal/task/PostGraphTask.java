@@ -50,7 +50,7 @@ public class PostGraphTask extends AbstractTask {
 
         try {
             if (listener != null)
-                panelIndex = listener.postGraphEvent(
+                panelIndex = listener.graphSpaceEvent(
                         new ResultPanelEvent(graphJSON.getJSONObject("data").getString("name"),MessageConfig.TASK_IN_PROGRESS));
 
             graphId = postGraph(graphJSON, styleJSON, isGraphPublic, null).getGraph().getId();

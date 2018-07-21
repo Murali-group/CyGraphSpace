@@ -148,6 +148,7 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
             graphNameLabel = new JLabel("Graph: ");
 
             graphNameText = new JTextField(name);
+            graphNameText.setBorder(javax.swing.BorderFactory.createEmptyBorder());
             graphNameText.setEditable(false);
             graphNameText.setOpaque(false);
 

@@ -2,8 +2,6 @@ package org.cytoscape.graphspace.cygraphspace.internal.task;
 
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
-
 import org.cytoscape.graphspace.cygraphspace.internal.gui.ResultPanelEvent;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.ResultPanelEventListener;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
@@ -56,8 +54,6 @@ public class PostGraphTask extends AbstractTask {
             graphId = postGraph(graphJSON, styleJSON, isGraphPublic, null).getGraph().getId();
         } catch (Exception e1) {
             taskMonitor.setStatusMessage(MessageConfig.POST_GRAPH_TASK_STATUS_FAIL);
-            JOptionPane.showMessageDialog(null, MessageConfig.POST_GRAPH_TASK_DIALOG_FAIL, 
-                    "Error", JOptionPane.ERROR_MESSAGE);
 
             if (listener != null)
                 listener.updateGraphStatusEvent(
@@ -71,8 +67,6 @@ public class PostGraphTask extends AbstractTask {
                     new ResultPanelEvent(panelIndex, graphId, "", MessageConfig.TASK_COMPLETE));
 
         taskMonitor.setStatusMessage(MessageConfig.POST_GRAPH_TASK_STATUS_SUCCESS);
-        JOptionPane.showMessageDialog(null, MessageConfig.POST_GRAPH_TASK_DIALOG_SUCCESS, 
-                "Message", JOptionPane.INFORMATION_MESSAGE);
     }
 
     //post the current network to GraphSpace

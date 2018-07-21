@@ -78,7 +78,7 @@ public class CyActivator extends AbstractCyActivator {
 		manager.setCyRootNetworkManager(cyRootNetworkManager);
 
 		//register result panel
-		CyGraphSpaceResultPanel resultPanel = new CyGraphSpaceResultPanel("CyGraphSpace taskbar");
+		CyGraphSpaceResultPanel resultPanel = new CyGraphSpaceResultPanel(MessageConfig.RESULT_PANEL_TITLE);
 		registerAllServices(context, resultPanel, new Properties());
 
 	    //registering Toolbar component

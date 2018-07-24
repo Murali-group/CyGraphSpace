@@ -130,7 +130,9 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
         private JLabel statusLabel;
         private JLabel statusText;
 
-        private JButton urlBtn;
+        private JPanel linkPanel;
+        private JLabel linkLabel;
+        private JButton linkBtn;
 
         public PanelItem(int index, String name, String status) {
             this.index = index;
@@ -163,10 +165,6 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
             statusPanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); 
             statusPanel.add(statusLabel);
             statusPanel.add(statusText);
-
-            urlBtn = new JButton("Link");
-            urlBtn.setVisible(false);
-            statusPanel.add(urlBtn);
             this.add(statusPanel);
         }
 
@@ -175,8 +173,12 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
             statusText.setText(status);
 
             if (graphId != -1) {
-                urlBtn.setVisible(true);
-                urlBtn.addActionListener(new ActionListener() {
+                linkBtn = new JButton(MessageConfig.GRAPHSPACE_LINK + graphId);
+                linkBtn.setOpaque(false);
+                linkBtn.setContentAreaFilled(false);
+                linkBtn.setBorderPainted(false);
+
+                linkBtn.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         try {
@@ -190,6 +192,12 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
                         }
                     }
                 });
+
+                linkLabel = new JLabel("Link: ");
+                linkPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                linkPanel.add(linkLabel);
+                linkPanel.add(linkBtn);
+                this.add(linkPanel);
             }
         }
     }

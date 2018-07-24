@@ -173,7 +173,7 @@ public class CyGraphSpaceResultPanel extends JPanel implements CytoPanelComponen
             statusText.setText(status);
 
             if (graphId != -1) {
-                linkBtn = new JButton(MessageConfig.GRAPHSPACE_LINK + graphId);
+                linkBtn = new JButton("<HTML><FONT color=\"#000099\"><U>" + MessageConfig.GRAPHSPACE_LINK + graphId + "</U></FONT></HTML>");
                 linkBtn.setOpaque(false);
                 linkBtn.setContentAreaFilled(false);
                 linkBtn.setBorderPainted(false);

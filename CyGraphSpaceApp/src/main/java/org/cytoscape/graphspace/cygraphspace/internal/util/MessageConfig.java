@@ -40,7 +40,7 @@ public class MessageConfig {
             + "Please select a smaller network or subnetwork to upload.";
 
     // Result panel title
-    public static final String RESULT_PANEL_TITLE = "CyGraphSpace Task";
+    public static final String RESULT_PANEL_TITLE = "CyGraphSpace Status";
 
     // Result panel status messages
     public static final String TASK_COMPLETE = "Complete";

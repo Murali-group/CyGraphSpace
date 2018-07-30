@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import org.cytoscape.graphspace.cygraphspace.internal.gui.AuthenticationDialog;
+import org.cytoscape.graphspace.cygraphspace.internal.gui.CyGraphSpaceResultPanel;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.Server;
 import org.cytoscape.graphspace.cygraphspace.internal.util.MessageConfig;
@@ -22,8 +23,12 @@ public class PostGraphMenuActionListener implements ActionListener {
     private static ImageIcon loading;
     private static JLabel loadingLabel;
     private static AuthenticationDialog dialog;
+    private CyGraphSpaceResultPanel resultPanel;
 
-    public PostGraphMenuActionListener() {
+    public PostGraphMenuActionListener(CyGraphSpaceResultPanel resultPanel) {
+
+        this.resultPanel = resultPanel;
+
         loadingFrame = new JFrame("Checking if the graph already exists");
         loading = new ImageIcon(this.getClass().getClassLoader().getResource("loading.gif"));
         loadingLabel = new JLabel("", loading, JLabel.CENTER);
@@ -59,7 +64,7 @@ public class PostGraphMenuActionListener implements ActionListener {
             new Thread() {
                 public void run() {
                     try {
-                        PostGraphExportUtils.populate(CyObjectManager.INSTANCE.getApplicationFrame(), loadingFrame);
+                        PostGraphExportUtils.populate(CyObjectManager.INSTANCE.getApplicationFrame(), loadingFrame, resultPanel);
                     } catch (Exception e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -71,7 +76,7 @@ public class PostGraphMenuActionListener implements ActionListener {
         //if there is a network but the user is not authenticated, open the login dialog for the user to log in. Once logged in, open the post graph dialog
         else {
             if (dialog == null)
-                dialog = new AuthenticationDialog(loadingFrame);
+                dialog = new AuthenticationDialog(loadingFrame, resultPanel);
 
             dialog.setLocationRelativeTo(CyObjectManager.INSTANCE.getApplicationFrame());
             dialog.setVisible(true);

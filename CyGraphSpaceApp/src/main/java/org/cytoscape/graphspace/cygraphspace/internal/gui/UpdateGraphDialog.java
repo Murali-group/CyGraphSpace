@@ -39,9 +39,15 @@ public class UpdateGraphDialog extends JDialog {
 	private JLabel graphNameValue;
 	private JLabel graphNameLabel;
     private JLabel updateMessage;
+
+    private CyGraphSpaceResultPanel resultPanel;
 	
-	public UpdateGraphDialog(String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags) {
+	public UpdateGraphDialog(String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags,
+	        CyGraphSpaceResultPanel resultPanel) {
 	    super(CyObjectManager.INSTANCE.getApplicationFrame(), "Update the graph/network on GraphSpace", ModalityType.APPLICATION_MODAL);
+
+	    this.resultPanel = resultPanel;
+
 		JLabel hostLabel = new JLabel("Host:");
 		hostValueLabel = new JLabel("www.graphspace.org");
 		usernameValueLabel = new JLabel("Anonymous");
@@ -136,6 +142,7 @@ public class UpdateGraphDialog extends JDialog {
         this.dispose();
         SynchronousTaskManager<?> synTaskMan = CyObjectManager.INSTANCE.getSynchrounousTaskManager();
         UpdateGraphTask updateGraphTask = new UpdateGraphTask(graphJSON, styleJSON, isPublic);
+        updateGraphTask.setResultPanelEventListener(resultPanel);
         synTaskMan.execute(new TaskIterator(updateGraphTask));
 	}
 	

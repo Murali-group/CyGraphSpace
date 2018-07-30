@@ -40,8 +40,14 @@ public class PostGraphDialog extends JDialog {
 	private JLabel graphNameLabel;
 	private JLabel graphNameValue;
 
-	public PostGraphDialog(String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags) {
+	private CyGraphSpaceResultPanel resultPanel;
+
+	public PostGraphDialog(String graphName, JSONObject graphJSON, JSONObject styleJSON, boolean isGraphPublic, ArrayList<String> tags,
+			CyGraphSpaceResultPanel resultPanel) {
 	    super(CyObjectManager.INSTANCE.getApplicationFrame(), "Upload the graph/netork GraphSpace", ModalityType.APPLICATION_MODAL);
+
+	    this.resultPanel = resultPanel;
+
 		JLabel hostLabel = new JLabel("Host:");
 		hostValueLabel = new JLabel("www.graphspace.org");
 		usernameValueLabel = new JLabel("Anonymous");
@@ -127,6 +133,7 @@ public class PostGraphDialog extends JDialog {
         this.dispose();
         SynchronousTaskManager<?> synTaskMan = CyObjectManager.INSTANCE.getSynchrounousTaskManager();
         PostGraphTask postGraphTask = new PostGraphTask(graphJSON, styleJSON, isGraphPublic);
+        postGraphTask.setResultPanelEventListener(resultPanel);
         synTaskMan.execute(new TaskIterator(postGraphTask));
 	}
 

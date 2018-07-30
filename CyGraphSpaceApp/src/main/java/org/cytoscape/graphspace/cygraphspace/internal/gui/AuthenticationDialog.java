@@ -43,9 +43,14 @@ public class AuthenticationDialog extends JDialog {
 	private JButton loginButton;
 	JButton cancelButton;
 	private JFrame loadingFrame;
+	
+	private CyGraphSpaceResultPanel resultPanel;
 
-	public AuthenticationDialog(JFrame loadingFrame) {
+	public AuthenticationDialog(JFrame loadingFrame, CyGraphSpaceResultPanel resultPanel) {
 	    super(CyObjectManager.INSTANCE.getApplicationFrame(), "Log in to the Server", ModalityType.APPLICATION_MODAL);
+
+	    this.resultPanel = resultPanel;
+
 	    JLabel hostLabel = new JLabel("Host");
 
 	    AuthTextFieldListener textFieldListener = new AuthTextFieldListener();
@@ -184,7 +189,7 @@ public class AuthenticationDialog extends JDialog {
             new Thread() {
                 public void run() {
                     try {
-                        PostGraphExportUtils.populate(CyObjectManager.INSTANCE.getApplicationFrame(), loadingFrame);
+                        PostGraphExportUtils.populate(CyObjectManager.INSTANCE.getApplicationFrame(), loadingFrame, resultPanel);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import org.apache.commons.io.FileUtils;
+import org.cytoscape.graphspace.cygraphspace.internal.gui.CyGraphSpaceResultPanel;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.PostGraphDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.gui.UpdateGraphDialog;
 import org.cytoscape.graphspace.cygraphspace.internal.singletons.CyObjectManager;
@@ -30,7 +31,7 @@ public class PostGraphExportUtils {
      * @param loadingFrame the loading frame
      * @throws Exception
      */
-    public static void populate(Frame parent, JFrame loadingFrame) throws Exception {
+    public static void populate(Frame parent, JFrame loadingFrame, CyGraphSpaceResultPanel resultPanel) throws Exception {
         JSONObject graphJSON = exportNetworkToJSON();
         JSONObject styleJSON = exportStyleToJSON();
         String graphName = graphJSON.getJSONObject("data").getString("name");
@@ -46,7 +47,7 @@ public class PostGraphExportUtils {
 
             Graph graph = Server.INSTANCE.getGraphByName(graphName);
             isGraphPublic = graph.isPublic();
-            UpdateGraphDialog updateDialog = new UpdateGraphDialog(graphName, graphJSON, styleJSON, isGraphPublic, null);
+            UpdateGraphDialog updateDialog = new UpdateGraphDialog(graphName, graphJSON, styleJSON, isGraphPublic, null, resultPanel);
             updateDialog.setLocationRelativeTo(parent);
             updateDialog.setVisible(true);
         }
@@ -59,7 +60,7 @@ public class PostGraphExportUtils {
                 }
             });
 
-            PostGraphDialog postDialog = new PostGraphDialog(graphName, graphJSON, styleJSON, isGraphPublic, null);
+            PostGraphDialog postDialog = new PostGraphDialog(graphName, graphJSON, styleJSON, isGraphPublic, null, resultPanel);
             postDialog.setLocationRelativeTo(parent);
             postDialog.setVisible(true);
         }
